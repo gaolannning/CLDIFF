@@ -1,7 +1,8 @@
 ## This is readme about CLDiff
 
-### TODOs
+### TODO
 
+* C++ diff (ongoing)
 * Documentation of CLDiff
 
 ### How to start
