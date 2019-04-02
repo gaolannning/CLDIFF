@@ -12,6 +12,7 @@ import edu.fdu.se.base.miningchangeentity.ChangeEntityPreprocess;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.AddOrRemoveFileProcessing;
+import edu.fdu.se.base.preprocessingfile.FilePairPreDiffC;
 import edu.fdu.se.base.preprocessingfile.data.FileOutputLog;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.webapi.GenerateChangeEntityJson;
@@ -23,7 +24,7 @@ import org.json.JSONArray;
  * Created by huangkaifeng on 2018/2/27.
  *
  */
-public class CLDiffCore {
+public class CLDiffCoreC {
 
     public ChangeEntityData changeEntityData;
     public FileOutputLog mFileOutputLog;
@@ -32,7 +33,7 @@ public class CLDiffCore {
         int index = filePrev.lastIndexOf('/');
         String fileName = filePrev.substring(index+1,filePrev.length());
         Global.fileName = fileName;
-        FilePairPreDiff preDiff = new FilePairPreDiff();
+        FilePairPreDiffC preDiff = new FilePairPreDiffC();
         preDiff.initFilePath(filePrev,fileCurr);
         int result = preDiff.compareTwoFile();
         if(result ==-1){
@@ -67,7 +68,7 @@ public class CLDiffCore {
     public void dooDiffFile(String fileName, byte[] filePrevContent, byte[] fileCurrContent, String output) {
         long start = System.nanoTime();
         // 1.pre
-        FilePairPreDiff preDiff = new FilePairPreDiff();
+        FilePairPreDiffC preDiff = new FilePairPreDiffC();
         preDiff.initFileContent(filePrevContent,fileCurrContent);
         int result = preDiff.compareTwoFile();
         long end = System.nanoTime();
@@ -100,7 +101,7 @@ public class CLDiffCore {
     }
 
 
-    private void runDiff(FilePairPreDiff preDiff,String fileName){
+    private void runDiff(FilePairPreDiffC preDiff,String fileName){
         long start = System.nanoTime();
         PreprocessedData preData = preDiff.getPreprocessedData();
         JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(preData.getSrcCu(),preData.getDstCu());

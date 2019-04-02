@@ -26,7 +26,7 @@ import java.util.*;
 public class CLDiffAPI {
 
     private Map<String, ChangeEntityData> fileChangeEntityData = new HashMap<>();
-    public CLDiffCore clDiffCore;
+    public CLDiffCoreC clDiffCore;
     private List<FilePairData> filePairDatas;
 
     /**
@@ -37,7 +37,7 @@ public class CLDiffAPI {
     public CLDiffAPI(String outputDir, Meta meta) {
 //        Global.outputFilePathList = new ArrayList<>();
         filePairDatas = new ArrayList<>();
-        clDiffCore = new CLDiffCore();
+        clDiffCore = new CLDiffCoreC();
         clDiffCore.mFileOutputLog = new FileOutputLog(outputDir, meta.getProject_name());
         clDiffCore.mFileOutputLog.setCommitId(meta.getCommit_hash(), meta.getParents());
         initDataFromJson(meta);
@@ -94,6 +94,7 @@ public class CLDiffAPI {
                 this.clDiffCore.dooAddFile(fp.getFileName(), fp.getCurr(), absolutePath);
             } else if (fp.getCurr() == null) {
                 this.clDiffCore.dooRemoveFile(fp.getFileName(), fp.getPrev(), absolutePath);
+
             } else {
                 this.clDiffCore.dooDiffFile(fp.getFileName(), fp.getPrev(), fp.getCurr(), absolutePath);
             }

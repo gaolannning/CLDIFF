@@ -25,10 +25,10 @@ import edu.fdu.se.javaparser.JDTParserFactory;
  *
  * prefx 为 method field等所属的class，如果是内部类A, 那么prfix写到X.X.X.A.为止
  */
-public class FilePairPreDiff {
+public class FilePairPreDiffC {
 
 
-    public FilePairPreDiff() {
+    public FilePairPreDiffC() {
         preprocessedData = new PreprocessedData();
         preprocessedTempData = new PreprocessedTempData();
         queue = new LinkedList<>();
