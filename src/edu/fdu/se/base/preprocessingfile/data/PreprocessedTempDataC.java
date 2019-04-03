@@ -1,17 +1,21 @@
 package edu.fdu.se.base.preprocessingfile.data;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTComment;
+import org.eclipse.cdt.core.dom.ast.IASTFileLocation;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTUsingDirective;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Created by huangkaifeng on 2018/1/18.
@@ -53,8 +57,8 @@ public class PreprocessedTempDataC {
     /**
      * list of comments to be removed
      */
-    public List<ASTNode> srcRemovalNodes;
-    public List<ASTNode> dstRemovalNodes;
+    public List<IASTNode> srcRemovalNodes;
+    public List<IASTNode> dstRemovalNodes;
 
 
     /**
@@ -73,7 +77,7 @@ public class PreprocessedTempDataC {
     }
 
 
-    public void addToSrcRemoveList(ASTNode bd) {
+    public void addToSrcRemoveList(IASTNode bd) {
         this.srcRemovalNodes.add(bd);
     }
 
@@ -85,8 +89,8 @@ public class PreprocessedTempDataC {
         }
     }
 
-    public void removeSrcRemovalList(CompilationUnit cu, List<Integer> lineList) {
-        for (ASTNode item : this.srcRemovalNodes) {
+    public void removeSrcRemovalList(IASTTranslationUnit cu, List<Integer> lineList) {
+        for (IASTNode item : this.srcRemovalNodes) {
 //            if(item instanceof MethodDeclaration){
 //                MethodDeclaration md = (MethodDeclaration) item;
 //                if(md.getName().toString().startsWith("create")){
@@ -97,32 +101,32 @@ public class PreprocessedTempDataC {
 
 //        	System.out.println(item.toString());
 //            System.out.println(cu.getLineNumber(item.getStartPosition()) +"  "+cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
-            setLinesFlag(lineList,cu.getLineNumber(item.getStartPosition()),
-                    cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
+            //如果不是IASTFileLocation则终止程序
+            assert(item.getNodeLocations()[0] instanceof IASTFileLocation);
+            setLinesFlag(lineList, ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber(),
+                        ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber());
+            ASTRewrite rewriter = ASTRewrite.create(cu);
+            rewriter.remove(item,null);
+//            item.setParent(null);
 
-            item.delete();
+
         }
-        this.srcRemovalNodes.clear();
+        //this.srcRemovalNodes.clear();
     }
 
-    public void addToDstRemoveList(ASTNode bd) {
+    public void addToDstRemoveList(IASTNode bd) {
         dstRemovalNodes.add(bd);
     }
 
-    public void removeDstRemovalList(CompilationUnit cu, List<Integer> lineList) {
-        for (ASTNode item : this.dstRemovalNodes) {
-            if(item instanceof BodyDeclaration){
-                BodyDeclaration bd = (BodyDeclaration) item;
-                if(bd.getJavadoc()!=null){
-                    setLinesFlag(lineList,cu.getLineNumber(bd.getJavadoc().getStartPosition()),
-                            cu.getLineNumber(bd.getJavadoc().getStartPosition()+bd.getJavadoc().getLength()-1));
-                }
-            }
-            setLinesFlag(lineList,cu.getLineNumber(item.getStartPosition()),
-                    cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
-            item.delete();
+    public void removeDstRemovalList(IASTTranslationUnit cu, List<Integer> lineList) {
+        for (IASTNode item : this.dstRemovalNodes) {
+            assert(item.getNodeLocations()[0] instanceof IASTFileLocation);
+            setLinesFlag(lineList, ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber(),
+                    ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber());
+            ASTRewrite rewriter = ASTRewrite.create(cu);
+//            rewriter.remove(item,null);
         }
-        dstRemovalNodes.clear();
+//        dstRemovalNodes.clear();
     }
 
     public void initBodySrcNodeMap(BodyDeclarationPair bodyDeclarationPair){
@@ -142,36 +146,41 @@ public class PreprocessedTempDataC {
     }
 
 
-    public void removeAllSrcComments(CompilationUnit cu,List<Integer> lineList) {
-        PackageDeclaration packageDeclaration = cu.getPackage();
-        if (packageDeclaration != null)
-            addToSrcRemoveList(packageDeclaration);
-        List<ASTNode> commentList = cu.getCommentList();
-        for (int i = commentList.size() - 1; i >= 0; i--) {
-            if(commentList.get(i) instanceof Javadoc){
-                addToSrcRemoveList(commentList.get(i));
+    public void removeAllSrcComments(IASTTranslationUnit cu, List<Integer> lineList) {
+//        PackageDeclaration packageDeclaration = cu.getPackage();  C++没有包声明
+//        if (packageDeclaration != null)
+//            addToSrcRemoveList(packageDeclaration);
+        for(IASTNode item:cu.getChildren()){
+            if(item instanceof CPPASTUsingDirective){
+                addToSrcRemoveList(item);
             }
         }
-        List<ImportDeclaration> imprortss = cu.imports();
-        for (int i = imprortss.size() - 1; i >= 0; i--) {
-            addToSrcRemoveList(imprortss.get(i));
+
+        List<IASTNode> commentList = Arrays.asList(cu.getComments());
+        for (int i = commentList.size() - 1; i >= 0; i--) {
+                addToSrcRemoveList(commentList.get(i));
+        }
+        List<IASTNode> includes = Arrays.asList(cu.getIncludeDirectives());
+        for (int i = includes.size() - 1; i >= 0; i--) {
+            addToSrcRemoveList(includes.get(i));
         }
         removeSrcRemovalList(cu,lineList);
     }
 
-    public void removeAllDstComments(CompilationUnit cu,List<Integer> lineList) {
-        List<ASTNode> commentList = cu.getCommentList();
-        PackageDeclaration packageDeclaration = cu.getPackage();
-        if (packageDeclaration != null)
-            addToDstRemoveList(packageDeclaration);
-        List<ImportDeclaration> imprortss = cu.imports();
-        for (int i = commentList.size() - 1; i >= 0; i--) {
-            if(commentList.get(i) instanceof Javadoc) {
-                addToDstRemoveList(commentList.get(i));
+    public void removeAllDstComments(IASTTranslationUnit cu,List<Integer> lineList) {
+        for(IASTNode item:cu.getChildren()){
+            if(item instanceof CPPASTUsingDirective){
+                addToDstRemoveList(item);
             }
         }
-        for (int i = imprortss.size() - 1; i >= 0; i--) {
-            addToDstRemoveList(imprortss.get(i));
+
+        List<IASTNode> commentList = Arrays.asList(cu.getComments());
+        for (int i = commentList.size() - 1; i >= 0; i--) {
+            addToDstRemoveList(commentList.get(i));
+        }
+        List<IASTNode> includes = Arrays.asList(cu.getIncludeDirectives());
+        for (int i = includes.size() - 1; i >= 0; i--) {
+            addToDstRemoveList(includes.get(i));
         }
         removeDstRemovalList(cu,lineList);
     }

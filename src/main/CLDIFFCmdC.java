@@ -93,9 +93,9 @@ public class CLDIFFCmdC {
 
     static IASTTranslationUnit getTranslationUnit(File source) throws Exception{
         FileContent reader = FileContent.create(
-                source.getAbsolutePath(),
+                "",
                 getContentFile(source).toCharArray());
-
+        CodeReader cd = new CodeReader(getContentFile(source).toCharArray());
         return GPPLanguage.getDefault().getASTTranslationUnit(
                 reader,
                 new ScannerInfo(),

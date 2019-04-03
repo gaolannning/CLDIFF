@@ -4,7 +4,10 @@ package edu.fdu.se.base.preprocessingfile.data;
 import edu.fdu.se.base.links.LayeredChangeEntityContainer;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
+import edu.fdu.se.javaparser.CDTParserFactory;
 import edu.fdu.se.javaparser.JDTParserFactory;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
@@ -24,8 +27,12 @@ public class PreprocessedDataC {
     public List<Integer> dstLines;
     public List<Integer> srcLines;
 
+
+    //编译单元
     public CompilationUnit dstCu;
     public CompilationUnit srcCu;
+    public IASTTranslationUnit dstTu;
+    public IASTTranslationUnit srcTu;
 
     private List<String> interfacesAndFathers;
 
@@ -88,28 +95,28 @@ public class PreprocessedDataC {
         }
     }
 
-    public void loadTwoCompilationUnits(CompilationUnit src,CompilationUnit dst,String srcPath,String dstPath){
-        this.srcCu = src;
+    public void loadTwoTranslationUnits(IASTTranslationUnit src,IASTTranslationUnit dst,String srcPath,String dstPath){
+        this.srcTu = src;
         this.srcLineList = new ArrayList<>();
-        this.fullStringSrc = JDTParserFactory.getLinesOfFile(srcPath,this.srcLineList);
-        this.srcLines = JDTParserFactory.getLinesList(srcLineList.size());
+        this.fullStringSrc = CDTParserFactory.getLinesOfFile(srcPath,this.srcLineList);
+        this.srcLines = CDTParserFactory.getLinesList(srcLineList.size());
 
-        this.dstCu = dst;
+        this.dstTu = dst;
         this.dstLineList = new ArrayList<>();
         this.fullStringDst = JDTParserFactory.getLinesOfFile(dstPath,this.dstLineList);
         this.dstLines = JDTParserFactory.getLinesList(dstLineList.size());
     }
 
-    public void loadTwoCompilationUnits(CompilationUnit src,CompilationUnit dst,byte[] srcContent,byte[] dstContent){
-        this.srcCu = src;
+    public void loadTwoTranslationUnits(IASTTranslationUnit src,IASTTranslationUnit dst,byte[] srcContent,byte[] dstContent){
+        this.srcTu = src;
         this.srcLineList = new ArrayList<>();
-        this.fullStringSrc = JDTParserFactory.getLinesOfFile(srcContent,this.srcLineList);
-        this.srcLines = JDTParserFactory.getLinesList(srcLineList.size());
+        this.fullStringSrc = CDTParserFactory.getLinesOfFile(srcContent,this.srcLineList);
+        this.srcLines = CDTParserFactory.getLinesList(srcLineList.size());
 
-        this.dstCu = dst;
+        this.dstTu = dst;
         this.dstLineList = new ArrayList<>();
-        this.fullStringDst = JDTParserFactory.getLinesOfFile(dstContent,this.dstLineList);
-        this.dstLines = JDTParserFactory.getLinesList(dstLineList.size());
+        this.fullStringDst = CDTParserFactory.getLinesOfFile(dstContent,this.dstLineList);
+        this.dstLines = CDTParserFactory.getLinesList(dstLineList.size());
     }
 
 

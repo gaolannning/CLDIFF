@@ -1,16 +1,14 @@
 package edu.fdu.se.base.preprocessingfile;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Queue;
 
+import edu.fdu.se.base.preprocessingfile.data.*;
+import edu.fdu.se.javaparser.CDTParserFactory;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.jdt.core.dom.*;
 
-import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
-import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
-import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
 import edu.fdu.se.javaparser.JDTParserFactory;
 
 /**
@@ -29,13 +27,13 @@ public class FilePairPreDiffC {
 
 
     public FilePairPreDiffC() {
-        preprocessedData = new PreprocessedData();
-        preprocessedTempData = new PreprocessedTempData();
+        preprocessedData = new PreprocessedDataC();
+        preprocessedTempData = new PreprocessedTempDataC();
         queue = new LinkedList<>();
     }
 
-    private PreprocessedData preprocessedData;
-    private PreprocessedTempData preprocessedTempData;
+    private PreprocessedDataC preprocessedData;
+    private PreprocessedTempDataC preprocessedTempData;
 
     class SrcDstPair{
         TypeDeclaration tpSrc;
@@ -44,26 +42,32 @@ public class FilePairPreDiffC {
     private Queue<SrcDstPair> queue;
 
     public void initFilePath(String prevPath,String currPath){
-        preprocessedData.srcCu = JDTParserFactory.getCompilationUnit(prevPath);
-        preprocessedData.dstCu = JDTParserFactory.getCompilationUnit(currPath);
-        preprocessedData.loadTwoCompilationUnits(preprocessedData.srcCu, preprocessedData.dstCu, prevPath, currPath);
+//        preprocessedData.srcCu = JDTParserFactory.getCompilationUnit(prevPath);
+//        preprocessedData.dstCu = JDTParserFactory.getCompilationUnit(currPath);
+        try {
+            preprocessedData.srcTu = CDTParserFactory.getTranslationUnit(prevPath);
+            preprocessedData.dstTu = CDTParserFactory.getTranslationUnit(currPath);
+            preprocessedData.loadTwoTranslationUnits(preprocessedData.srcTu, preprocessedData.dstTu, prevPath, currPath);
+        }catch (Exception e){
+
+        }
     }
     public void initFileContent(byte[] prevContent,byte[] currContent){
         try {
-            preprocessedData.srcCu = JDTParserFactory.getCompilationUnit(prevContent);
-            preprocessedData.dstCu = JDTParserFactory.getCompilationUnit(currContent);
-            preprocessedData.loadTwoCompilationUnits(preprocessedData.srcCu, preprocessedData.dstCu, prevContent, currContent);
+            preprocessedData.srcTu = CDTParserFactory.getTranslationUnit(prevContent);
+            preprocessedData.dstTu = CDTParserFactory.getTranslationUnit(currContent);
+            preprocessedData.loadTwoTranslationUnits(preprocessedData.srcTu, preprocessedData.dstTu, prevContent, currContent);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    private void test(CompilationUnit cu){
-        List<BodyDeclaration> bd = cu.types();
+    private void test(IASTTranslationUnit cu){
+        List<IASTNode> bd = Arrays.asList(cu.getChildren());
     }
     public int compareTwoFile() {
-        CompilationUnit cuSrc = preprocessedData.srcCu;
-        CompilationUnit cuDst = preprocessedData.dstCu;
+        IASTTranslationUnit cuSrc = preprocessedData.srcTu;
+        IASTTranslationUnit cuDst = preprocessedData.dstTu;
         test(cuSrc);
 //        fileOutputLog.writeFileBeforeProcess(preprocessedData);
 //        if ("true".equals(ProjectProperties.getInstance().getValue(PropertyKeys.DEBUG_PREPROCESSING))) {
@@ -72,25 +76,30 @@ public class FilePairPreDiffC {
 //        }
         preprocessedTempData.removeAllSrcComments(cuSrc, preprocessedData.srcLines);
         preprocessedTempData.removeAllDstComments(cuDst, preprocessedData.dstLines);
-        if(cuSrc.types().size() != cuDst.types().size()){
-            return -1;
-        }
-        for(int i = 0;i<cuSrc.types().size();i++){
-            BodyDeclaration bodyDeclarationSrc = (BodyDeclaration) cuSrc.types().get(i);
-            BodyDeclaration bodyDeclarationDst = (BodyDeclaration) cuDst.types().get(i);
-            if ((bodyDeclarationSrc instanceof TypeDeclaration) && (bodyDeclarationDst instanceof TypeDeclaration)) {
-                SrcDstPair srcDstPair = new SrcDstPair();
-                srcDstPair.tpSrc = (TypeDeclaration) bodyDeclarationSrc;
-                srcDstPair.tpDst = (TypeDeclaration) bodyDeclarationDst;
-                this.queue.offer(srcDstPair);
-            }else{
-                return -1;
-            }
-        }
-        while(queue.size()!=0){
-            SrcDstPair tmp = queue.poll();
-            compare(cuSrc,cuDst,tmp.tpSrc,tmp.tpDst);
-        }
+//        if(cuSrc.types().size() != cuDst.types().size()){
+//            return -1;
+//        }
+//        for(int i = 0;i<cuSrc.types().size();i++){
+//            BodyDeclaration bodyDeclarationSrc = (BodyDeclaration) cuSrc.types().get(i);
+//            BodyDeclaration bodyDeclarationDst = (BodyDeclaration) cuDst.types().get(i);
+//            if ((bodyDeclarationSrc instanceof TypeDeclaration) && (bodyDeclarationDst instanceof TypeDeclaration)) {
+//                SrcDstPair srcDstPair = new SrcDstPair();
+//                srcDstPair.tpSrc = (TypeDeclaration) bodyDeclarationSrc;
+//                srcDstPair.tpDst = (TypeDeclaration) bodyDeclarationDst;
+//                this.queue.offer(srcDstPair);
+//            }else{
+//                return -1;
+//            }
+//        }
+//        while(queue.size()!=0){
+//            SrcDstPair tmp = queue.poll();
+//            compare(cuSrc,cuDst,tmp.tpSrc,tmp.tpDst);
+//        }
+        TypeNodesTraversal astTraversal = new TypeNodesTraversal();
+//        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
+//        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
+        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, tdSrc, tdSrc.getName().toString() + ".");
+        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, tdDst, tdDst.getName().toString() + ".");
         return 0;
     }
     public void addSuperClass(TypeDeclaration type,List<String> list){
