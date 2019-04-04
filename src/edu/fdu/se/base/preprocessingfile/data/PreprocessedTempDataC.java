@@ -46,11 +46,11 @@ public class PreprocessedTempDataC {
         dstRemovalNodes = new ArrayList<>();
     }
 
-    public Map<String, List<BodyDeclarationPair>> srcNodeBodyNameMap;
+    public Map<String, List<BodyDeclarationPairC>> srcNodeBodyNameMap;
     /**
      * 0 初始化之后的值  1 遍历到了之后 需要保留的different  2 遍历到了之后 需要删除的same   3 prev中有，curr没有，change：deleted
      */
-    public Map<BodyDeclarationPair,Integer> srcNodeVisitingMap;
+    public Map<BodyDeclarationPairC,Integer> srcNodeVisitingMap;
 
     public Map<BodyDeclarationPair,Integer> srcNodeHashCodeMap;
 
@@ -65,9 +65,9 @@ public class PreprocessedTempDataC {
      * method name
      *
      */
-    public void addToMapBodyName(BodyDeclarationPair bd,String name) {
+    public void addToMapBodyName(BodyDeclarationPairC bd,String name) {
         if (this.srcNodeBodyNameMap.containsKey(name)) {
-            List<BodyDeclarationPair> mList = this.srcNodeBodyNameMap.get(name);
+            List<BodyDeclarationPairC> mList = this.srcNodeBodyNameMap.get(name);
             mList.add(bd);
         } else {
             List<BodyDeclarationPair> mList = new ArrayList<>();
@@ -129,7 +129,7 @@ public class PreprocessedTempDataC {
 //        dstRemovalNodes.clear();
     }
 
-    public void initBodySrcNodeMap(BodyDeclarationPair bodyDeclarationPair){
+    public void initBodySrcNodeMap(BodyDeclarationPairC bodyDeclarationPair){
         this.srcNodeVisitingMap.put(bodyDeclarationPair,BODY_INITIALIZED_VALUE);
     }
 
@@ -137,11 +137,11 @@ public class PreprocessedTempDataC {
      *
      * @param v
      */
-    public void setBodySrcNodeMap(BodyDeclarationPair bdp, int v){
+    public void setBodySrcNodeMap(BodyDeclarationPairC bdp, int v){
         this.srcNodeVisitingMap.put(bdp,v);
     }
 
-    public int getNodeMapValue(BodyDeclarationPair bodyDeclarationPair){
+    public int getNodeMapValue(BodyDeclarationPairC bodyDeclarationPair){
         return this.srcNodeVisitingMap.get(bodyDeclarationPair);
     }
 

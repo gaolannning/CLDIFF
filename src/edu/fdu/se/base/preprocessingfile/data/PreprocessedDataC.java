@@ -6,6 +6,7 @@ import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.javaparser.CDTParserFactory;
 import edu.fdu.se.javaparser.JDTParserFactory;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.model.ITranslationUnit;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -50,11 +51,11 @@ public class PreprocessedDataC {
     /**
      * curr 删除的added的body
      */
-    private List<BodyDeclarationPair> mBodiesAdded;
+    private List<BodyDeclarationPairC> mBodiesAdded;
     /**
      * prev 删除的removed body
      */
-    private List<BodyDeclarationPair> mBodiesDeleted;
+    private List<BodyDeclarationPairC> mBodiesDeleted;
 
     private List<ChangeEntity> preprocessChangeEntity;
 
@@ -67,7 +68,7 @@ public class PreprocessedDataC {
     }
 
 
-    private Map<String,List<BodyDeclaration>> classOrInterfaceOrEnum;
+    private Map<String,List<IASTNode>> classOrInterfaceOrEnum;
 
     public PreprocessedDataC(){
         mBodiesAdded = new ArrayList<>();
@@ -84,12 +85,12 @@ public class PreprocessedDataC {
     public LayeredChangeEntityContainer entityContainer;
 
 
-    public void addTypeDeclaration(String prefix, BodyDeclaration a, String name){
+    public void addTypeDeclaration(String prefix, IASTNode a, String name){
         String key = prefix + "." + name;
         if(this.classOrInterfaceOrEnum.containsKey(key)){
             classOrInterfaceOrEnum.get(key).add(a);
         }else{
-            List<BodyDeclaration> mList = new ArrayList<>();
+            List<IASTNode> mList = new ArrayList<>();
             mList.add(a);
             this.classOrInterfaceOrEnum.put(key,mList);
         }
@@ -121,33 +122,33 @@ public class PreprocessedDataC {
 
 
 
-    public void addBodiesAdded(BodyDeclaration bodyDeclaration,String classPrefix){
-        this.mBodiesAdded.add(new BodyDeclarationPair(bodyDeclaration,classPrefix));
+    public void addBodiesAdded(IASTNode bodyDeclaration,String classPrefix){
+        this.mBodiesAdded.add(new BodyDeclarationPairC(bodyDeclaration,classPrefix));
     }
 
 
-    public void addBodiesDeleted(BodyDeclarationPair bodyDeclarationPair){
+    public void addBodiesDeleted(BodyDeclarationPairC bodyDeclarationPair){
         this.mBodiesDeleted.add(bodyDeclarationPair);
     }
 
 
     public void printAddedRemovedBodies(){
-        for(BodyDeclarationPair item:this.mBodiesAdded){
+        for(BodyDeclarationPairC item:this.mBodiesAdded){
 //            System.out.println(item.getBodyDeclaration().toString()+"  "+item.getLocationClassString());
             System.out.println(item.getBodyDeclaration().toString());
         }
         System.out.print("-----------------------------\n");
-        for(BodyDeclarationPair item:this.mBodiesDeleted){
+        for(BodyDeclarationPairC item:this.mBodiesDeleted){
 //            System.out.println(item.getBodyDeclaration().toString()+"  "+item.getLocationClassString());
             System.out.println(item.getBodyDeclaration().toString());
         }
     }
 
-    public List<BodyDeclarationPair> getmBodiesAdded() {
+    public List<BodyDeclarationPairC> getmBodiesAdded() {
         return mBodiesAdded;
     }
 
-    public List<BodyDeclarationPair> getmBodiesDeleted() {
+    public List<BodyDeclarationPairC> getmBodiesDeleted() {
         return mBodiesDeleted;
     }
 

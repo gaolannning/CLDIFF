@@ -95,11 +95,11 @@ public class FilePairPreDiffC {
 //            SrcDstPair tmp = queue.poll();
 //            compare(cuSrc,cuDst,tmp.tpSrc,tmp.tpDst);
 //        }
-        TypeNodesTraversal astTraversal = new TypeNodesTraversal();
+        TypeNodesTraversalC astTraversal = new TypeNodesTraversalC();
 //        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
 //        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
-        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, tdSrc, tdSrc.getName().toString() + ".");
-        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, tdDst, tdDst.getName().toString() + ".");
+        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, (IASTNode)cuSrc, "Root" + ".");
+        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, (IASTNode)cuDst, "Root" + ".");
         return 0;
     }
     public void addSuperClass(TypeDeclaration type,List<String> list){

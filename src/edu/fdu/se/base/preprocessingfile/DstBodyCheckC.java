@@ -3,12 +3,12 @@ package edu.fdu.se.base.preprocessingfile;
 import edu.fdu.se.base.links.MyRange;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntity;
-import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
-import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
-import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
+import edu.fdu.se.base.preprocessingfile.data.*;
+import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,10 +17,27 @@ import java.util.List;
  */
 public class DstBodyCheckC {
 
-    public BodyDeclarationPair getExactBodyDeclarationPair(List<BodyDeclarationPair> bodyDeclarationPairs,Class clazz){
-        for(BodyDeclarationPair bodyDeclarationPair:bodyDeclarationPairs){
-            if(bodyDeclarationPair.getBodyDeclaration().getClass().equals(clazz)){
-                return bodyDeclarationPair;
+//    public BodyDeclarationPair getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Class clazz){
+//        for(BodyDeclarationPair bodyDeclarationPair:bodyDeclarationPairs){
+//            if(bodyDeclarationPair.getBodyDeclaration().getClass().equals(clazz)){
+//                return bodyDeclarationPair;
+//            }
+//        }
+//        return null;
+//    }
+
+    public BodyDeclarationPairC getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Class clazz1,Class[] clazz2){
+        for(BodyDeclarationPairC bodyDeclarationPair:bodyDeclarationPairs){
+            if(bodyDeclarationPair.getBodyDeclaration().getClass().equals(clazz1)){
+                if(clazz2 == null)
+                    return bodyDeclarationPair;
+            }
+            if(bodyDeclarationPair instanceof IASTSimpleDeclaration){
+                for(Class c:clazz2){
+                    if(((IASTSimpleDeclaration) bodyDeclarationPair).getDeclSpecifier().equals(c)){
+                        return bodyDeclarationPair;
+                    }
+                }
             }
         }
         return null;
@@ -29,20 +46,20 @@ public class DstBodyCheckC {
     /**
      * visited
      */
-    public int checkFieldDeclarationInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, FieldDeclaration fd, String prefix) {
+    public int checkFieldDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode fd, String prefix) {
 
-        List<VariableDeclarationFragment> vdList = fd.fragments();
-        for (VariableDeclarationFragment vd : vdList) {
+        List<IASTDeclarator> vdList = Arrays.asList(((IASTSimpleDeclaration) fd).getDeclarators());
+        for (IASTDeclarator vd : vdList) {
             String key = prefix + vd.getName().toString();
             compareResult.currFieldNames.add(vd.getName().toString());
             compareResult.prevCurrFieldNames.add(vd.getName().toString());
             boolean newFieldFlag = true;
             if (compareCache.srcNodeBodyNameMap.containsKey(key)) {
-                List<BodyDeclarationPair> srcBodyPairs = compareCache.srcNodeBodyNameMap.get(key);
-                BodyDeclarationPair srcBody = getExactBodyDeclarationPair(srcBodyPairs,FieldDeclaration.class);
+                List<BodyDeclarationPairC> srcBodyPairs = compareCache.srcNodeBodyNameMap.get(key);
+                BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcBodyPairs,IASTSimpleDeclaration.class,new Class[]{IASTNamedTypeSpecifier.class,IASTSimpleDeclSpecifier.class});
                 if(srcBody != null){
                     newFieldFlag = false;
-                    if (srcBody.getBodyDeclaration().toString().hashCode() == fd.toString().hashCode()
+                    if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == fd.toString().hashCode()
                             && srcBody.getLocationClassString().hashCode() == prefix.hashCode()) {
                         compareCache.addToDstRemoveList(fd);
                         compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
@@ -73,19 +90,19 @@ public class DstBodyCheckC {
      * @param prefixClassName classname到cod的name前一个为止
      * @return 1 2
      */
-    public int checkTypeDeclarationInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, TypeDeclaration cod, String prefixClassName) {
+    public int checkTypeDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode cod, String prefixClassName) {
 
         if (compareCache.srcNodeBodyNameMap.containsKey(prefixClassName)) {
-            List<BodyDeclarationPair> srcNodeList = compareCache.srcNodeBodyNameMap.get(prefixClassName);
-            BodyDeclarationPair srcBody = getExactBodyDeclarationPair(srcNodeList,TypeDeclaration.class);
+            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(prefixClassName);
+            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList, IASTSimpleDeclaration.class, new Class[]{IASTCompositeTypeSpecifier.class});
             if(srcBody != null) {
-                if (srcBody.getBodyDeclaration().toString().hashCode() == cod.toString().hashCode()
+                if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode()
                         && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
 //                System.out.println(srcBody.getBodyDeclaration().toString());
 //                System.out.println(cod.toString());
                     compareCache.addToDstRemoveList(cod);
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
-                    TypeNodesTraversal.traverseTypeDeclarationSetVisited(compareCache, (TypeDeclaration) srcBody.getBodyDeclaration(), prefixClassName);
+                    TypeNodesTraversalC.traverseTypeDeclarationSetVisited(compareCache, (IASTNode) srcBody.getBodyDeclaration(), prefixClassName);
                     return 1;
                 } else {
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_DIFFERENT_RETAIN);
@@ -101,13 +118,14 @@ public class DstBodyCheckC {
         return 3;
     }
 
-    public int checkEnumDeclarationInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, EnumDeclaration ed, String prefixClassName){
-        String key = prefixClassName + ed.getName().toString();
+    public int checkEnumDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode ed, String prefixClassName){
+        String name= ((IASTEnumerationSpecifier)((IASTSimpleDeclaration)ed).getDeclSpecifier()).getName().toString();
+        String key = prefixClassName + name;
         if(compareCache.srcNodeBodyNameMap.containsKey(key)){
-            List<BodyDeclarationPair> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
-            BodyDeclarationPair srcBody = getExactBodyDeclarationPair(srcNodeList,EnumDeclaration.class);
+            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
+            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,IASTSimpleDeclaration.class,new Class[]{IASTEnumerationSpecifier.class});
             if(srcBody != null) {
-                if (srcBody.getBodyDeclaration().toString().hashCode() == ed.toString().hashCode()
+                if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == ed.toString().hashCode()
                         && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
                     compareCache.addToDstRemoveList(ed);
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
@@ -115,7 +133,7 @@ public class DstBodyCheckC {
                 } else {
                     MyRange myRange1,myRange2;
                     int s1, e1,s2,e2;
-                    s1 = compareResult.getSrcCu().getLineNumber(srcBody.getBodyDeclaration().getStartPosition());
+                    s1 = compareResult.getSrcCu().getLineNumber(srcBody.getBodyDeclaration().getFileLocation());
                     e1 = compareResult.getSrcCu().getLineNumber(srcBody.getBodyDeclaration().getStartPosition() + srcBody.getBodyDeclaration().getLength() - 1);
                     s2 = compareResult.getDstCu().getLineNumber(ed.getStartPosition());
                     e2 = compareResult.getDstCu().getLineNumber(ed.getStartPosition() + ed.getLength() - 1);
@@ -145,35 +163,39 @@ public class DstBodyCheckC {
     /**
      * curr的节点去prev的map里check
      */
-    public int checkMethodDeclarationOrInitializerInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, BodyDeclaration bd, String prefixClassName) {
+    public int checkMethodDeclarationOrInitializerInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode bd, String prefixClassName) {
         String methodNameKey = null;
-        if (bd instanceof Initializer) {
-            Initializer idd = (Initializer) bd;
-            methodNameKey = prefixClassName;
-            if (idd.modifiers().contains("static")) {
-                methodNameKey += "static";
-            } else {
-                methodNameKey += "{";
-            }
-        } else if (bd instanceof MethodDeclaration) {
-            MethodDeclaration md = (MethodDeclaration) bd;
-            methodNameKey = prefixClassName + md.getName().toString();
-            if(md.getName().toString().equals("setPoolSize")){
-                System.out.print("a");
-            }
+//        if (bd instanceof Initializer) {
+//            Initializer idd = (Initializer) bd;
+//            methodNameKey = prefixClassName;
+//            if (idd.modifiers().contains("static")) {
+//                methodNameKey += "static";
+//            } else {
+//                methodNameKey += "{";
+//            }
+//        } else if (bd instanceof MethodDeclaration) {
+        if (bd instanceof IASTFunctionDefinition) {
+            IASTFunctionDefinition md = (IASTFunctionDefinition) bd;
+            String name = md.getDeclarator().getName().toString();
+            methodNameKey = prefixClassName + name;
+//            if(md.getName().toString().equals("setPoolSize")){
+//                System.out.print("a");
+//            }
 
-        } else if (bd instanceof EnumDeclaration) {
-            EnumDeclaration ed = (EnumDeclaration) bd;
-            methodNameKey = prefixClassName + ed.getName().toString();
-        } else {
+        }
+//        else if (bd instanceof EnumDeclaration) {
+//            EnumDeclaration ed = (EnumDeclaration) bd;
+//            methodNameKey = prefixClassName + ed.getName().toString();
+//        }
+        else {
             System.err.println("[ERR] ---------------------------");
         }
 
         if (compareCache.srcNodeBodyNameMap.containsKey(methodNameKey)) {
-            List<BodyDeclarationPair> srcNodeList = compareCache.srcNodeBodyNameMap.get(methodNameKey);
+            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(methodNameKey);
             boolean findSame = false;
-            for (BodyDeclarationPair srcBody : srcNodeList) {
-                if (srcBody.hashCode() == (String.valueOf(bd.toString().hashCode()) + String.valueOf(prefixClassName.hashCode())).hashCode()) {
+            for (BodyDeclarationPairC srcBody : srcNodeList) {
+                if (srcBody.hashCode() == (String.valueOf(bd.getRawSignature().toString().hashCode()) + String.valueOf(prefixClassName.hashCode())).hashCode()) {
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
                     compareCache.addToDstRemoveList(bd);
                     findSame = true;
@@ -183,7 +205,7 @@ public class DstBodyCheckC {
             if (findSame) {
                 return 1;
             } else {
-                for (BodyDeclarationPair srcBody : srcNodeList) {
+                for (BodyDeclarationPairC srcBody : srcNodeList) {
                     if (PreprocessedTempData.BODY_SAME_REMOVE != compareCache.getNodeMapValue(srcBody)) {
                         compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_DIFFERENT_RETAIN);
                     }
