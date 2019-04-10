@@ -2,6 +2,8 @@ package edu.fdu.se.base.preprocessingfile;
 
 import edu.fdu.se.base.preprocessingfile.data.*;
 import org.eclipse.cdt.core.dom.ast.*;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTUsingDirective;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTVisibilityLabel;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
 import org.eclipse.jdt.core.dom.*;
 
@@ -25,36 +27,49 @@ public class TypeNodesTraversalC {
      * @param prefixClassName class 节点为止的prefix ， root节点的class prefix 为classname
      */
     public void traverseDstTypeDeclarationCompareSrc(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode cod, String prefixClassName) {
-        compareResult.addTypeDeclaration(prefixClassName, cod, prefixClassName);
+        String curName = null;
+        List<IASTNode> nodeList = null;
+        if(cod instanceof  IASTTranslationUnit) {
+            nodeList = Arrays.asList(((IASTTranslationUnit)cod).getChildren());
+            curName = "Root.";
+        } else{
+            nodeList = Arrays.asList(((IASTCompositeTypeSpecifier)((IASTSimpleDeclaration) cod).getDeclSpecifier()).getMembers());
+            IASTSimpleDeclaration sd = (IASTSimpleDeclaration) cod;
+            int type = ((IASTCompositeTypeSpecifier)(sd.getDeclSpecifier())).getKey();
+            curName = prefixClassName+(type==3?"class:":"struct:")+((IASTCompositeTypeSpecifier)sd.getDeclSpecifier()).getName().toString()+".";
+        }
+        compareResult.addTypeDeclaration(curName, cod, curName);
         int status = dstBodyCheck.checkTypeDeclarationInDst(compareResult, compareCache, cod, prefixClassName);
         if(status == 1|| status==3){
             return;
-        }
-        List<IASTNode> nodeList = null;
-        if(cod instanceof IASTTranslationUnit){             //最外部
-            nodeList = Arrays.asList(((IASTTranslationUnit)cod).getChildren());
-        }
-        else if(cod instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration) cod).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier){      //class,struct
-            nodeList = Arrays.asList(((IASTCompositeTypeSpecifier)((IASTSimpleDeclaration) cod).getDeclSpecifier()).getMembers());
         }
         assert(nodeList!=null);
         for (int i = nodeList.size() - 1; i >= 0; i--) {
             IASTNode node = nodeList.get(i);
             if (node instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier) {
                 IASTSimpleDeclaration cod2 = ( IASTSimpleDeclaration) node;
-                String name = ((IASTCompositeTypeSpecifier)((IASTSimpleDeclaration)node).getDeclSpecifier()).getName().toString();
-                traverseDstTypeDeclarationCompareSrc(compareResult, compareCache, cod2, prefixClassName + name + ".");
+                IASTCompositeTypeSpecifier specifier = (IASTCompositeTypeSpecifier)((IASTSimpleDeclaration)node).getDeclSpecifier();
+                String name = (specifier.getKey()==3?"class:":"struct:")+specifier.getName().toString();
+                traverseDstTypeDeclarationCompareSrc(compareResult, compareCache, cod2, curName);
             } else if ( node instanceof IASTFunctionDefinition) {
-                dstBodyCheck.checkMethodDeclarationOrInitializerInDst(compareResult, compareCache, node, prefixClassName);
-            } else if (node instanceof FieldDeclaration) {
-                FieldDeclaration fd = (FieldDeclaration) node;
-                dstBodyCheck.checkFieldDeclarationInDst(compareResult, compareCache, fd, prefixClassName);
-            } else if (node instanceof AnnotationTypeDeclaration) {
-                compareCache.addToDstRemoveList(node);
-            } else if (node instanceof EnumDeclaration) {
-                EnumDeclaration ed = (EnumDeclaration) node;
-                dstBodyCheck.checkEnumDeclarationInDst(compareResult,compareCache,ed,prefixClassName);
-            } else {
+                dstBodyCheck.checkMethodDeclarationOrInitializerInDst(compareResult, compareCache, node, curName);
+            } else if (node instanceof IASTSimpleDeclaration) {
+                IASTSimpleDeclaration node1 = (IASTSimpleDeclaration) node;
+                if (node1.getDeclSpecifier() instanceof IASTEnumerationSpecifier) {
+                    dstBodyCheck.checkEnumDeclarationInDst(compareResult, compareCache, node, curName);
+                } else if(node1.getDeclSpecifier() instanceof IASTNamedTypeSpecifier || node1.getDeclSpecifier() instanceof IASTSimpleDeclSpecifier){
+                    dstBodyCheck.checkFieldDeclarationInDst(compareResult, compareCache, node, curName);
+                }
+                else{
+                        System.err.println("[ERR]Error:" + node.getClass().getSimpleName());
+                }
+            } else if(node instanceof ICPPASTUsingDirective) {
+                //To Do
+            }
+            else if(node instanceof  ICPPASTVisibilityLabel){
+                // To Do
+            }
+             else {
                 System.err.println("[ERR]Error:" + node.getClass().getSimpleName());
             }
         }
@@ -98,10 +113,20 @@ public class TypeNodesTraversalC {
 
 
     public void traverseSrcTypeDeclarationInit(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode typeDeclaration, String prefixClassName) {
-        List<IASTNode> nodeList = Arrays.asList(typeDeclaration.getChildren());
-        compareResult.addTypeDeclaration(prefixClassName, typeDeclaration, prefixClassName);
+        List<IASTNode> nodeList = null;
+        String curName = null;
+        if(typeDeclaration instanceof  IASTTranslationUnit) {
+            nodeList = Arrays.asList(typeDeclaration.getChildren());
+            curName = "Root.";
+        } else{
+            nodeList = Arrays.asList(((IASTCompositeTypeSpecifier)((IASTSimpleDeclaration)typeDeclaration).getDeclSpecifier()).getMembers());
+            IASTSimpleDeclaration sd = (IASTSimpleDeclaration) typeDeclaration;
+            int type = ((IASTCompositeTypeSpecifier)(sd.getDeclSpecifier())).getKey();
+            curName = prefixClassName+(type==3?"class:":"struct:")+((IASTCompositeTypeSpecifier)sd.getDeclSpecifier()).getName().toString()+".";
+        }
+        compareResult.addTypeDeclaration(curName, typeDeclaration, curName);
         BodyDeclarationPairC typeBodyDeclarationPair = new BodyDeclarationPairC(typeDeclaration, prefixClassName);
-        compareCache.addToMapBodyName(typeBodyDeclarationPair, prefixClassName);
+        compareCache.addToMapBodyName(typeBodyDeclarationPair, curName);
         compareCache.initBodySrcNodeMap(typeBodyDeclarationPair);
         for (int i = nodeList.size() - 1; i >= 0; i--) {
             IASTNode bodyDeclaration = nodeList.get(i);
@@ -110,34 +135,49 @@ public class TypeNodesTraversalC {
                 IASTSimpleDeclaration cod2 = (IASTSimpleDeclaration) bodyDeclaration;
                 String name = ((IASTCompositeTypeSpecifier)(cod2.getDeclSpecifier())).getName().toString();
                 int type = ((IASTCompositeTypeSpecifier)(cod2.getDeclSpecifier())).getKey();    //key = 3表示class,key = 1表示struct
-                String subCodName = prefixClassName + (type==3?"class:":"struct:") + name + ".";
+                String subCodName = curName;
                 traverseSrcTypeDeclarationInit(compareResult, compareCache, cod2, subCodName);
                 continue;
             }
-            BodyDeclarationPairC bdp = new BodyDeclarationPairC(bodyDeclaration, prefixClassName);
-            compareCache.initBodySrcNodeMap(bdp);
+
+            BodyDeclarationPairC bdp = new BodyDeclarationPairC(bodyDeclaration, curName);
+//            compareCache.initBodySrcNodeMap(bdp);
             if (bodyDeclaration instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)bodyDeclaration).getDeclSpecifier() instanceof IASTEnumerationSpecifier) {
                 String name = ((IASTEnumerationSpecifier) ((IASTSimpleDeclaration) bodyDeclaration).getDeclSpecifier()).getName().toString();
-                compareCache.addToMapBodyName(bdp, prefixClassName + name);
+//                BodyDeclarationPairC bdp = new BodyDeclarationPairC(bodyDeclaration, prefixClassName);
+//                compareCache.initBodySrcNodeMap(bdp);
+                compareCache.initBodySrcNodeMap(bdp);
+                compareCache.addToMapBodyName(bdp, curName + name);
                 continue;
             }
 //            if (bodyDeclaration instanceof IASTFunctionDefinition && !((IASTFunctionDefinition) bodyDeclaration).getDeclSpecifier().toString().equals("")) {
             if (bodyDeclaration instanceof IASTFunctionDefinition) {
                 IASTFunctionDefinition md = (IASTFunctionDefinition) bodyDeclaration;
                 String name = md.getDeclarator().getName().toString();
-                compareCache.addToMapBodyName(bdp, prefixClassName + name);
+//                BodyDeclarationPairC bdp = new BodyDeclarationPairC(bodyDeclaration, prefixClassName);
+//                compareCache.initBodySrcNodeMap(bdp);
+                compareCache.initBodySrcNodeMap(bdp);
+                compareCache.addToMapBodyName(bdp, curName + name);
                 continue;
             }
+//            if(bodyDeclaration instanceof IASTSimpleDeclaration) {
+//                IASTNode node = ((IASTSimpleDeclaration) bodyDeclaration).getDeclSpecifier();
+//                int n = 1;
+//            }
             if (bodyDeclaration instanceof IASTSimpleDeclaration && (((IASTSimpleDeclaration)bodyDeclaration).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier||((IASTSimpleDeclaration)bodyDeclaration).getDeclSpecifier() instanceof IASTNamedTypeSpecifier)) {
                 IASTSimpleDeclaration fd = (IASTSimpleDeclaration) bodyDeclaration;
                 List<IASTDeclarator> mmList = Arrays.asList(fd.getDeclarators());
+                compareCache.initBodySrcNodeMap(bdp);
                 for (IASTDeclarator vd : mmList) {
-                    compareCache.addToMapBodyName(bdp, prefixClassName + vd.getName().toString());
+//                    BodyDeclarationPairC bdp = new BodyDeclarationPairC(bodyDeclaration, prefixClassName);
+//                    compareCache.initBodySrcNodeMap(bdp);
+                    compareCache.addToMapBodyName(bdp, curName + vd.getName().toString());
                     compareResult.prevFieldNames.add(vd.getName().toString());
                     compareResult.prevCurrFieldNames.add(vd.getName().toString());
                 }
                 continue;
             }
+
 //            if (bodyDeclaration instanceof IASTFunctionDefinition && ((IASTFunctionDefinition) bodyDeclaration).getDeclSpecifier().toString().equals("")) {
 //                //内部类不会有static
 //                IASTFunctionDefinition idd = (IASTFunctionDefinition) bodyDeclaration;
@@ -158,22 +198,22 @@ public class TypeNodesTraversalC {
     }
 
 
-    public void traverseSrcTypeDeclaration2Keys(PreprocessedData compareResult, PreprocessedTempData compareCache, TypeDeclaration typeDeclaration, String prefixClassName) {
-        List<BodyDeclaration> nodeList = typeDeclaration.bodyDeclarations();
-        BodyDeclarationPair typeBodyDeclarationPair = new BodyDeclarationPair(typeDeclaration, prefixClassName);
-        compareResult.entityContainer.addKey(typeBodyDeclarationPair);
-        for (int i = nodeList.size() - 1; i >= 0; i--) {
-            BodyDeclaration bodyDeclaration = nodeList.get(i);
-            if (bodyDeclaration instanceof TypeDeclaration) {
-                TypeDeclaration cod2 = (TypeDeclaration) bodyDeclaration;
-                String subCodName = prefixClassName + cod2.getName().toString() + ".";
-                traverseSrcTypeDeclarationInit(compareResult, compareCache, cod2, subCodName);
-                continue;
-            }
-            BodyDeclarationPair bdp = new BodyDeclarationPair(bodyDeclaration, prefixClassName);
-            compareResult.entityContainer.addKey(bdp);
-        }
-    }
+//    public void traverseSrcTypeDeclaration2Keys(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, TypeDeclaration typeDeclaration, String prefixClassName) {
+//        List<BodyDeclaration> nodeList = typeDeclaration.bodyDeclarations();
+//        BodyDeclarationPair typeBodyDeclarationPair = new BodyDeclarationPair(typeDeclaration, prefixClassName);
+//        compareResult.entityContainer.addKey(typeBodyDeclarationPair);
+//        for (int i = nodeList.size() - 1; i >= 0; i--) {
+//            BodyDeclaration bodyDeclaration = nodeList.get(i);
+//            if (bodyDeclaration instanceof TypeDeclaration) {
+//                TypeDeclaration cod2 = (TypeDeclaration) bodyDeclaration;
+//                String subCodName = prefixClassName + cod2.getName().toString() + ".";
+//                traverseSrcTypeDeclarationInit(compareResult, compareCache, cod2, subCodName);
+//                continue;
+//            }
+//            BodyDeclarationPair bdp = new BodyDeclarationPair(bodyDeclaration, prefixClassName);
+//            compareResult.entityContainer.addKey(bdp);
+//        }
+//    }
 
 
 

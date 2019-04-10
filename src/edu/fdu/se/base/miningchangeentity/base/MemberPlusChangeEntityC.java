@@ -9,15 +9,15 @@ import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
  * Created by huangkaifeng on 2018/2/8.
  *
  */
-public class MemberPlusChangeEntity extends ChangeEntity {
+public class MemberPlusChangeEntityC extends ChangeEntity {
 
     public BodyDeclarationPairC bodyDeclarationPair;
 
-    public MemberPlusChangeEntity(ClusteredActionBean bean){
+    public MemberPlusChangeEntityC(ClusteredActionBean bean){
         super(bean);
     }
 
-    public MemberPlusChangeEntity(String location,String changeType,MyRange myRange){
+    public MemberPlusChangeEntityC(String location,String changeType,MyRange myRange){
         super(location,changeType,myRange);
 
     }

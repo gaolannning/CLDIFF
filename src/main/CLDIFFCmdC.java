@@ -47,16 +47,24 @@ public class CLDIFFCmdC {
             IASTNode[] node1 = ctu.getMacroDefinitions();
             IASTNode[] node2 = ctu.getDeclarations();
             IASTNode[] node3 = ctu.getIncludeDirectives();
-            for(IASTNode nd:node){
-                if(nd instanceof IASTSimpleDeclaration){
-                    IASTDeclarator[] declarators = ((IASTSimpleDeclaration) nd).getDeclarators();           //int a的a
-                    IASTDeclSpecifier declSpecifiers = ((IASTSimpleDeclaration) nd).getDeclSpecifier();     //int a的int
-                    System.out.println(declarators.length);
+//            for(IASTNode nd:node){
+//                if(nd instanceof IASTSimpleDeclaration){
+//                    IASTDeclarator[] declarators = ((IASTSimpleDeclaration) nd).getDeclarators();           //int a的a
+//                    IASTDeclSpecifier declSpecifiers = ((IASTSimpleDeclaration) nd).getDeclSpecifier();     //int a的int
+//                    System.out.println(declarators.length);
+//                }
+//            }
+            ASTVisitor visitor = new ASTVisitor() {
+                @Override
+                public int visit(IASTTranslationUnit tu) {
+                    return super.visit(tu);
                 }
-            }
+            };
+            ctu.accept(visitor);
+            visitor.visit((IASTSimpleDeclaration)node[2]);
             int i = 1;
         }catch(Exception e){
-
+            System.out.println(e);
         }
     }
     /*

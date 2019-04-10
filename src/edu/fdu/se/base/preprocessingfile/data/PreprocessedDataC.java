@@ -2,6 +2,7 @@ package edu.fdu.se.base.preprocessingfile.data;
 
 
 import edu.fdu.se.base.links.LayeredChangeEntityContainer;
+import edu.fdu.se.base.links.LayeredChangeEntityContainerC;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.javaparser.CDTParserFactory;
@@ -41,11 +42,20 @@ public class PreprocessedDataC {
     public Set<String> currFieldNames;
     public Set<String> prevCurrFieldNames;
 
+    @Deprecated
     public CompilationUnit getDstCu() {
         return dstCu;
     }
+    @Deprecated
     public CompilationUnit getSrcCu() {
         return srcCu;
+    }
+
+    public IASTTranslationUnit getDstTu() {
+        return dstTu;
+    }
+    public IASTTranslationUnit getSrcTu() {
+        return srcTu;
     }
 
     /**
@@ -74,7 +84,7 @@ public class PreprocessedDataC {
         mBodiesAdded = new ArrayList<>();
         mBodiesDeleted = new ArrayList<>();
         classOrInterfaceOrEnum = new HashMap<>();
-        entityContainer = new LayeredChangeEntityContainer();
+        entityContainer = new LayeredChangeEntityContainerC();
         prevFieldNames = new HashSet<>();
         currFieldNames = new HashSet<>();
         prevCurrFieldNames = new HashSet<>();
@@ -82,7 +92,7 @@ public class PreprocessedDataC {
 
 
     }
-    public LayeredChangeEntityContainer entityContainer;
+    public LayeredChangeEntityContainerC entityContainer;
 
 
     public void addTypeDeclaration(String prefix, IASTNode a, String name){

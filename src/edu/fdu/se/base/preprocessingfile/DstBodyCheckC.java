@@ -3,8 +3,12 @@ package edu.fdu.se.base.preprocessingfile;
 import edu.fdu.se.base.links.MyRange;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntity;
+import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntityC;
 import edu.fdu.se.base.preprocessingfile.data.*;
 import org.eclipse.cdt.core.dom.ast.*;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTCompositeTypeSpecifier;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTEnumerationSpecifier;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNamedTypeSpecifier;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
@@ -26,18 +30,55 @@ public class DstBodyCheckC {
 //        return null;
 //    }
 
-    public BodyDeclarationPairC getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Class clazz1,Class[] clazz2){
+//    public BodyDeclarationPairC getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Class clazz1,Class[] clazz2){
+//        for(BodyDeclarationPairC bodyDeclarationPair:bodyDeclarationPairs){
+//            if(bodyDeclarationPair.getBodyDeclaration().getClass().equals(clazz1)){
+//                if(clazz2 == null)
+//                    return bodyDeclarationPair;
+//            }
+//            if(bodyDeclarationPair.getBodyDeclaration() instanceof  IASTTranslationUnit){
+//                return bodyDeclarationPair;
+//            }
+//            if(bodyDeclarationPair.getBodyDeclaration() instanceof IASTSimpleDeclaration ){
+//                for(Class c:clazz2){
+//                    Class clazz = ((IASTSimpleDeclaration) bodyDeclarationPair.getBodyDeclaration()).getDeclSpecifier().getClass();
+//                    if(((IASTSimpleDeclaration) bodyDeclarationPair.getBodyDeclaration()).getDeclSpecifier().getClass().equals(c)){
+//                        return bodyDeclarationPair;
+//                    }
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
+    enum Type{
+        TypeDeclaration,FieldDeclaration,FunctionDeclaration,EnumDeclaration
+    }
+
+    public BodyDeclarationPairC getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Type type){
         for(BodyDeclarationPairC bodyDeclarationPair:bodyDeclarationPairs){
-            if(bodyDeclarationPair.getBodyDeclaration().getClass().equals(clazz1)){
-                if(clazz2 == null)
-                    return bodyDeclarationPair;
-            }
-            if(bodyDeclarationPair instanceof IASTSimpleDeclaration){
-                for(Class c:clazz2){
-                    if(((IASTSimpleDeclaration) bodyDeclarationPair).getDeclSpecifier().equals(c)){
+            IASTNode node = bodyDeclarationPair.getBodyDeclaration();
+            switch(type){
+                case TypeDeclaration:
+                    if(node instanceof IASTTranslationUnit)
+                        return  bodyDeclarationPair;
+                    if(node instanceof  IASTSimpleDeclaration && ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)
+                        return bodyDeclarationPair;
+                    break;
+                case FieldDeclaration:
+                    if(node instanceof  IASTSimpleDeclaration)
+                        if(((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTNamedTypeSpecifier || ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier)
+                            return bodyDeclarationPair;
+                    break;
+                case FunctionDeclaration:
+                    if(node instanceof  IASTFunctionDefinition)
+                        return bodyDeclarationPair;
+                    break;
+                case EnumDeclaration:
+                    if(node instanceof  IASTSimpleDeclaration && ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTEnumerationSpecifier){
                         return bodyDeclarationPair;
                     }
-                }
+                    break;
             }
         }
         return null;
@@ -56,10 +97,10 @@ public class DstBodyCheckC {
             boolean newFieldFlag = true;
             if (compareCache.srcNodeBodyNameMap.containsKey(key)) {
                 List<BodyDeclarationPairC> srcBodyPairs = compareCache.srcNodeBodyNameMap.get(key);
-                BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcBodyPairs,IASTSimpleDeclaration.class,new Class[]{IASTNamedTypeSpecifier.class,IASTSimpleDeclSpecifier.class});
+                BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcBodyPairs,Type.FieldDeclaration);
                 if(srcBody != null){
                     newFieldFlag = false;
-                    if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == fd.toString().hashCode()
+                    if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == fd.getRawSignature().toString().hashCode()
                             && srcBody.getLocationClassString().hashCode() == prefix.hashCode()) {
                         compareCache.addToDstRemoveList(fd);
                         compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
@@ -91,10 +132,18 @@ public class DstBodyCheckC {
      * @return 1 2
      */
     public int checkTypeDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode cod, String prefixClassName) {
-
-        if (compareCache.srcNodeBodyNameMap.containsKey(prefixClassName)) {
-            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(prefixClassName);
-            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList, IASTSimpleDeclaration.class, new Class[]{IASTCompositeTypeSpecifier.class});
+        String curName = null;
+        if(cod instanceof  IASTTranslationUnit) {
+            curName = "Root.";
+        } else{
+            IASTSimpleDeclaration sd = (IASTSimpleDeclaration) cod;
+            int type = ((IASTCompositeTypeSpecifier)(sd.getDeclSpecifier())).getKey();
+            curName = prefixClassName+(type==3?"class:":"struct:")+((IASTCompositeTypeSpecifier)sd.getDeclSpecifier()).getName().toString()+".";
+        }
+        String key = curName;
+        if (compareCache.srcNodeBodyNameMap.containsKey(key)) {
+            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
+            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,Type.TypeDeclaration);
             if(srcBody != null) {
                 if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode()
                         && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
@@ -102,7 +151,7 @@ public class DstBodyCheckC {
 //                System.out.println(cod.toString());
                     compareCache.addToDstRemoveList(cod);
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
-                    TypeNodesTraversalC.traverseTypeDeclarationSetVisited(compareCache, (IASTNode) srcBody.getBodyDeclaration(), prefixClassName);
+                    TypeNodesTraversalC.traverseTypeDeclarationSetVisited(compareCache, (IASTNode) srcBody.getBodyDeclaration(), curName);
                     return 1;
                 } else {
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_DIFFERENT_RETAIN);
@@ -123,32 +172,32 @@ public class DstBodyCheckC {
         String key = prefixClassName + name;
         if(compareCache.srcNodeBodyNameMap.containsKey(key)){
             List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
-            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,IASTSimpleDeclaration.class,new Class[]{IASTEnumerationSpecifier.class});
+            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,Type.EnumDeclaration);
             if(srcBody != null) {
-                if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == ed.toString().hashCode()
+                if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == ed.getRawSignature().toString().hashCode()
                         && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
                     compareCache.addToDstRemoveList(ed);
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
                     return 1;
                 } else {
-                    MyRange myRange1,myRange2;
-                    int s1, e1,s2,e2;
-                    s1 = compareResult.getSrcCu().getLineNumber(srcBody.getBodyDeclaration().getFileLocation());
-                    e1 = compareResult.getSrcCu().getLineNumber(srcBody.getBodyDeclaration().getStartPosition() + srcBody.getBodyDeclaration().getLength() - 1);
-                    s2 = compareResult.getDstCu().getLineNumber(ed.getStartPosition());
-                    e2 = compareResult.getDstCu().getLineNumber(ed.getStartPosition() + ed.getLength() - 1);
-                    myRange1= new MyRange(s1, e1, ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
-                    myRange2 = new MyRange(s2, e2, ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
-                    EnumChangeEntity code = new EnumChangeEntity(srcBody, ChangeEntityDesc.StageIIOpt.OPT_CHANGE, myRange1,myRange2);
-                    EnumDeclaration fd = (EnumDeclaration) srcBody.getBodyDeclaration();
-                    PreprocessUtil.generateEnumChangeEntity(code, fd, ed);
-                    if (compareResult.getPreprocessChangeEntity() == null) {
-                        compareResult.setPreprocessChangeEntity(new ArrayList<>());
-                    }
-                    compareResult.getPreprocessChangeEntity().add(code);
-                    compareCache.addToDstRemoveList(ed);
-                    compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
-//                compareCache.setBodySrcNodeMap(srcBody,PreprocessedTempData.BODY_DIFFERENT_RETAIN);
+//                    MyRange myRange1,myRange2;
+//                    int s1, e1,s2,e2;
+//                    s1 = srcBody.getBodyDeclaration().getFileLocation().getStartingLineNumber();
+//                    e1 = srcBody.getBodyDeclaration().getFileLocation().getEndingLineNumber();
+//                    s2 = ed.getFileLocation().getStartingLineNumber();
+//                    e2 = ed.getFileLocation().getEndingLineNumber();
+//                    myRange1= new MyRange(s1, e1, ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
+//                    myRange2 = new MyRange(s2, e2, ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
+//                    EnumChangeEntityC code = new EnumChangeEntityC(srcBody, ChangeEntityDesc.StageIIOpt.OPT_CHANGE, myRange1,myRange2);
+//                    IASTNode fd = (IASTNode) srcBody.getBodyDeclaration();
+//                    PreprocessUtil.generateEnumChangeEntityC(code, fd, ed);
+//                    if (compareResult.getPreprocessChangeEntity() == null) {
+//                        compareResult.setPreprocessChangeEntity(new ArrayList<>());
+//                    }
+//                    compareResult.getPreprocessChangeEntity().add(code);
+//                    compareCache.addToDstRemoveList(ed);
+//                    compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
+                compareCache.setBodySrcNodeMap(srcBody,PreprocessedTempData.BODY_DIFFERENT_RETAIN);
                     return 2;
                 }
             }else{
@@ -195,6 +244,8 @@ public class DstBodyCheckC {
             List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(methodNameKey);
             boolean findSame = false;
             for (BodyDeclarationPairC srcBody : srcNodeList) {
+                int hashCode1 = (String.valueOf(bd.getRawSignature().toString().hashCode()) + String.valueOf(prefixClassName.hashCode())).hashCode();
+                int hashCode2 = srcBody.hashCode();
                 if (srcBody.hashCode() == (String.valueOf(bd.getRawSignature().toString().hashCode()) + String.valueOf(prefixClassName.hashCode())).hashCode()) {
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
                     compareCache.addToDstRemoveList(bd);

@@ -28,6 +28,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
@@ -52,6 +54,17 @@ public class TreeContext {
 	public void setCu(CompilationUnit cu) {
 		this.cu = cu;
 	}
+
+    //add by yxy
+    private IASTTranslationUnit tu;
+
+    public IASTTranslationUnit getTu() {
+        return tu;
+    }
+
+    public void setTu(IASTTranslationUnit tu) {
+        this.tu = tu;
+    }
 
 //	@Override
 //    public String toString() {
@@ -95,6 +108,18 @@ public class TreeContext {
 //        }
 //    }
 
+    //add by yxy
+    public ITree createTree(int type, String label, String typeLabel, IASTNode node) {
+//        registerTypeLabel(type, typeLabel);
+        return new Tree(type, label, node);
+    }
+
+    public ITree createTree(int type, String label, IASTNode node){
+        Integer[] range = {node.getFileLocation().getStartingLineNumber(),node.getFileLocation().getEndingLineNumber()};
+        return new Tree(type,label,node,range);
+    }
+
+
     public ITree createTree(int type, String label, String typeLabel) {
 //        registerTypeLabel(type, typeLabel);
         return new Tree(type, label);
@@ -105,6 +130,8 @@ public class TreeContext {
 //        registerTypeLabel(type, typeLabel);
         return new Tree(type, label, node);
     }
+
+
     // add by hkf
     public ITree createTree(int type, String label, ASTNode node){
         Integer[] range = {this.cu.getLineNumber(node.getStartPosition()),this.cu.getLineNumber(node.getStartPosition()+node.getLength()-1)};

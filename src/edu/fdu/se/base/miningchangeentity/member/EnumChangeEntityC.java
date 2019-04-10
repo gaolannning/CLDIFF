@@ -14,9 +14,9 @@ import java.util.List;
  * Created by huangkaifeng on 2018/3/21.
  *
  */
-public class EnumChangeEntity extends MemberPlusChangeEntity{
+public class EnumChangeEntityC extends MemberPlusChangeEntity{
 
-    public EnumChangeEntity(ClusteredActionBean bean){
+    public EnumChangeEntityC(ClusteredActionBean bean){
         super(bean);
     }
 
@@ -26,7 +26,7 @@ public class EnumChangeEntity extends MemberPlusChangeEntity{
     public List<String> methodList;
     public MyRange dstRange;
 
-    public EnumChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange1,MyRange myRange2){
+    public EnumChangeEntityC(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange1, MyRange myRange2){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange1);
         EnumDeclaration ed = (EnumDeclaration) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());
@@ -36,7 +36,7 @@ public class EnumChangeEntity extends MemberPlusChangeEntity{
 
     }
 
-    public EnumChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange1){
+    public EnumChangeEntityC(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange1){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange1);
         EnumDeclaration ed = (EnumDeclaration) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());

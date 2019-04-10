@@ -4,6 +4,8 @@ import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.actions.model.Move;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.common.Global;
+import edu.fdu.se.base.generatingactions.JavaParserVisitor;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.Body.*;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.statement.*;
@@ -32,7 +34,7 @@ public class ClusterUpDown extends AbstractCluster{
                 continue;
             }
             Tree insNode = (Tree) a.getNode();
-            if(processBigAction(a,insNode.getAstNode().getNodeType())==1) {
+            if(processBigAction(a, JavaParserVisitorC.getNodeTypeId(insNode.getAstNodeC()))==1) {
 
             }
         }

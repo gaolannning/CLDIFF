@@ -5,6 +5,7 @@ import edu.fdu.se.base.miningchangeentity.ClusteredActionBean;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.base.MemberPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
+import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 /**
@@ -17,7 +18,7 @@ public class MethodChangeEntity extends MemberPlusChangeEntity {
         super(bean);
     }
 
-    public MethodChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange){
+    public MethodChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
         MethodDeclaration md =(MethodDeclaration) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());

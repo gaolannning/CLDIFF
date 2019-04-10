@@ -6,6 +6,8 @@ import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.*;
 
@@ -45,7 +47,18 @@ public class JavaParserTreeGenerator {
         }
     }
 
+    @Deprecated
     public JavaParserTreeGenerator(CompilationUnit prev, CompilationUnit curr) {
+        srcTC = generateFromCompilationUnit(prev,ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
+        src = srcTC.getRoot();
+        dstTC = generateFromCompilationUnit(curr,ChangeEntityDesc.StageITreeType.DST_TREE_NODE);
+        dst = dstTC.getRoot();
+        Matcher m = Matchers.getInstance().getMatcher(src, dst);
+        m.match();
+        mapping = m.getMappings();
+    }
+
+    public JavaParserTreeGenerator(IASTTranslationUnit prev, IASTTranslationUnit curr) {
         srcTC = generateFromCompilationUnit(prev,ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
         src = srcTC.getRoot();
         dstTC = generateFromCompilationUnit(curr,ChangeEntityDesc.StageITreeType.DST_TREE_NODE);
@@ -119,6 +132,7 @@ public class JavaParserTreeGenerator {
         return generateFromReader(new StringReader(content));
     }
 
+    @Deprecated
     public TreeContext generateFromCompilationUnit(CompilationUnit cu,int srcOrDst) {
         JavaParserVisitor visitor = new JavaParserVisitor(srcOrDst);
         visitor.getTreeContext().setCu(cu);
@@ -127,6 +141,44 @@ public class JavaParserTreeGenerator {
         TreeContext ctx = visitor.getTreeContext();
         ctx.validate();
         return ctx;
+    }
+
+    public TreeContext generateFromCompilationUnit(IASTTranslationUnit tu,int srcOrDst) {
+        JavaParserVisitorC visitor = new JavaParserVisitorC(srcOrDst);
+        visitor.getTreeContext().setTu(tu);
+        IASTNode astNode = tu;
+        setShouldVisit(visitor);
+        astNode.accept(visitor);
+        TreeContext ctx = visitor.getTreeContext();
+        ctx.validate();
+        return ctx;
+    }
+
+    private void setShouldVisit(JavaParserVisitorC visitorC){
+        visitorC.shouldVisitTranslationUnit = true;
+        visitorC.shouldVisitArrayModifiers  = true;
+        visitorC.shouldVisitAttributes  = true;
+        visitorC.shouldVisitBaseSpecifiers   = true;
+        visitorC.shouldVisitCaptures  = true;
+        visitorC.shouldVisitDeclarations   = true;
+        visitorC.shouldVisitDeclarators  = true;
+        visitorC.shouldVisitDeclSpecifiers   = true;
+        visitorC.shouldVisitDesignators  = true;
+        visitorC.shouldVisitEnumerators  = true;
+        visitorC.shouldVisitExpressions = true;
+        visitorC.shouldVisitImplicitNameAlternates  = true;
+        visitorC.shouldVisitImplicitNames = true;
+        visitorC.shouldVisitInitializers  = true;
+        visitorC.shouldVisitNames = true;
+        visitorC.shouldVisitNamespaces  = true;
+        visitorC.shouldVisitParameterDeclarations = true;
+        visitorC.shouldVisitPointerOperators   = true;
+        visitorC.shouldVisitProblems = true;
+        visitorC.shouldVisitStatements  = true;
+        visitorC.shouldVisitTemplateParameters = true;
+        visitorC.shouldVisitTokens  = true;
+        visitorC.shouldVisitTranslationUnit = true;
+        visitorC.shouldVisitTypeIds  = true;
     }
 
     public String getPrettyOldTreeString() {

@@ -5,6 +5,7 @@ import edu.fdu.se.base.miningchangeentity.ClusteredActionBean;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.base.MemberPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
+import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /**
@@ -18,7 +19,7 @@ public class ClassChangeEntity extends MemberPlusChangeEntity {
     /**
      * 预处理 识别的
      */
-    public ClassChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange){
+    public ClassChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
         TypeDeclaration cod = (TypeDeclaration)bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());

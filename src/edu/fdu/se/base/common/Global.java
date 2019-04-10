@@ -1,7 +1,9 @@
 package edu.fdu.se.base.common;
 
 import edu.fdu.se.base.miningchangeentity.ChangeEntityData;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
 import edu.fdu.se.server.Meta;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ public class Global {
 
 
     public static String parentCommit;
+
+    public static List<IASTNode> removal;
 
 //    public static List<String> outputFilePathList;
 

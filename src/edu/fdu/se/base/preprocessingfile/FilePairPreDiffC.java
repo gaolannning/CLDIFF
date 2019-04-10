@@ -5,8 +5,7 @@ import java.util.Map.Entry;
 
 import edu.fdu.se.base.preprocessingfile.data.*;
 import edu.fdu.se.javaparser.CDTParserFactory;
-import org.eclipse.cdt.core.dom.ast.IASTNode;
-import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.jdt.core.dom.*;
 
 import edu.fdu.se.javaparser.JDTParserFactory;
@@ -98,59 +97,64 @@ public class FilePairPreDiffC {
         TypeNodesTraversalC astTraversal = new TypeNodesTraversalC();
 //        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
 //        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
-        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, (IASTNode)cuSrc, "Root" + ".");
-        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, (IASTNode)cuDst, "Root" + ".");
-        return 0;
-    }
-    public void addSuperClass(TypeDeclaration type,List<String> list){
-        List<Type> aa  = type.superInterfaceTypes();
-        List<ASTNode> modifiers = type.modifiers();
-        for(ASTNode node:modifiers){
-            if(node instanceof Modifier){
-                Modifier modifier = (Modifier)node;
-                if(modifier.toString().equals("abstract")){
-                    list.add("abstract---"+type.getName().toString());
-                }
-            }
-        }
-        if(aa!=null) {
-            for (Type aaa : aa) {
-                list.add("interface---"+aaa.toString());
-            }
-        }
-
-        if(type.getSuperclassType()!=null) {
-            list.add("superclass---"+type.getSuperclassType().toString());
-        }
-    }
-
-    private void compare(CompilationUnit cuSrc,CompilationUnit cuDst,TypeDeclaration tdSrc,TypeDeclaration tdDst){
-        TypeNodesTraversal astTraversal = new TypeNodesTraversal();
-        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
-        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
-
-        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, tdSrc, tdSrc.getName().toString() + ".");
-        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, tdDst, tdDst.getName().toString() + ".");
-        // 考虑后面的识别 method name变化，这里把remove的注释掉
+        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, (IASTNode)cuSrc, "");
+        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, (IASTNode)cuDst, "");
         iterateVisitingMap();
-        undeleteSignatureChange();
         preprocessedTempData.removeSrcRemovalList(cuSrc, preprocessedData.srcLines);
         preprocessedTempData.removeDstRemovalList(cuDst, preprocessedData.dstLines);
         iterateVisitingMap2LoadContainerMap();
-//        astTraversal.traverseSrcTypeDeclaration2Keys(preprocessedData,preprocessedTempData,tdSrc,tdSrc.getName().toString() + ".");
-//        if (fileOutputLog != null) {
-//            fileOutputLog.writeFileAfterProcess(preprocessedData);
-//        }
-
+        return 0;
     }
+
+//    public void addSuperClass(IASTNode type,List<String> list){
+//        List<Type> aa  = ((IASTCompositeTypeSpecifier)((IASTSimpleDeclaration)type).getDeclSpecifier()).get
+//        List<ASTNode> modifiers = type.modifiers();
+//        for(ASTNode node:modifiers){
+//            if(node instanceof Modifier){
+//                Modifier modifier = (Modifier)node;
+//                if(modifier.toString().equals("abstract")){
+//                    list.add("abstract---"+type.getName().toString());
+//                }
+//            }
+//        }
+//        if(aa!=null) {
+//            for (Type aaa : aa) {
+//                list.add("interface---"+aaa.toString());
+//            }
+//        }
+//
+//        if(type.getSuperclassType()!=null) {
+//            list.add("superclass---"+type.getSuperclassType().toString());
+//        }
+//    }
+
+//    private void compare(CompilationUnit cuSrc,CompilationUnit cuDst,TypeDeclaration tdSrc,TypeDeclaration tdDst){
+//        TypeNodesTraversal astTraversal = new TypeNodesTraversal();
+//        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
+//        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
+//
+//        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, tdSrc, tdSrc.getName().toString() + ".");
+//        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, tdDst, tdDst.getName().toString() + ".");
+//        // 考虑后面的识别 method name变化，这里把remove的注释掉
+//        iterateVisitingMap();
+//        undeleteSignatureChange();
+//        preprocessedTempData.removeSrcRemovalList(cuSrc, preprocessedData.srcLines);
+//        preprocessedTempData.removeDstRemovalList(cuDst, preprocessedData.dstLines);
+//        iterateVisitingMap2LoadContainerMap();
+////        astTraversal.traverseSrcTypeDeclaration2Keys(preprocessedData,preprocessedTempData,tdSrc,tdSrc.getName().toString() + ".");
+////        if (fileOutputLog != null) {
+////            fileOutputLog.writeFileAfterProcess(preprocessedData);
+////        }
+//
+//    }
 
 
     private void iterateVisitingMap() {
-        for (Entry<BodyDeclarationPair, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
-            BodyDeclarationPair bdp = item.getKey();
+        for (Entry<BodyDeclarationPairC, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
+            BodyDeclarationPairC bdp = item.getKey();
             int value = item.getValue();
-            BodyDeclaration bd = bdp.getBodyDeclaration();
-            if (bd instanceof TypeDeclaration) {
+            IASTNode bd = bdp.getBodyDeclaration();
+            if (bd instanceof IASTTranslationUnit ||(bd instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration) bd).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)) {
                 switch (value) {
 //                    case PreprocessedTempData.BODY_DIFFERENT_RETAIN:
 //                    case PreprocessedTempData.BODY_FATHERNODE_REMOVE:
@@ -158,21 +162,21 @@ public class FilePairPreDiffC {
                     case PreprocessedTempData.BODY_INITIALIZED_VALUE:
                         this.preprocessedData.addBodiesDeleted(bdp);
                         this.preprocessedTempData.addToSrcRemoveList(bd);
-                        TypeNodesTraversal.traverseTypeDeclarationSetVisited(preprocessedTempData, (TypeDeclaration) bd, bdp.getLocationClassString());
+                        TypeNodesTraversalC.traverseTypeDeclarationSetVisited(preprocessedTempData,  bd, bdp.getLocationClassString());
                         break;
                     case PreprocessedTempData.BODY_SAME_REMOVE:
                         this.preprocessedTempData.addToSrcRemoveList(bd);
-                        TypeNodesTraversal.traverseTypeDeclarationSetVisited(preprocessedTempData, (TypeDeclaration) bd, bdp.getLocationClassString());
+                        TypeNodesTraversalC.traverseTypeDeclarationSetVisited(preprocessedTempData,  bd, bdp.getLocationClassString());
                         break;
                 }
             }
         }
-        for (Entry<BodyDeclarationPair, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
-            BodyDeclarationPair bdp = item.getKey();
+        for (Entry<BodyDeclarationPairC, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
+            BodyDeclarationPairC bdp = item.getKey();
             int value = item.getValue();
-            BodyDeclaration bd = bdp.getBodyDeclaration();
+            IASTNode bd = bdp.getBodyDeclaration();
 
-            if (!(bd instanceof TypeDeclaration)) {
+            if (!(bd instanceof IASTTranslationUnit ||(bd instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration) bd).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier))) {
                 switch (value) {
                     case PreprocessedTempData.BODY_DIFFERENT_RETAIN:
                     case PreprocessedTempData.BODY_FATHERNODE_REMOVE:
@@ -197,8 +201,8 @@ public class FilePairPreDiffC {
     }
 
     private void iterateVisitingMap2LoadContainerMap() {
-        for (Entry<BodyDeclarationPair, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
-            BodyDeclarationPair bdp = item.getKey();
+        for (Entry<BodyDeclarationPairC, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
+            BodyDeclarationPairC bdp = item.getKey();
             int value = item.getValue();
 //            System.out.println(bdp.getBodyDeclaration().toString());
 //            System.out.println(bdp.getLocationClassString());
@@ -217,21 +221,26 @@ public class FilePairPreDiffC {
 
     }
 
-    public PreprocessedData getPreprocessedData() {
+    public PreprocessedDataC getPreprocessedData() {
         return preprocessedData;
     }
 
+    public PreprocessedTempDataC getPreprocessedTempData() {
+        return preprocessedTempData;
+    }
+
+
     public void undeleteSignatureChange() {
-        List<BodyDeclarationPair> addTmp = new ArrayList<>();
-        for (BodyDeclarationPair bdpAdd : preprocessedData.getmBodiesAdded()) {
-            if (bdpAdd.getBodyDeclaration() instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) bdpAdd.getBodyDeclaration();
-                String methodName = md.getName().toString();
-                List<BodyDeclarationPair> bdpDeleteList = new ArrayList<>();
-                for (BodyDeclarationPair bdpDelete : preprocessedData.getmBodiesDeleted()) {
-                    if (bdpDelete.getBodyDeclaration() instanceof MethodDeclaration) {
-                        MethodDeclaration md2 = (MethodDeclaration) bdpDelete.getBodyDeclaration();
-                        String methodName2 = md2.getName().toString();
+        List<BodyDeclarationPairC> addTmp = new ArrayList<>();
+        for (BodyDeclarationPairC bdpAdd : preprocessedData.getmBodiesAdded()) {
+            if (bdpAdd.getBodyDeclaration() instanceof IASTFunctionDefinition) {
+                IASTFunctionDefinition md = (IASTFunctionDefinition) bdpAdd.getBodyDeclaration();
+                String methodName = md.getDeclarator().getName().toString();
+                List<BodyDeclarationPairC> bdpDeleteList = new ArrayList<>();
+                for (BodyDeclarationPairC bdpDelete : preprocessedData.getmBodiesDeleted()) {
+                    if (bdpDelete.getBodyDeclaration() instanceof IASTFunctionDefinition) {
+                        IASTFunctionDefinition md2 = (IASTFunctionDefinition) bdpDelete.getBodyDeclaration();
+                        String methodName2 = md2.getDeclarator().getName().toString();
                         if (potentialMethodNameChange(methodName, methodName2)) {
                             bdpDeleteList.add(bdpDelete);
                         }
@@ -241,7 +250,7 @@ public class FilePairPreDiffC {
                     //remove的时候可能会有hashcode相同但是一个是在内部类的情况，但是这种情况很少见，所以暂时先不考虑
                     preprocessedTempData.dstRemovalNodes.remove(bdpAdd.getBodyDeclaration());
                     addTmp.add(bdpAdd);
-                    for (BodyDeclarationPair bdpTmp : bdpDeleteList) {
+                    for (BodyDeclarationPairC bdpTmp : bdpDeleteList) {
                         this.preprocessedTempData.srcRemovalNodes.remove(bdpTmp.getBodyDeclaration());
                         this.preprocessedData.getmBodiesDeleted().remove(bdpTmp);
                         this.preprocessedData.entityContainer.addKey(bdpTmp);
@@ -250,7 +259,7 @@ public class FilePairPreDiffC {
             }
 
         }
-        for (BodyDeclarationPair tmp : addTmp) {
+        for (BodyDeclarationPairC tmp : addTmp) {
             this.preprocessedData.getmBodiesAdded().remove(tmp);
         }
     }

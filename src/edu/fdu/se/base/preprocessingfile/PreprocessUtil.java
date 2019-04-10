@@ -3,6 +3,10 @@ package edu.fdu.se.base.preprocessingfile;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntity;
+import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntityC;
+import org.eclipse.cdt.core.dom.ast.IASTEnumerationSpecifier;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTSimpleDeclaration;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -30,6 +34,20 @@ public class PreprocessUtil {
         }
     }
 
+//    public static void  enumDeclarationThumnailsC(IASTNode ed,List<String> varList,List<String> methodCallsList){
+//        List<IASTNode> bodyDeclarations = ((IASTEnumerationSpecifier)((IASTSimpleDeclaration)(ed));
+//        List<EnumConstantDeclaration> strings = ed.enumConstants();
+//        for(EnumConstantDeclaration s:strings){
+//            varList.add(s.getName().toString());
+//        }
+//        if(bodyDeclarations == null) return;
+//        for(BodyDeclaration bd:bodyDeclarations){
+//            if(bd instanceof MethodDeclaration){
+//                methodCallsList.add(((MethodDeclaration)bd).getName().toString());
+//            }
+//        }
+//    }
+
     public static void generateEnumChangeEntity(EnumChangeEntity changeEntity, EnumDeclaration e1, EnumDeclaration e2){
         MyList<String> varList = new MyList<>();
         MyList<String> methodDecList = new MyList<>();
@@ -46,4 +64,22 @@ public class PreprocessUtil {
         changeEntity.variableList = varList;
         changeEntity.methodList = methodDecList;
     }
+
+
+//    public static void generateEnumChangeEntityC(EnumChangeEntityC changeEntity, IASTNode e1, IASTNode e2){
+//        MyList<String> varList = new MyList<>();
+//        MyList<String> methodDecList = new MyList<>();
+//        enumDeclarationThumnailsC(e1,varList,methodDecList);
+//        enumDeclarationThumnailsC(e2,varList,methodDecList);
+//        String name  = ((IASTEnumerationSpecifier)((IASTSimpleDeclaration)(e1)).getDeclSpecifier()).getName().toString();
+//        changeEntity.stageIIBean.setEntityCreationStage(ChangeEntityDesc.StageIIGenStage.ENTITY_GENERATION_STAGE_PRE_DIFF);
+//        changeEntity.stageIIBean.setGranularity(ChangeEntityDesc.StageIIGranularity.GRANULARITY_MEMBER);
+//        changeEntity.stageIIBean.setOpt(ChangeEntityDesc.StageIIOpt.OPT_CHANGE);
+//        changeEntity.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_ENUM);
+////        changeEntity.stageIIBean.setOpt2(ChangeEntityDesc.StageIIOpt2.OPT2_CHANGE);
+//        changeEntity.stageIIBean.setSubEntity(ChangeEntityDesc.StageIISub.SUB_DECLARATION);
+//        changeEntity.stageIIBean.setThumbnail(name);
+//        changeEntity.variableList = varList;
+//        changeEntity.methodList = methodDecList;
+//    }
 }

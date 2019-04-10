@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import com.github.gumtreediff.actions.model.Action;
@@ -46,6 +47,9 @@ public class Tree extends AbstractTree implements ITree {
 
     //add by rh
     private ASTNode astNode;
+
+    //add by yxy
+    private IASTNode astNodeC;
 //    private JdtMethodCall methodCall = null;
     
     /**
@@ -55,6 +59,40 @@ public class Tree extends AbstractTree implements ITree {
     private List<Action> doActions;
     private int srcOrDst;
     private Integer[] lineRange;
+
+    // add by yxy
+    public Tree(int type, String label, IASTNode n) {
+        this.type = type;
+        this.label = (label == null) ? NO_LABEL : label.intern();
+        this.id = NO_ID;
+        this.depth = NO_VALUE;
+        this.hash = NO_VALUE;
+        this.height = NO_VALUE;
+        this.depth = NO_VALUE;
+        this.size = NO_VALUE;
+        this.pos = NO_VALUE;
+        this.length = NO_VALUE;
+        this.children = new ArrayList<>();
+        this.astNodeC = n;
+        this.astClass = n.getClass();
+    }
+
+    public Tree(int type, String label, IASTNode n,Integer[] lineRange) {
+        this.type = type;
+        this.label = (label == null) ? NO_LABEL : label.intern();
+        this.id = NO_ID;
+        this.depth = NO_VALUE;
+        this.hash = NO_VALUE;
+        this.height = NO_VALUE;
+        this.depth = NO_VALUE;
+        this.size = NO_VALUE;
+        this.pos = NO_VALUE;
+        this.length = NO_VALUE;
+        this.children = new ArrayList<>();
+        this.astNodeC = n;
+        this.astClass = n.getClass();
+        this.lineRange = lineRange;
+    }
 
     public Tree(int type, String label, ASTNode n) {
         this.type = type;
@@ -71,6 +109,8 @@ public class Tree extends AbstractTree implements ITree {
         this.astNode = n;
         this.astClass = n.getClass();
     }
+
+
 
     public Tree(int type, String label, ASTNode n,Integer[] lineRange) {
         this.type = type;
@@ -95,6 +135,10 @@ public class Tree extends AbstractTree implements ITree {
 
     public ASTNode getAstNode(){
     	return astNode;
+    }
+
+    public IASTNode getAstNodeC(){
+        return astNodeC;
     }
 
     public String getRangeString(){

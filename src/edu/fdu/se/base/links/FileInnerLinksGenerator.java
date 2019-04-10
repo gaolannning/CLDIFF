@@ -9,6 +9,7 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.miningchangeentity.base.StatementPlusChangeEntity;
 import edu.fdu.se.base.miningchangeentity.member.*;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
+import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -100,7 +101,7 @@ public class FileInnerLinksGenerator {
      * main entrance
      */
     public void generateFile() {
-        LayeredChangeEntityContainer container = this.changeEntityData.entityContainer;
+        LayeredChangeEntityContainerC container = this.changeEntityData.entityContainer;
         List<ChangeEntity> entities = this.changeEntityData.mad.getChangeEntityList();
         for(ChangeEntity a:entities) {
 
@@ -109,13 +110,13 @@ public class FileInnerLinksGenerator {
         if(container==null){
             return;
         }
-        Map<BodyDeclarationPair, List<ChangeEntity>> mMap = container.getLayerMap();
+        Map<BodyDeclarationPairC, List<ChangeEntity>> mMap = container.getLayerMap();
         List<ChangeEntity> methodChangeEntity = new ArrayList<>();
         List<ChangeEntity> fieldChangeEntity = new ArrayList<>();
         List<ChangeEntity> innerClassChangeEntity = new ArrayList<>();
         List<ChangeEntity> stmtChangeEntity = new ArrayList<>();
-        for (Map.Entry<BodyDeclarationPair, List<ChangeEntity>> entry : mMap.entrySet()) {
-            BodyDeclarationPair key = entry.getKey();
+        for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : mMap.entrySet()) {
+            BodyDeclarationPairC key = entry.getKey();
             if (key.getBodyDeclaration() instanceof MethodDeclaration) {
                 List<ChangeEntity> mList = entry.getValue();
                 mList.forEach(a->{

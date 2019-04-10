@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.github.gumtreediff.actions.model.*;
 import edu.fdu.se.base.common.Global;
+import edu.fdu.se.base.links.LayeredChangeEntityContainerC;
+import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
@@ -52,9 +54,9 @@ public class ChangeEntityPreprocess {
 
 
     public void setChangeEntityOpt2Opt2Exp(){
-        LayeredChangeEntityContainer container = this.ced.entityContainer;
-        for (Map.Entry<BodyDeclarationPair, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
-            BodyDeclarationPair bodyDeclarationPair = entry.getKey();
+        LayeredChangeEntityContainerC container = this.ced.entityContainer;
+        for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
+            BodyDeclarationPairC bodyDeclarationPair = entry.getKey();
             List<ChangeEntity> mList = entry.getValue();
             for(ChangeEntity ce:mList){
                 if(!ce.stageIIBean.getEntityCreationStage().equals(ChangeEntityDesc.StageIIGenStage.ENTITY_GENERATION_STAGE_PRE_DIFF)){
@@ -157,9 +159,9 @@ public class ChangeEntityPreprocess {
     }
 
     public void mergeMoveAndWrapper() {
-        LayeredChangeEntityContainer container = this.ced.entityContainer;
-        for (Map.Entry<BodyDeclarationPair, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
-            BodyDeclarationPair bodyDeclarationPair = entry.getKey();
+        LayeredChangeEntityContainerC container = this.ced.entityContainer;
+        for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
+            BodyDeclarationPairC bodyDeclarationPair = entry.getKey();
             if (bodyDeclarationPair.getBodyDeclaration() instanceof MethodDeclaration) {
                 //每个method里面
                 List<ChangeEntity> mList = entry.getValue();

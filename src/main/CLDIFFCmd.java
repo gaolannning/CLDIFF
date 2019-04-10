@@ -10,8 +10,8 @@ public class CLDIFFCmd {
 
     public static void main(String args[]){
         Global.runningMode = 0;
-        String repo = "C:/Users/Administrator/Desktop/git2/.git";
-        String commitId = "a01515087281538907f79f6c0180294d78db91f3";
+        String repo = "C:/Users/Administrator/Desktop/gitc/.git";
+        String commitId = "02c49d489b323f4c840cc86930ca286528e3d38f";
         String outputDir = "C:/Users/Administrator/Desktop/aaa";
         CLDiffLocal CLDiffLocal = new CLDiffLocal();
         CLDiffLocal.run(commitId,repo,outputDir);

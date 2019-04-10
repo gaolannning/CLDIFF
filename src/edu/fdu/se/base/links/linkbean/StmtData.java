@@ -9,6 +9,7 @@ import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.StatementPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class StmtData extends LinkBean {
     public List<String> classCreation;
 
 
-    public StmtData(StatementPlusChangeEntity ce, PreprocessedData preprocessedData) {
+    public StmtData(StatementPlusChangeEntity ce, PreprocessedDataC preprocessedData) {
         this.variableLocal = new MyList<>();
         this.methodInvocation = new MyList<>();
         this.variableField = new MyList<>();
@@ -66,7 +67,7 @@ public class StmtData extends LinkBean {
     }
 
 
-    private void parseMove(Action a, PreprocessedData preprocessedData) {
+    private void parseMove(Action a, PreprocessedDataC preprocessedData) {
         Tree tree = (Tree) a.getNode();
         List<Tree> simpleNames = new ArrayList<>();
         for (ITree tmp : tree.preOrder()) {
@@ -95,7 +96,7 @@ public class StmtData extends LinkBean {
         }
     }
 
-    private void parseNonMove(List<Action> actions, PreprocessedData preprocessedData) {
+    private void parseNonMove(List<Action> actions, PreprocessedDataC preprocessedData) {
         for (Action a : actions) {
             Tree tree = (Tree) a.getNode();
             String updateVal = null;

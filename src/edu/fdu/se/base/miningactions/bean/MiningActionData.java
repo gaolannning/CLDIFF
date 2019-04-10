@@ -14,6 +14,7 @@ import edu.fdu.se.base.generatingactions.GumTreeDiffParser;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.generatingactions.JavaParserTreeGenerator;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
 
 public class MiningActionData {
 
@@ -26,13 +27,13 @@ public class MiningActionData {
 
 	private List<ChangeEntity> mChangeEntityList;
 
-	public PreprocessedData preprocessedData;
+	public PreprocessedDataC preprocessedData;
 
 	public MiningActionData(List<ChangeEntity> mList){
 		this.mChangeEntityList = mList;
 	}
 
-	public MiningActionData(PreprocessedData preprocessedData, GeneratingActionsData agb, JavaParserTreeGenerator treeGenerator){
+	public MiningActionData(PreprocessedDataC preprocessedData, GeneratingActionsData agb, JavaParserTreeGenerator treeGenerator){
 		this.preprocessedData = preprocessedData;
 		this.mGeneratingActionsData = agb;
 		this.mMapping = treeGenerator.mapping;

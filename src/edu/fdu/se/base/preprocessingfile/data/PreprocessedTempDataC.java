@@ -52,7 +52,7 @@ public class PreprocessedTempDataC {
      */
     public Map<BodyDeclarationPairC,Integer> srcNodeVisitingMap;
 
-    public Map<BodyDeclarationPair,Integer> srcNodeHashCodeMap;
+    public Map<BodyDeclarationPairC,Integer> srcNodeHashCodeMap;
 
     /**
      * list of comments to be removed
@@ -70,7 +70,7 @@ public class PreprocessedTempDataC {
             List<BodyDeclarationPairC> mList = this.srcNodeBodyNameMap.get(name);
             mList.add(bd);
         } else {
-            List<BodyDeclarationPair> mList = new ArrayList<>();
+            List<BodyDeclarationPairC> mList = new ArrayList<>();
             mList.add(bd);
             this.srcNodeBodyNameMap.put(name, mList);
         }
@@ -105,8 +105,8 @@ public class PreprocessedTempDataC {
             assert(item.getNodeLocations()[0] instanceof IASTFileLocation);
             setLinesFlag(lineList, ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber(),
                         ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber());
-            ASTRewrite rewriter = ASTRewrite.create(cu);
-            rewriter.remove(item,null);
+//            ASTRewrite rewriter = ASTRewrite.create(cu);
+//            rewriter.remove(item,null);
 //            item.setParent(null);
 
 

@@ -34,7 +34,7 @@ public class BodyDeclarationPairC {
 
     @Override
     public boolean equals(Object obj){
-        BodyDeclarationPair bdp = (BodyDeclarationPair)obj;
+        BodyDeclarationPairC bdp = (BodyDeclarationPairC)obj;
         if(bdp.hashCode() ==this.hashCode) return true;
         return false;
     }

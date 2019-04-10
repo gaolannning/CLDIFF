@@ -15,10 +15,15 @@ import edu.fdu.se.base.preprocessingfile.AddOrRemoveFileProcessing;
 import edu.fdu.se.base.preprocessingfile.FilePairPreDiffC;
 import edu.fdu.se.base.preprocessingfile.data.FileOutputLog;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempDataC;
 import edu.fdu.se.base.webapi.GenerateChangeEntityJson;
 import edu.fdu.se.config.ProjectProperties;
 import edu.fdu.se.config.PropertyKeys;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 /**
  * Created by huangkaifeng on 2018/2/27.
@@ -103,37 +108,42 @@ public class CLDiffCoreC {
 
     private void runDiff(FilePairPreDiffC preDiff,String fileName){
         long start = System.nanoTime();
-        PreprocessedData preData = preDiff.getPreprocessedData();
-        JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(preData.getSrcCu(),preData.getDstCu());
+        PreprocessedDataC preData = preDiff.getPreprocessedData();
+        PreprocessedTempDataC preTempDataC = preDiff.getPreprocessedTempData();
+        Global.removal = new ArrayList<IASTNode>();
+        Global.removal.addAll(preTempDataC.srcRemovalNodes);
+        Global.removal.addAll(preTempDataC.dstRemovalNodes);
+        JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(preData.getSrcTu(),preData.getDstTu());
         treeGenerator.setFileName(fileName);
-        //gumtree
+//        //gumtree
         MyActionGenerator actionGenerator = new MyActionGenerator(treeGenerator);
         GeneratingActionsData actionsData = actionGenerator.generate();
-        //print
+//        //print
         long end = System.nanoTime();
         System.out.println("----mapping " +(end-start));
         printActions(actionsData,treeGenerator);
+
         long start2 = System.nanoTime();
         MiningActionData mad = new MiningActionData(preData,actionsData,treeGenerator);
         ActionAggregationGenerator aag = new ActionAggregationGenerator();
         aag.doCluster(mad);
-//correcting
-        ChangeEntityData ced = new ChangeEntityData(mad);
-        ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);
-        cep.preprocessChangeEntity();//1.init 2.merge 3.set 4.sub
-        changeEntityData = ced;
-        changeEntityData.fileName = fileName;
-        long end2 = System.nanoTime();
-        System.out.println("----grouping " +(end2-start2));
-// json
-        GenerateChangeEntityJson.setStageIIIBean(ced);
-        JSONArray json = GenerateChangeEntityJson.generateEntityJson(ced.mad);
-        this.mFileOutputLog.writeEntityJson(json.toString(4));
-        if(Global.runningMode==0){
-            System.out.println(GenerateChangeEntityJson.toConsoleString(json));
-        }else {
-            System.out.println(json.toString(4));
-        }
+////correcting
+//        ChangeEntityData ced = new ChangeEntityData(mad);
+//        ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);
+//        cep.preprocessChangeEntity();//1.init 2.merge 3.set 4.sub
+//        changeEntityData = ced;
+//        changeEntityData.fileName = fileName;
+//        long end2 = System.nanoTime();
+//        System.out.println("----grouping " +(end2-start2));
+//// json
+//        GenerateChangeEntityJson.setStageIIIBean(ced);
+//        JSONArray json = GenerateChangeEntityJson.generateEntityJson(ced.mad);
+//        this.mFileOutputLog.writeEntityJson(json.toString(4));
+//        if(Global.runningMode==0){
+//            System.out.println(GenerateChangeEntityJson.toConsoleString(json));
+//        }else {
+//            System.out.println(json.toString(4));
+//        }
 
     }
 
