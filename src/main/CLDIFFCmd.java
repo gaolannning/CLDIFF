@@ -11,9 +11,9 @@ public class CLDIFFCmd {
     public static void main(String args[]){
         Global.runningMode = 0;
         String repo = "C:/Users/Administrator/Desktop/gitc/.git";
-        String commitId = "02c49d489b323f4c840cc86930ca286528e3d38f";
+        String commitId = "74a087a2052ee761001340ac607b1b87a3048c2e";
         String outputDir = "C:/Users/Administrator/Desktop/aaa";
         CLDiffLocal CLDiffLocal = new CLDiffLocal();
         CLDiffLocal.run(commitId,repo,outputDir);
-    }
+    };
 }

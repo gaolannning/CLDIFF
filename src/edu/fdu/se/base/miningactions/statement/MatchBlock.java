@@ -3,6 +3,8 @@ package edu.fdu.se.base.miningactions.statement;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.actions.model.Move;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.generatingactions.JavaParserVisitor;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.ChangePacket;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.util.AstRelations;
@@ -20,25 +22,25 @@ public class MatchBlock {
     public static void matchBlock(MiningActionData fp, Action a) {
 
         Tree fatherNode = (Tree) a.getNode().getParent();
-        int type = fatherNode.getAstNode().getNodeType();
-        if (a instanceof Move && type != ASTNode.IF_STATEMENT) {
+        int type = JavaParserVisitorC.getNodeTypeId(fatherNode.getAstNodeC());
+        if (a instanceof Move && type != JavaParserVisitorC.IF_STATEMENT) {
             handleMoveOnBlock(fp, a);
             fp.setActionTraversedMap(a);
             return;
         }
         switch (type) {
-            case ASTNode.SWITCH_STATEMENT:
+            case JavaParserVisitorC.SWITCH_STATEMENT:
 //                MatchSwitch.matchSwitchCaseNewEntity(fp,a);
                 fp.setActionTraversedMap(a);
                 break;
-            case ASTNode.IF_STATEMENT:
+            case JavaParserVisitorC.IF_STATEMENT:
                 //Pattern 1.2 Match else
                 if (fatherNode.getChildPosition(a.getNode()) == 2) {
                     MatchIfElse.matchElse(fp, a);
                 }
                 fp.setActionTraversedMap(a);
                 break;
-            case ASTNode.TRY_STATEMENT:
+            case JavaParserVisitorC.TRY_STATEMENT:
                 ////Finally块
                 if (fatherNode.getChildPosition(a.getNode()) == fatherNode.getChildren().size() - 1) {
                     MatchTry.matchFinally(fp, a);

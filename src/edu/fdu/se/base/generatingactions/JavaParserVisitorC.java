@@ -4,13 +4,14 @@ import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
 import edu.fdu.se.base.common.Global;
+import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.core.dom.ast.c.ICASTDesignator;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTCapture;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTCompositeTypeSpecifier;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTNamespaceDefinition;
-import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTTemplateParameter;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.cdt.core.dom.ast.cpp.*;
+import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTCompoundStatement;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTDeclarationStatement;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPNodeFactory;
 
 
 import java.util.ArrayDeque;
@@ -333,7 +334,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
     protected String getLabel(IASTNode n) {
         if (n instanceof IASTName) return ((IASTName) n).toString();
         if (n instanceof IASTTranslationUnit) return "*TranslationUnit*";
-        if (n instanceof Modifier) return n.toString();
+        if (n instanceof IASTLiteralExpression) return String.valueOf(((IASTLiteralExpression) n).getValue());
 //        if (n instanceof StringLiteral) return ((StringLiteral) n).getEscapedValue();
 //        if (n instanceof NumberLiteral) return ((NumberLiteral) n).getToken();
 //        if (n instanceof CharacterLiteral) return ((CharacterLiteral) n).getEscapedValue();
@@ -346,10 +347,99 @@ public class JavaParserVisitorC  extends ASTVisitor {
 //        if (n instanceof TagElement) return ((TagElement) n).getTagName();
         return "";
     }
+    public static final int UNKNOWN = 0;
+    public static final int TYPE_DECLARATION = 1;
+    public static final int METHOD_DECLARATION = 2;
+    public static final int FIELD_DECLARATION = 3;
+    public static final int ENUM_DECLARATION = 4;
+    public static final int RETURN_STATEMENT = 5;
+    public static final int DO_STATEMENT = 6;
+    public static final int IF_STATEMENT = 7;
+    public static final int WHILE_STATEMENT = 8;
+    public static final int FOR_STATEMENT = 9;
+    public static final int TRY_STATEMENT = 10;
+    public static final int SWITCH_STATEMENT = 11;
+    public static final int SWITCH_CASE = 12;
+    public static final int CATCH_CLAUSE = 13;
+    public static final int EXPRESSION_STATEMENT = 14;
+    public static final int LABELED_STATEMENT = 15;
+    public static final int BLOCK_SCOPE = 16;
+    public static final int DECLARATION_STATEMENT = 17;
+    public static final int COMPOUND_STATEMENT = 18;
+    public static final int NAME = 19;
+    public static final int BREAK_STATEMENT = 20;
+    public static final int CONTINUE_STATEMENT = 21;
+
 
     public static int getNodeTypeId(IASTNode n){
+//        if(n instanceof IASTCompoundStatement){
+//            int i = 1;
+//        }
         // To Do
-        return 1;
+        if (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier){
+            return TYPE_DECLARATION;
+        }
+        if(n instanceof IASTFunctionDefinition){
+            return METHOD_DECLARATION;
+        }
+        if (n instanceof IASTSimpleDeclaration && (((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier||((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier)){
+            return FIELD_DECLARATION;
+        }
+        if (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTEnumerationSpecifier){
+            return ENUM_DECLARATION;
+        }
+        if(n instanceof IASTReturnStatement){
+            return RETURN_STATEMENT;
+        }
+        if(n instanceof IASTDoStatement){
+            return DO_STATEMENT;
+        }
+        if(n instanceof IASTIfStatement){
+            return IF_STATEMENT;
+        }
+        if(n instanceof IASTWhileStatement){
+            return WHILE_STATEMENT;
+        }
+        if(n instanceof IASTForStatement){
+            return FOR_STATEMENT;
+        }
+        if(n instanceof ICPPASTTryBlockStatement){
+            return TRY_STATEMENT;
+        }
+        if(n instanceof IASTSwitchStatement){
+            return SWITCH_STATEMENT;
+        }
+        if(n instanceof IASTCaseStatement){
+            return SWITCH_CASE;
+        }
+        if(n instanceof ICPPASTCatchHandler){
+            return CATCH_CLAUSE;
+        }
+        if(n instanceof IASTExpressionStatement){
+            return EXPRESSION_STATEMENT;
+        }
+        if(n instanceof IASTLabelStatement){
+            return LABELED_STATEMENT;
+        }
+        if(n instanceof  ICPPBlockScope){
+            return  BLOCK_SCOPE;
+        }
+        if(n instanceof CPPASTDeclarationStatement){
+            return DECLARATION_STATEMENT;
+        }
+        if(n instanceof CPPASTCompoundStatement){
+            return COMPOUND_STATEMENT;
+        }
+        if(n instanceof IName){
+            return NAME;
+        }
+        if(n instanceof IASTBreakStatement){
+            return BREAK_STATEMENT;
+        }
+        if(n instanceof IASTContinueStatement){
+            return CONTINUE_STATEMENT;
+        }
+        return UNKNOWN;
     }
 
 //    @Override

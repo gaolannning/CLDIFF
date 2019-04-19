@@ -6,6 +6,7 @@ import com.github.gumtreediff.actions.model.Move;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.generatingactions.ActionConstants;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.ChangePacket;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -109,32 +110,32 @@ public class BasicTreeTraversal {
         int type;
         Tree curNode = (Tree)node;
         while (true) {
-            type = curNode.getAstNode().getNodeType();
+            type = JavaParserVisitorC.getNodeTypeId(curNode.getAstNodeC());
             boolean isEnd = false;
             switch (type) {
-                case ASTNode.TYPE_DECLARATION:
-                case ASTNode.METHOD_DECLARATION:
-                case ASTNode.FIELD_DECLARATION:
-                case ASTNode.ENUM_DECLARATION:
+                case JavaParserVisitorC.TYPE_DECLARATION:
+                case JavaParserVisitorC.METHOD_DECLARATION:
+                case JavaParserVisitorC.FIELD_DECLARATION:
+                case JavaParserVisitorC.ENUM_DECLARATION:
 //                case ASTNode.BLOCK:
-                case ASTNode.ASSERT_STATEMENT:
-                case ASTNode.THROW_STATEMENT:
-                case ASTNode.RETURN_STATEMENT:
-                case ASTNode.DO_STATEMENT:
-                case ASTNode.IF_STATEMENT:
-                case ASTNode.WHILE_STATEMENT:
-                case ASTNode.ENHANCED_FOR_STATEMENT:
-                case ASTNode.FOR_STATEMENT:
-                case ASTNode.TRY_STATEMENT:
-                case ASTNode.SWITCH_STATEMENT:
-                case ASTNode.SWITCH_CASE:
-                case ASTNode.CATCH_CLAUSE:
-                case ASTNode.EXPRESSION_STATEMENT:
-                case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-                case ASTNode.SYNCHRONIZED_STATEMENT:
-                case ASTNode.CONSTRUCTOR_INVOCATION:
-                case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
-                case ASTNode.LABELED_STATEMENT:
+//                case ASTNode.ASSERT_STATEMENT:
+//                case ASTNode.THROW_STATEMENT:
+                case JavaParserVisitorC.RETURN_STATEMENT:
+                case JavaParserVisitorC.DO_STATEMENT:
+                case JavaParserVisitorC.IF_STATEMENT:
+                case JavaParserVisitorC.WHILE_STATEMENT:
+//                case ASTNode.ENHANCED_FOR_STATEMENT:
+                case JavaParserVisitorC.FOR_STATEMENT:
+                case JavaParserVisitorC.TRY_STATEMENT:
+                case JavaParserVisitorC.SWITCH_STATEMENT:
+                case JavaParserVisitorC.SWITCH_CASE:
+                case JavaParserVisitorC.CATCH_CLAUSE:
+                case JavaParserVisitorC.EXPRESSION_STATEMENT:
+//                case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+//                case ASTNode.SYNCHRONIZED_STATEMENT:
+//                case ASTNode.CONSTRUCTOR_INVOCATION:
+//                case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
+                case JavaParserVisitorC.LABELED_STATEMENT:
                     isEnd = true;
                 default:break;
             }

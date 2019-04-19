@@ -4,6 +4,7 @@ import com.github.gumtreediff.actions.model.*;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.statement.*;
 import edu.fdu.se.base.miningactions.util.BasicTreeTraversal;
@@ -52,7 +53,7 @@ public class MatchNonStatement {
 
 
     public static void matchNodeNewEntity(MiningActionData fp, Action a, Tree queryFather,int treeType, Tree traverseFather) {
-        int nodeType = traverseFather.getAstNode().getNodeType();
+        int nodeType = JavaParserVisitorC.getNodeTypeId(traverseFather.getAstNodeC());
         switch (nodeType) {
             case ASTNode.TYPE_DECLARATION:
                 MatchClass.matchClassSignatureNewEntity(fp, a, queryFather,treeType, traverseFather);

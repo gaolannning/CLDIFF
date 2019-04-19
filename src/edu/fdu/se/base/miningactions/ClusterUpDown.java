@@ -62,7 +62,7 @@ public class ClusterUpDown extends AbstractCluster{
             for(int i=0;i<treeListA.size();i++){
                 ta = treeListA.get(i);
                 tb = treeListB.get(i);
-                if(ta.getAstNode().getNodeType() != tb.getAstNode().getNodeType()){
+                if(JavaParserVisitorC.getNodeTypeId(ta.getAstNodeC()) != JavaParserVisitorC.getNodeTypeId(tb.getAstNodeC())){
                     flag = 1;
                     break;
                 }
@@ -100,7 +100,7 @@ public class ClusterUpDown extends AbstractCluster{
             int pos = parent.getChildPosition(t);
             posList.add(pos);
             list.add(parent);
-            if(parent.getAstNode().getNodeType()!=ASTNode.BLOCK){
+            if(JavaParserVisitorC.getNodeTypeId(parent.getAstNodeC())!=JavaParserVisitorC.BLOCK_SCOPE){
                 break;
             }
         }
@@ -113,98 +113,149 @@ public class ClusterUpDown extends AbstractCluster{
         int res = 0;
         switch (type) {
             // 外面
-            case ASTNode.TYPE_DECLARATION:
+            case JavaParserVisitorC.TYPE_DECLARATION:
                 MatchClass.matchClassDeclaration(fp, a);
-                break;
-            case ASTNode.FIELD_DECLARATION:
-                MatchFieldDeclaration.matchFieldDeclaration(fp, a);
-                break;
-            case ASTNode.INITIALIZER:
-                MatchInitializerBlock.matchInitializerBlock(fp, a);
-                break;
-            case ASTNode.METHOD_DECLARATION:
-                MatchMethod.matchMethdDeclaration(fp, a);
-                break;
-            case ASTNode.ENUM_DECLARATION:
-            case ASTNode.ENUM_CONSTANT_DECLARATION:
-                MatchEnum.matchEnum(fp,a);
-                break;
+               break;
 
             // 里面
-            case ASTNode.ASSERT_STATEMENT:
-                MatchAssert.matchAssert(fp,a);
-                break;
-            case ASTNode.IF_STATEMENT:
+            case JavaParserVisitorC.IF_STATEMENT:
                 MatchIfElse.matchIf(fp, a);
                 break;
-            case ASTNode.BLOCK:
+            case JavaParserVisitorC.COMPOUND_STATEMENT:
                 MatchBlock.matchBlock(fp, a);
                 break;
-            case ASTNode.BREAK_STATEMENT:
+            case JavaParserVisitorC.BREAK_STATEMENT:
                 MatchControlStatements.matchBreakStatements(fp,a);
                 break;
-            case ASTNode.CONTINUE_STATEMENT:
+            case JavaParserVisitorC.CONTINUE_STATEMENT:
                 MatchControlStatements.matchContinueStatements(fp,a);
-            case ASTNode.RETURN_STATEMENT:
+                break;
+            case JavaParserVisitorC.RETURN_STATEMENT:
                 MatchReturnStatement.matchReturnStatement(fp, a);
                 break;
-            case ASTNode.FOR_STATEMENT:
+            case JavaParserVisitorC.FOR_STATEMENT:
                 //增加for语句
                 MatchForStatement.matchForStatement(fp, a);
                 break;
-            case ASTNode.ENHANCED_FOR_STATEMENT:
-                //增加for语句
-                MatchForStatement.matchEnhancedForStatement(fp, a);
-                break;
-            case ASTNode.WHILE_STATEMENT:
+            case JavaParserVisitorC.WHILE_STATEMENT:
                 //增加while语句
                 MatchWhileStatement.matchWhileStatement(fp, a);
                 break;
-            case ASTNode.DO_STATEMENT:
+            case JavaParserVisitorC.DO_STATEMENT:
                 //增加do while语句
                 MatchWhileStatement.matchDoStatement(fp, a);
                 break;
-            case ASTNode.TRY_STATEMENT:
+            case JavaParserVisitorC.TRY_STATEMENT:
                 MatchTry.matchTry(fp, a);
                 break;
-            case ASTNode.THROW_STATEMENT:
-                MatchTry.matchThrowStatement(fp, a);
-                break;
-            case ASTNode.CATCH_CLAUSE:
+            case JavaParserVisitorC.CATCH_CLAUSE:
                 MatchTry.matchCatchClause(fp,a);
                 break;
-            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-                MatchVariableDeclarationExpression.matchVariableDeclaration(fp, a);
-                break;
-            case ASTNode.EXPRESSION_STATEMENT:
-                if (AstRelations.isFatherXXXStatement(a, ASTNode.IF_STATEMENT) && a.getNode().getParent().getChildPosition(a.getNode()) == 2) {
-                    MatchIfElse.matchElse(fp, a);
-                } else {
-                    MatchExpressionStatement.matchExpression(fp, a);
-                }
-                break;
-            case ASTNode.SYNCHRONIZED_STATEMENT:
-                MatchSynchronized.matchSynchronized(fp, a);
-                break;
-            case ASTNode.SWITCH_STATEMENT:
+            case JavaParserVisitorC.SWITCH_STATEMENT:
                 MatchSwitch.matchSwitch(fp, a);
                 break;
-            case ASTNode.SWITCH_CASE:
+            case JavaParserVisitorC.SWITCH_CASE:
                 MatchSwitch.matchSwitchCase(fp, a);
                 break;
-            case ASTNode.EMPTY_STATEMENT:
-                break;
-            case ASTNode.TYPE_DECLARATION_STATEMENT:
-                break;
-            case ASTNode.CONSTRUCTOR_INVOCATION:
-                MatchConstructorInvocation.matchConstructorInvocation(fp,a);
-                break;
-            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
-                MatchConstructorInvocation.matchSuperConstructorInvocation(fp,a);
-                break;
-            case ASTNode.LABELED_STATEMENT:
+            case JavaParserVisitorC.LABELED_STATEMENT:
                 MatchLabeledStatement.matchLabeledStatement(fp,a);
                 break;
+            case JavaParserVisitorC.DECLARATION_STATEMENT:
+                MatchVariableDeclarationExpression.matchVariableDeclaration(fp, a);
+                break;
+//            // 外面
+//            case ASTNode.TYPE_DECLARATION:
+//                MatchClass.matchClassDeclaration(fp, a);
+//                break;
+//            case ASTNode.FIELD_DECLARATION:
+//                MatchFieldDeclaration.matchFieldDeclaration(fp, a);
+//                break;
+//            case ASTNode.INITIALIZER:
+//                MatchInitializerBlock.matchInitializerBlock(fp, a);
+//                break;
+//            case ASTNode.METHOD_DECLARATION:
+//                MatchMethod.matchMethdDeclaration(fp, a);
+//                break;
+//            case ASTNode.ENUM_DECLARATION:
+//            case ASTNode.ENUM_CONSTANT_DECLARATION:
+//                MatchEnum.matchEnum(fp,a);
+//                break;
+//
+//            // 里面
+//            case ASTNode.ASSERT_STATEMENT:
+//                MatchAssert.matchAssert(fp,a);
+//                break;
+//            case ASTNode.IF_STATEMENT:
+//                MatchIfElse.matchIf(fp, a);
+//                break;
+//            case ASTNode.BLOCK:
+//                MatchBlock.matchBlock(fp, a);
+//                break;
+//            case ASTNode.BREAK_STATEMENT:
+//                MatchControlStatements.matchBreakStatements(fp,a);
+//                break;
+//            case ASTNode.CONTINUE_STATEMENT:
+//                MatchControlStatements.matchContinueStatements(fp,a);
+//            case ASTNode.RETURN_STATEMENT:
+//                MatchReturnStatement.matchReturnStatement(fp, a);
+//                break;
+//            case ASTNode.FOR_STATEMENT:
+//                //增加for语句
+//                MatchForStatement.matchForStatement(fp, a);
+//                break;
+//            case ASTNode.ENHANCED_FOR_STATEMENT:
+//                //增加for语句
+//                MatchForStatement.matchEnhancedForStatement(fp, a);
+//                break;
+//            case ASTNode.WHILE_STATEMENT:
+//                //增加while语句
+//                MatchWhileStatement.matchWhileStatement(fp, a);
+//                break;
+//            case ASTNode.DO_STATEMENT:
+//                //增加do while语句
+//                MatchWhileStatement.matchDoStatement(fp, a);
+//                break;
+//            case ASTNode.TRY_STATEMENT:
+//                MatchTry.matchTry(fp, a);
+//                break;
+//            case ASTNode.THROW_STATEMENT:
+//                MatchTry.matchThrowStatement(fp, a);
+//                break;
+//            case ASTNode.CATCH_CLAUSE:
+//                MatchTry.matchCatchClause(fp,a);
+//                break;
+//            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+//                MatchVariableDeclarationExpression.matchVariableDeclaration(fp, a);
+//                break;
+//            case ASTNode.EXPRESSION_STATEMENT:
+//                if (AstRelations.isFatherXXXStatement(a, ASTNode.IF_STATEMENT) && a.getNode().getParent().getChildPosition(a.getNode()) == 2) {
+//                    MatchIfElse.matchElse(fp, a);
+//                } else {
+//                    MatchExpressionStatement.matchExpression(fp, a);
+//                }
+//                break;
+//            case ASTNode.SYNCHRONIZED_STATEMENT:
+//                MatchSynchronized.matchSynchronized(fp, a);
+//                break;
+//            case ASTNode.SWITCH_STATEMENT:
+//                MatchSwitch.matchSwitch(fp, a);
+//                break;
+//            case ASTNode.SWITCH_CASE:
+//                MatchSwitch.matchSwitchCase(fp, a);
+//                break;
+//            case ASTNode.EMPTY_STATEMENT:
+//                break;
+//            case ASTNode.TYPE_DECLARATION_STATEMENT:
+//                break;
+//            case ASTNode.CONSTRUCTOR_INVOCATION:
+//                MatchConstructorInvocation.matchConstructorInvocation(fp,a);
+//                break;
+//            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
+//                MatchConstructorInvocation.matchSuperConstructorInvocation(fp,a);
+//                break;
+//            case ASTNode.LABELED_STATEMENT:
+//                MatchLabeledStatement.matchLabeledStatement(fp,a);
+//                break;
             default:
                 res =1;
                 break;

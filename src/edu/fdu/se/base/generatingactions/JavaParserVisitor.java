@@ -3,6 +3,7 @@ package edu.fdu.se.base.generatingactions;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
+import org.eclipse.cdt.core.dom.ast.IASTLiteralExpression;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayDeque;
@@ -35,7 +36,7 @@ public class JavaParserVisitor  extends ASTVisitor {
         if (n instanceof Name) return ((Name) n).getFullyQualifiedName();
         if (n instanceof Type) return n.toString();
         if (n instanceof Modifier) return n.toString();
-        if (n instanceof StringLiteral) return ((StringLiteral) n).getEscapedValue();
+        if (n instanceof IASTLiteralExpression) return ((StringLiteral) n).getEscapedValue();
         if (n instanceof NumberLiteral) return ((NumberLiteral) n).getToken();
         if (n instanceof CharacterLiteral) return ((CharacterLiteral) n).getEscapedValue();
         if (n instanceof BooleanLiteral) return ((BooleanLiteral) n).toString();

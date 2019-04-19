@@ -231,7 +231,7 @@ public class ChangeEntityPreprocess {
         ChangeEntityPrinter.printContainerEntity(ced.entityContainer, ced.mad.preprocessedData.srcCu);
     }
     public void printNaturalEntityDesc(){
-        ChangeEntityPrinter.printContainerEntityNatural(ced.entityContainer, ced.mad.preprocessedData.srcCu);
+        ChangeEntityPrinter.printContainerEntityNatural(ced.entityContainer, ced.mad.preprocessedData.srcTu);
     }
 
     public void setChangeEntitySub(){

@@ -37,7 +37,7 @@ public class Insert extends Addition {
     @Override
     public String toString(){
         Tree t = (Tree)this.getNode();
-        return this.getClass().getSimpleName() +" "+ t.getAstNode().getClass().getSimpleName();
+        return this.getClass().getSimpleName() +" "+ t.getAstNodeC().getClass().getSimpleName();
     }
 
 }

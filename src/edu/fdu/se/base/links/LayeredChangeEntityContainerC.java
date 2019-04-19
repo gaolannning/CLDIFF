@@ -106,7 +106,7 @@ public class LayeredChangeEntityContainerC {
             if (tree == null) {
                 System.out.println("a");
             }
-            startPos = tree.getAstNode().getStartPosition();
+            startPos = tree.getAstNodeC().getFileLocation().getNodeOffset();
 
         } else if (changeEntity.clusteredActionBean.traverseType == ChangeEntityDesc.StageITraverseType.TRAVERSE_DOWN_UP) {
             // father节点的range

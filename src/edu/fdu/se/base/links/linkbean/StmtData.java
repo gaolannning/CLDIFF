@@ -6,6 +6,7 @@ import com.github.gumtreediff.actions.model.Update;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.common.Global;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.StatementPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
@@ -107,8 +108,8 @@ public class StmtData extends LinkBean {
             }
             ITree dstNode = Global.ced.mad.getMappedDstOfSrcNode(tree);
 
-            if (tree.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
-                    || tree.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
+            if (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC()) == JavaParserVisitorC.NAME
+                    || tree.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
                 ASTNode exp = findExpression(tree);
                 boolean flag = true;
                 if (exp != null && exp instanceof MethodInvocation) {
@@ -162,9 +163,9 @@ public class StmtData extends LinkBean {
 
     private ASTNode findExpression(Tree tree) {
         int flag = 0;
-        while (!tree.getAstNode().getClass().getSimpleName().endsWith("Declaration")) {
+        while (!tree.getAstNodeC().getClass().getSimpleName().endsWith("Declaration")) {
             tree = (Tree) tree.getParent();
-            switch (tree.getAstNode().getNodeType()) {
+            switch (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC())) {
                 case ASTNode.NORMAL_ANNOTATION:
                 case ASTNode.MARKER_ANNOTATION:
                 case ASTNode.SINGLE_MEMBER_ANNOTATION:

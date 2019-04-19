@@ -127,23 +127,23 @@ public class CLDiffCoreC {
         MiningActionData mad = new MiningActionData(preData,actionsData,treeGenerator);
         ActionAggregationGenerator aag = new ActionAggregationGenerator();
         aag.doCluster(mad);
-////correcting
-//        ChangeEntityData ced = new ChangeEntityData(mad);
-//        ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);
-//        cep.preprocessChangeEntity();//1.init 2.merge 3.set 4.sub
-//        changeEntityData = ced;
-//        changeEntityData.fileName = fileName;
-//        long end2 = System.nanoTime();
-//        System.out.println("----grouping " +(end2-start2));
-//// json
-//        GenerateChangeEntityJson.setStageIIIBean(ced);
-//        JSONArray json = GenerateChangeEntityJson.generateEntityJson(ced.mad);
-//        this.mFileOutputLog.writeEntityJson(json.toString(4));
-//        if(Global.runningMode==0){
-//            System.out.println(GenerateChangeEntityJson.toConsoleString(json));
-//        }else {
-//            System.out.println(json.toString(4));
-//        }
+//correcting
+        ChangeEntityData ced = new ChangeEntityData(mad);
+        ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);
+        cep.preprocessChangeEntity();//1.init 2.merge 3.set 4.sub
+        changeEntityData = ced;
+        changeEntityData.fileName = fileName;
+        long end2 = System.nanoTime();
+        System.out.println("----grouping " +(end2-start2));
+// json
+        GenerateChangeEntityJson.setStageIIIBean(ced);
+        JSONArray json = GenerateChangeEntityJson.generateEntityJson(ced.mad);
+        this.mFileOutputLog.writeEntityJson(json.toString(4));
+        if(Global.runningMode==0){
+            System.out.println(GenerateChangeEntityJson.toConsoleString(json));
+        }else {
+            System.out.println(json.toString(4));
+        }
 
     }
 

@@ -6,6 +6,9 @@ import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.links.MyRange;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
+import org.eclipse.cdt.core.dom.ast.*;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTTranslationUnit;
+import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -46,16 +49,16 @@ public class AstRelations {
 	}
 
 	public static String getLocationString(ITree tree){
-		ASTNode node = ((Tree)tree).getAstNode();
+		IASTNode node = ((Tree)tree).getAstNodeC();
 		String result="";
-		while(!(node instanceof CompilationUnit)){
-			if(node instanceof TypeDeclaration){
-				TypeDeclaration tp  = (TypeDeclaration) node;
+		while(!(node instanceof ICPPASTTranslationUnit)){
+			if(node instanceof IASTSimpleDeclaration &&((IASTSimpleDeclaration) node).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier){
+				IASTCompositeTypeSpecifier tp  = (IASTCompositeTypeSpecifier) ((IASTSimpleDeclaration)node).getDeclSpecifier();
 				result = tp.getName().toString()+"."+ result;
 			}
 			node = node.getParent();
 		}
-		return null;
+		return "root";
 	}
 
 }
