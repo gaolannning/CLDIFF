@@ -12,6 +12,7 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.*;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
+import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.List;
@@ -43,24 +44,25 @@ public class ChangeEntityData {
         int s;
         int e;
         MyRange myRange = null;
+        IASTNode n = item.getBodyDeclaration();
         if (Insert.class.getSimpleName().equals(type)) {
-            s = mad.preprocessedData.getDstTu().getFileLocation().getStartingLineNumber();    //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
-            e = mad.preprocessedData.getDstTu().getFileLocation().getEndingLineNumber();       //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
+            s = n.getFileLocation().getStartingLineNumber();    //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
+            e = n.getFileLocation().getEndingLineNumber();       //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
             myRange = new MyRange(s, e, ChangeEntityDesc.StageITreeType.DST_TREE_NODE);
         } else if (Delete.class.getSimpleName().equals(type)) {
-            s = mad.preprocessedData.getSrcTu().getFileLocation().getStartingLineNumber();             //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
-            e = mad.preprocessedData.getSrcTu().getFileLocation().getEndingLineNumber();              //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
+            s = n.getFileLocation().getStartingLineNumber();             //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
+            e = n.getFileLocation().getEndingLineNumber();              //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
             myRange = new MyRange(s, e, ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
         }
-        if (item.getBodyDeclaration() instanceof FieldDeclaration) {
+        if (n instanceof IASTSimpleDeclaration && (((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier ||((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier)) {
             ce = new FieldChangeEntity(item, type, myRange);
-        } else if (item.getBodyDeclaration() instanceof MethodDeclaration) {
+        } else if (n instanceof IASTFunctionDefinition) {
             ce = new MethodChangeEntity(item, type, myRange);
         } else if (item.getBodyDeclaration() instanceof Initializer) {
             ce = new InitializerChangeEntity(item, type, myRange);
-        } else if (item.getBodyDeclaration() instanceof TypeDeclaration) {
+        } else if (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier) {
             ce = new ClassChangeEntity(item, type, myRange);
-        } else if (item.getBodyDeclaration() instanceof EnumDeclaration) {
+        } else if (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTEnumerationSpecifier) {
             ce = new EnumChangeEntity(item, type, myRange);
         }
         return ce;

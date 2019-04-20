@@ -58,7 +58,7 @@ public class AstRelations {
 			}
 			node = node.getParent();
 		}
-		return "root";
+		return result;
 	}
 
 }

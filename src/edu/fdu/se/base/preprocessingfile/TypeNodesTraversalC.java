@@ -125,7 +125,7 @@ public class TypeNodesTraversalC {
             curName = prefixClassName+(type==3?"class:":"struct:")+((IASTCompositeTypeSpecifier)sd.getDeclSpecifier()).getName().toString()+".";
         }
         compareResult.addTypeDeclaration(curName, typeDeclaration, curName);
-        BodyDeclarationPairC typeBodyDeclarationPair = new BodyDeclarationPairC(typeDeclaration, prefixClassName);
+        BodyDeclarationPairC typeBodyDeclarationPair = new BodyDeclarationPairC(typeDeclaration, curName);
         compareCache.addToMapBodyName(typeBodyDeclarationPair, curName);
         compareCache.initBodySrcNodeMap(typeBodyDeclarationPair);
         for (int i = nodeList.size() - 1; i >= 0; i--) {

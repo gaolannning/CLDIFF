@@ -116,7 +116,15 @@ public class ClusterUpDown extends AbstractCluster{
             case JavaParserVisitorC.TYPE_DECLARATION:
                 MatchClass.matchClassDeclaration(fp, a);
                break;
-
+            case JavaParserVisitorC.FIELD_DECLARATION:
+                MatchFieldDeclaration.matchFieldDeclaration(fp, a);
+                break;
+            case JavaParserVisitorC.METHOD_DECLARATION:
+                MatchMethod.matchMethdDeclaration(fp, a);
+                break;
+            case JavaParserVisitorC.ENUM_DECLARATION:
+                MatchEnum.matchEnum(fp,a);
+                break;
             // 里面
             case JavaParserVisitorC.IF_STATEMENT:
                 MatchIfElse.matchIf(fp, a);

@@ -9,6 +9,7 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.*;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
+import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.*;
@@ -63,7 +64,8 @@ public class LayeredChangeEntityContainerC {
         if(changeEntity==null) return;
         BodyDeclarationPairC mKey = null;
         for (BodyDeclarationPairC key : this.layerMap.keySet()) {
-            if (key.getBodyDeclaration() instanceof TypeDeclaration) {
+            IASTNode bodyDeclaration = key.getBodyDeclaration();
+            if ( bodyDeclaration instanceof IASTTranslationUnit ||(bodyDeclaration instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)bodyDeclaration).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)) {
                 if (changeEntity instanceof ClassChangeEntity) {
                     String location = changeEntity.stageIIBean.getLocation();
                     location = location.substring(0, location.length() - 1);
@@ -74,6 +76,8 @@ public class LayeredChangeEntityContainerC {
                         break;
                     }
                 } else {
+                    String a = changeEntity.stageIIBean.getLocation();
+                    String b = key.getLocationClassString();
                     if (changeEntity.stageIIBean.getLocation().equals(key.getLocationClassString())) {
                         mKey = key;
                         break;
@@ -111,7 +115,7 @@ public class LayeredChangeEntityContainerC {
         } else if (changeEntity.clusteredActionBean.traverseType == ChangeEntityDesc.StageITraverseType.TRAVERSE_DOWN_UP) {
             // father节点的range
             tree = (Tree) node;
-            startPos = tree.getAstNode().getStartPosition();
+            startPos = tree.getAstNodeC().getFileLocation().getNodeOffset();
         }
         mKey = getEnclosedBodyDeclaration(changeEntity, startPos);
         if (mKey != null && this.layerMap.containsKey(mKey)) {
@@ -125,7 +129,12 @@ public class LayeredChangeEntityContainerC {
 
     private BodyDeclarationPairC getEnclosedBodyDeclaration(ChangeEntity changeEntity, int start) {
         for (BodyDeclarationPairC key : this.layerMap.keySet()) {
-            if (key.getBodyDeclaration() instanceof TypeDeclaration) {
+            IASTNode n = key.getBodyDeclaration();
+//            if(n instanceof IASTSimpleDeclaration){
+//                boolean b1 = ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier;
+//                boolean b2 = ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier;
+//            }
+            if (n instanceof IASTTranslationUnit||(n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)) {
                 if (changeEntity instanceof ClassChangeEntity
                         || changeEntity instanceof EnumChangeEntity
                         || changeEntity instanceof FieldChangeEntity

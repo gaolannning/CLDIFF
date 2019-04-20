@@ -6,9 +6,12 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.base.MemberPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
+import org.eclipse.cdt.core.dom.ast.IASTDeclarator;
+import org.eclipse.cdt.core.dom.ast.IASTSimpleDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,13 +27,13 @@ public class FieldChangeEntity extends MemberPlusChangeEntity {
      */
     public FieldChangeEntity(BodyDeclarationPairC fieldDeclarationPair, String changeType, MyRange myRange){
         super(fieldDeclarationPair.getLocationClassString(),changeType,myRange);
-        FieldDeclaration fd = (FieldDeclaration) fieldDeclarationPair.getBodyDeclaration();
+        IASTSimpleDeclaration fd = (IASTSimpleDeclaration) fieldDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(fieldDeclarationPair.getLocationClassString());
         this.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_FIELD);
         this.bodyDeclarationPair = fieldDeclarationPair;
-        List<VariableDeclarationFragment> list = fd.fragments();
+        List<IASTDeclarator> list = Arrays.asList(fd.getDeclarators());
         String res = "";
-        for(VariableDeclarationFragment vd:list){
+        for(IASTDeclarator vd:list){
             res += vd+",";
         }
         this.stageIIBean.setThumbnail(fieldDeclarationPair.getLocationClassString() + res);

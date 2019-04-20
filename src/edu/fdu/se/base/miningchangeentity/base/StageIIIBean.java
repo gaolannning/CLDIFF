@@ -1,5 +1,7 @@
 package edu.fdu.se.base.miningchangeentity.base;
 
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,6 +41,7 @@ public class StageIIIBean {
         String subType;
     }
 
+    @Deprecated
     private void addRangeResultList(Integer[] range, CompilationUnit cu, String file, String type) {
         if (subRange == null) {
             subRange = new ArrayList<>();
@@ -81,37 +84,123 @@ public class StageIIIBean {
         subRange.add(subRangeItem);
     }
 
+
+    private void addRangeResultList(Integer[] range, IASTTranslationUnit cu, String file, String type) {
+        if (subRange == null) {
+            subRange = new ArrayList<>();
+        }
+        int startLine = PreprocessedDataC.getLineNumber(cu,range[0]);
+        int startColumn = PreprocessedDataC.getColumnNumber(cu,range[0]);
+        int endLine =  PreprocessedDataC.getLineNumber(cu,range[1]);
+        int endColumn = PreprocessedDataC.getColumnNumber(cu,range[1]);
+
+        List<Integer> endColumnList = new ArrayList<>();
+        int i = 1;
+        while (startLine + i <= endLine) {
+            int lineNum = startLine + i;
+            int pos = PreprocessedDataC.getPosition(cu,lineNum);
+            pos--;
+            endColumnList.add(pos);
+            i++;
+        }
+        for (int j = startLine, m = 0; j < endLine; j++, m++) {
+            int pos = endColumnList.get(m);
+            if (j == startLine) {
+                SubRange subRangeItem = new SubRange();
+                subRangeItem.file2 = file;
+                subRangeItem.subType = type;
+                subRangeItem.subRangeCode = startLine + "," + startColumn + "," + pos;
+                subRange.add(subRangeItem);
+            } else {
+                SubRange subRangeItem = new SubRange();
+                subRangeItem.file2 = file;
+                subRangeItem.subType = type;
+                subRangeItem.subRangeCode = startLine + "," + 0 + "," + pos;
+                subRange.add(subRangeItem);
+            }
+        }
+        int startColumn2 = endLine > startLine ? 0 : startColumn;
+        SubRange subRangeItem = new SubRange();
+        subRangeItem.file2 = file;
+        subRangeItem.subType = type;
+        subRangeItem.subRangeCode = endLine + "," + startColumn2 + "," + endColumn;
+        subRange.add(subRangeItem);
+    }
+
+    @Deprecated
     private void addRangesResultList(List<Integer[]> ranges, CompilationUnit cu, String file, String type) {
         for (Integer[] range : ranges) {
             addRangeResultList(range, cu, file, type);
         }
     }
 
+    private void addRangesResultList(List<Integer[]> ranges, IASTTranslationUnit cu, String file, String type) {
+        for (Integer[] range : ranges) {
+            addRangeResultList(range, cu, file, type);
+        }
+    }
+
+
+    @Deprecated
     public void addInsertList(List<Integer[]> ranges, CompilationUnit cu) {
         String file = ChangeEntityDesc.StageIIIFile.DST;
         String type = "insert";
         addRangesResultList(ranges, cu, file, type);
     }
 
+    public void addInsertList(List<Integer[]> ranges, IASTTranslationUnit cu) {
+        String file = ChangeEntityDesc.StageIIIFile.DST;
+        String type = "insert";
+        addRangesResultList(ranges, cu, file, type);
+    }
+
+    @Deprecated
     public void addUpdateList(List<Integer[]> ranges, CompilationUnit cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
         String type = "update";
         addRangesResultList(ranges, cu, file, type);
     }
 
+    public void addUpdateList(List<Integer[]> ranges, IASTTranslationUnit cu) {
+        String file = ChangeEntityDesc.StageIIIFile.SRC;
+        String type = "update";
+        addRangesResultList(ranges, cu, file, type);
+    }
+
+    @Deprecated
     public void addDeleteList(List<Integer[]> ranges, CompilationUnit cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
         String type = "delete";
         addRangesResultList(ranges, cu, file, type);
     }
 
+    public void addDeleteList(List<Integer[]> ranges, IASTTranslationUnit cu) {
+        String file = ChangeEntityDesc.StageIIIFile.SRC;
+        String type = "delete";
+        addRangesResultList(ranges, cu, file, type);
+    }
+
+    @Deprecated
     public void addMoveListSrc(Integer[] range, CompilationUnit cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
         String type = "move";
         addRangeResultList(range, cu, file, type);
     }
 
+    public void addMoveListSrc(Integer[] range, IASTTranslationUnit cu) {
+        String file = ChangeEntityDesc.StageIIIFile.SRC;
+        String type = "move";
+        addRangeResultList(range, cu, file, type);
+    }
+
+    @Deprecated
     public void addMoveListDst(Integer[] range, CompilationUnit cu) {
+        String file = ChangeEntityDesc.StageIIIFile.DST;
+        String type = "move";
+        addRangeResultList(range, cu, file, type);
+    }
+
+    public void addMoveListDst(Integer[] range, IASTTranslationUnit cu) {
         String file = ChangeEntityDesc.StageIIIFile.DST;
         String type = "move";
         addRangeResultList(range, cu, file, type);

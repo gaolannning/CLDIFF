@@ -6,6 +6,7 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.base.MemberPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 /**
@@ -20,10 +21,10 @@ public class MethodChangeEntity extends MemberPlusChangeEntity {
 
     public MethodChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
-        MethodDeclaration md =(MethodDeclaration) bodyDeclarationPair.getBodyDeclaration();
+        IASTFunctionDefinition md =(IASTFunctionDefinition) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());
         this.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_METHOD);
-        this.stageIIBean.setThumbnail(md.getName().toString());
+        this.stageIIBean.setThumbnail(md.getDeclarator().getName().toString());
         this.bodyDeclarationPair = bodyDeclarationPair;
     }
 

@@ -42,6 +42,55 @@ public class PreprocessedDataC {
     public Set<String> currFieldNames;
     public Set<String> prevCurrFieldNames;
 
+    //add by YXY
+    public static int getLineNumber(IASTTranslationUnit tu,Integer num){
+        String[] s= tu.getRawSignature().split("\n");
+        int[] lineCnt = new int[s.length];
+        for(int i = 0;i<s.length;i++){
+            lineCnt[i] = s[i].length()+1;
+        }
+        int cnt = 0;
+        for(int i = 0;i<s.length;i++){
+            cnt += lineCnt[i];
+            if(cnt>num){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int getColumnNumber(IASTTranslationUnit tu,Integer num){
+        String[] s= tu.getRawSignature().split("\n");
+        int[] lineCnt = new int[s.length];
+        for(int i = 0;i<s.length;i++){
+            lineCnt[i] = s[i].length()+1;
+        }
+        int cnt = 0;
+        for(int i = 0;i<s.length;i++){
+            cnt += lineCnt[i];
+            if(cnt>num){
+                return num-(cnt-lineCnt[i]);
+            }
+        }
+        return -1;
+    }
+
+    public static int getPosition(IASTTranslationUnit tu,Integer line){
+        String[] s= tu.getRawSignature().split("\n");
+        int[] lineCnt = new int[s.length];
+        for(int i = 0;i<s.length;i++){
+            lineCnt[i] = s[i].length()+1;
+        }
+        if(line>s.length){
+            return -1;
+        }
+        int cnt = 0;
+        for(int i = 0;i<line;i++){
+            cnt += lineCnt[i];
+        }
+        return cnt;
+    }
+
     @Deprecated
     public CompilationUnit getDstCu() {
         return dstCu;

@@ -3,15 +3,22 @@ package edu.fdu.se.base.links.linkbean;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.actions.model.Move;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.util.BasicTreeTraversal;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.MethodChangeEntity;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionDeclarator;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.core.dom.ast.IASTParameterDeclaration;
+import org.eclipse.cdt.internal.core.model.FunctionDeclaration;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,13 +33,13 @@ public class MethodData extends LinkBean {
         this.methodName = new MyList<>();
 
         if(ce.stageIIBean.getEntityCreationStage().equals(ChangeEntityDesc.StageIIGenStage.ENTITY_GENERATION_STAGE_PRE_DIFF)){
-            MethodDeclaration md = (MethodDeclaration) ce.bodyDeclarationPair.getBodyDeclaration();
+            IASTFunctionDefinition md = (IASTFunctionDefinition) ce.bodyDeclarationPair.getBodyDeclaration();
             setValue(md);
         }else{
             Tree tree = (Tree)ce.clusteredActionBean.curAction.getNode();
             if(ce.clusteredActionBean.curAction instanceof Move){
-                if(tree.getAstNode().getNodeType() == ASTNode.METHOD_DECLARATION){
-                    MethodDeclaration md = (MethodDeclaration) tree.getAstNode();
+                if(JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC()) == JavaParserVisitorC.METHOD_DECLARATION){
+                    IASTFunctionDefinition md = (IASTFunctionDefinition) tree.getAstNodeC();
                     setValue(md);
                 }
             }else {
@@ -42,16 +49,18 @@ public class MethodData extends LinkBean {
 
     }
 
-    public void setValue(MethodDeclaration md){
-        methodName.add(md.getName().toString());
-        List<SingleVariableDeclaration> params = md.parameters();
-        for(SingleVariableDeclaration svd :params){
-            svd.getName();
-            parameterName.add(svd.getName().toString());
-            parameterType.add(svd.getType().toString());
+    public void setValue(IASTFunctionDefinition md){
+        methodName.add(md.getDeclarator().getName().toString());
+        List<IASTNode> params = Arrays.asList(((IASTFunctionDeclarator) md.getDeclarator()).getChildren());
+        params = params.subList(1,params.size());
+        for(IASTNode svd :params){
+            IASTParameterDeclaration pd = (IASTParameterDeclaration) svd;
+            ((IASTParameterDeclaration) svd).getDeclarator().getName();
+            parameterName.add(pd.getDeclarator().getName().toString());
+            parameterType.add(pd.getDeclSpecifier().toString());
         }
-        if(md.getReturnType2()!=null){
-            returnType = md.getReturnType2().toString();
+        if(md.getDeclSpecifier()!=null){
+            returnType = md.getDeclSpecifier().toString();
         }
     }
 
@@ -62,7 +71,7 @@ public class MethodData extends LinkBean {
         List<String> tempParameterType = new MyList<>();
         List<String> tempParameterName = new MyList<>();
         String tempReturn = null;
-        if(tree.getAstNode().getNodeType() != ASTNode.METHOD_DECLARATION) {
+        if(JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC()) != JavaParserVisitorC.METHOD_DECLARATION) {
             tree = BasicTreeTraversal.findFafatherNode(ce.clusteredActionBean.curAction.getNode());
         }
         //*** start of retrieving methodName
@@ -74,23 +83,24 @@ public class MethodData extends LinkBean {
             }
 
         }
-        MethodDeclaration md = (MethodDeclaration) tree.getAstNode();
-        methodName.add(md.getName().toString());
-        List<SingleVariableDeclaration> params = md.parameters();
-        for(SingleVariableDeclaration svd :params){
-            svd.getName();
-            tempParameterName.add(svd.getName().toString());
-            tempParameterType.add(svd.getType().toString());
+        IASTFunctionDefinition md = (IASTFunctionDefinition) tree.getAstNodeC();
+        List<IASTNode> params = Arrays.asList(((IASTFunctionDeclarator) md.getDeclarator()).getChildren());
+        params = params.subList(1,params.size());
+        for(IASTNode svd :params){
+            IASTParameterDeclaration pd = (IASTParameterDeclaration) svd;
+            ((IASTParameterDeclaration) svd).getDeclarator().getName();
+            parameterName.add(pd.getDeclarator().getName().toString());
+            parameterType.add(pd.getDeclSpecifier().toString());
         }
-        if(md.getReturnType2()!=null) {
-            tempReturn = md.getReturnType2().toString();
+        if(md.getDeclSpecifier()!=null){
+            returnType = md.getDeclSpecifier().toString();
         }
         //***End
 
         for(Action a:ce.clusteredActionBean.actions){
             Tree t = (Tree) a.getNode();
-            if (t.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
-                    || t.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
+            if (JavaParserVisitorC.getNodeTypeId(t.getAstNodeC()) == JavaParserVisitorC.NAME
+                    || t.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
 //                if(tempMethodName.contains(t.getLabel())){
 //                    methodName.add(t.getLabel());
 //                }

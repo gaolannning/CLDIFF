@@ -4,6 +4,7 @@ import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.generatingactions.ActionConstants;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.ChangePacket;
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -44,7 +45,7 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         List<ITree> children = node.getChildren();
         for(ITree child:children){
             Tree tmp = (Tree) child;
-            if(tmp.getAstNode().getNodeType() == ASTNode.BLOCK){
+            if(JavaParserVisitorC.getNodeTypeId(tmp.getAstNodeC()) == JavaParserVisitorC.COMPOUND_STATEMENT){
                 break;
             }
             traverseNodeSubTree(tmp,result1,changePacket.getChangeSet1());

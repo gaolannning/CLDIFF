@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.github.gumtreediff.actions.model.*;
 import edu.fdu.se.base.common.Global;
+import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.links.LayeredChangeEntityContainerC;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -90,18 +91,12 @@ public class ChangeEntityPreprocess {
     public void generatingExpressions(List<Action> actions,StageIIBean bean){
         for(Action a:actions){
             Tree tree = (Tree) a.getNode();
-            int nodeType = tree.getAstNode().getNodeType();
+            int nodeType = JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC());
 //            System.out.println(tree.getAstNode());
             int flag = 0;
             switch(nodeType){
-                case ASTNode.NORMAL_ANNOTATION:
-                case ASTNode.MARKER_ANNOTATION:
-                case ASTNode.SINGLE_MEMBER_ANNOTATION:
-                case ASTNode.ARRAY_ACCESS:
-                case ASTNode.ARRAY_CREATION:
-                case ASTNode.ARRAY_INITIALIZER:
+
                 case ASTNode.ASSIGNMENT:
-                case ASTNode.CAST_EXPRESSION:
                 case ASTNode.CLASS_INSTANCE_CREATION:
                 case ASTNode.CONDITIONAL_EXPRESSION:
                 case ASTNode.CREATION_REFERENCE:
@@ -150,7 +145,7 @@ public class ChangeEntityPreprocess {
                 bean.addOpt2AndOpt2Expression(name,exp);
             }else if(flag ==2){
                 String name =a.getClass().getSimpleName();
-                String exp = tree.getAstNode().getClass().getSimpleName();
+                String exp = tree.getAstNodeC().getClass().getSimpleName();
 //            	System.out.println("-------------------------"+tree.getAstNode().getNodeType());
 //                System.out.println("-------------------------"+name+"  "+exp);
                 bean.addOpt2AndOpt2Expression(name,exp);

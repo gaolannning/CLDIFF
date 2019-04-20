@@ -2,6 +2,8 @@ package edu.fdu.se.base.links;
 
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
+import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 /**
@@ -23,12 +25,12 @@ public class LinkUtil {
     public static String findResidingMethodName(Tree t){
 
         while(true){
-            if(t.getAstNode().getClass().toString().endsWith("CompilationUnit")){
+            if(t.getAstNodeC().getClass().toString().endsWith("TranslationUnit")){
                 break;
             }
-            if(t.getAstNode().getClass().toString().endsWith("Declaration")){
-                MethodDeclaration md = (MethodDeclaration) t.getAstNode();
-                return md.getName().toString();
+            if(t.getAstNodeC().getClass().toString().endsWith("Definition")){
+                IASTFunctionDefinition md = (IASTFunctionDefinition) t.getAstNodeC();
+                return md.getDeclarator().getName().toString();
             }
             t = (Tree) t.getParent();
         }

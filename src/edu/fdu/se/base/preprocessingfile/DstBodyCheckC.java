@@ -145,8 +145,10 @@ public class DstBodyCheckC {
             List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
             BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,Type.TypeDeclaration);
             if(srcBody != null) {
+                boolean b1 = srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode();
+                boolean b2 = curName.hashCode() == srcBody.getLocationClassString().hashCode();
                 if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode()
-                        && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
+                        && curName.hashCode() == srcBody.getLocationClassString().hashCode()) {
 //                System.out.println(srcBody.getBodyDeclaration().toString());
 //                System.out.println(cod.toString());
                     compareCache.addToDstRemoveList(cod);

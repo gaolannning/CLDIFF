@@ -11,6 +11,8 @@ import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.StatementPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionCallExpression;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class StmtData extends LinkBean {
         for (Tree aa : simpleNames) {
             if (aa.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
                     || aa.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
-                ASTNode exp = findExpression(tree);
+                IASTNode exp = findExpression(tree);
                 if (exp == null || !(exp instanceof MethodInvocation)) {
                     if (preprocessedData.prevCurrFieldNames.contains(tree.getLabel())) {
                         this.variableField.add(tree.getLabel());
@@ -110,10 +112,10 @@ public class StmtData extends LinkBean {
 
             if (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC()) == JavaParserVisitorC.NAME
                     || tree.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
-                ASTNode exp = findExpression(tree);
+                IASTNode exp = findExpression(tree);
                 boolean flag = true;
-                if (exp != null && exp instanceof MethodInvocation) {
-                    if (isMethodInvocationName((MethodInvocation) exp, tree.getLabel())) {
+                if (exp != null && exp instanceof CPPASTFunctionCallExpression) {
+                    if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, tree.getLabel())) {
                         if (updateVal != null) {
                             methodInvocation.add(updateVal);
                         }
@@ -146,7 +148,7 @@ public class StmtData extends LinkBean {
                 Tree dstTree = (Tree) dstNode;
                 if (dstTree.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
                         || dstTree.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
-                    ASTNode exp = findExpression(dstTree);
+                    IASTNode exp = findExpression(dstTree);
                     if (exp != null && exp instanceof MethodInvocation) {
                         if (isMethodInvocationName((MethodInvocation) exp, updateVal)) {
                             if (updateVal != null) {
@@ -161,49 +163,52 @@ public class StmtData extends LinkBean {
     }
 
 
-    private ASTNode findExpression(Tree tree) {
+    private IASTNode findExpression(Tree tree) {
         int flag = 0;
-        while (!tree.getAstNodeC().getClass().getSimpleName().endsWith("Declaration")) {
+        while (!tree.getAstNodeC().getClass().getSimpleName().endsWith("Statement")) {
             tree = (Tree) tree.getParent();
             switch (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC())) {
-                case ASTNode.NORMAL_ANNOTATION:
-                case ASTNode.MARKER_ANNOTATION:
-                case ASTNode.SINGLE_MEMBER_ANNOTATION:
-                case ASTNode.ARRAY_CREATION:
-                case ASTNode.ARRAY_INITIALIZER:
-                case ASTNode.ASSIGNMENT:
-                case ASTNode.BOOLEAN_LITERAL:
-                case ASTNode.CAST_EXPRESSION:
-                case ASTNode.CHARACTER_LITERAL:
-                case ASTNode.CLASS_INSTANCE_CREATION:
-                case ASTNode.CONDITIONAL_EXPRESSION:
-                case ASTNode.CREATION_REFERENCE:
-                case ASTNode.EXPRESSION_METHOD_REFERENCE:
-                case ASTNode.FIELD_ACCESS:
-                case ASTNode.INFIX_EXPRESSION:
-                case ASTNode.INSTANCEOF_EXPRESSION:
-                case ASTNode.LAMBDA_EXPRESSION:
-                case ASTNode.METHOD_INVOCATION:
-                case ASTNode.SIMPLE_NAME:
-                case ASTNode.QUALIFIED_NAME:
-                case ASTNode.NULL_LITERAL:
-                case ASTNode.NUMBER_LITERAL:
-                case ASTNode.PARENTHESIZED_EXPRESSION:
-                case ASTNode.POSTFIX_EXPRESSION:
-                case ASTNode.PREFIX_EXPRESSION:
-                case ASTNode.STRING_LITERAL:
-                case ASTNode.SUPER_FIELD_ACCESS:
-                case ASTNode.SUPER_METHOD_INVOCATION:
-                case ASTNode.SUPER_METHOD_REFERENCE:
-                case ASTNode.THIS_EXPRESSION:
-                case ASTNode.TYPE_LITERAL:
-                case ASTNode.TYPE_METHOD_REFERENCE:
-                case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+                // TO ADD
+                case JavaParserVisitorC.EQUALS_INITIALIZER:
+                case JavaParserVisitorC.FUNCTION_CALL_EXPRESSION:
+//                case ASTNode.NORMAL_ANNOTATION:
+//                case ASTNode.MARKER_ANNOTATION:
+//                case ASTNode.SINGLE_MEMBER_ANNOTATION:
+//                case ASTNode.ARRAY_CREATION:
+//                case ASTNode.ARRAY_INITIALIZER:
+//                case ASTNode.ASSIGNMENT:
+//                case ASTNode.BOOLEAN_LITERAL:
+//                case ASTNode.CAST_EXPRESSION:
+//                case ASTNode.CHARACTER_LITERAL:
+//                case ASTNode.CLASS_INSTANCE_CREATION:
+//                case ASTNode.CONDITIONAL_EXPRESSION:
+//                case ASTNode.CREATION_REFERENCE:
+//                case ASTNode.EXPRESSION_METHOD_REFERENCE:
+//                case ASTNode.FIELD_ACCESS:
+//                case ASTNode.INFIX_EXPRESSION:
+//                case ASTNode.INSTANCEOF_EXPRESSION:
+//                case ASTNode.LAMBDA_EXPRESSION:
+//                case ASTNode.METHOD_INVOCATION:
+//                case ASTNode.SIMPLE_NAME:
+//                case ASTNode.QUALIFIED_NAME:
+//                case ASTNode.NULL_LITERAL:
+//                case ASTNode.NUMBER_LITERAL:
+//                case ASTNode.PARENTHESIZED_EXPRESSION:
+//                case ASTNode.POSTFIX_EXPRESSION:
+//                case ASTNode.PREFIX_EXPRESSION:
+//                case ASTNode.STRING_LITERAL:
+//                case ASTNode.SUPER_FIELD_ACCESS:
+//                case ASTNode.SUPER_METHOD_INVOCATION:
+//                case ASTNode.SUPER_METHOD_REFERENCE:
+//                case ASTNode.THIS_EXPRESSION:
+//                case ASTNode.TYPE_LITERAL:
+//                case ASTNode.TYPE_METHOD_REFERENCE:
+//                case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
                     flag = 1;
                     break;
             }
             if (flag == 1) {
-                return tree.getAstNode();
+                return tree.getAstNodeC();
             }
         }
         return null;
@@ -239,6 +244,43 @@ public class StmtData extends LinkBean {
         return false;
     }
 
+
+    private boolean isMethodInvocationName(CPPASTFunctionCallExpression methodInvocation, String methodName) {
+        String methodName1 = methodInvocation.getFunctionNameExpression().toString();
+        if (methodName.equals(methodName1)) {
+            return true;
+        }
+//        methodInvocationSet.add(methodName);
+//        Expression exp = methodInvocation.getExpression();
+//        if(exp!=null){
+//            if(exp instanceof ThisExpression){
+//                //this
+//            }else if(exp instanceof SimpleName){
+//                // 应该是field
+//                varNameSet.add(exp.toString());
+//            }
+//        }
+//        List arguments = methodInvocation.arguments();
+//        for (int i = 0; i < arguments.size(); i++) {
+//            ASTNode tmp = (ASTNode) arguments.get(i);
+//            if(tmp.getNodeType() == ASTNode.METHOD_INVOCATION) {
+////                setMethodInvocation((MethodInvocation)tmp,methodInvocationSet,varNameSet);
+//            }else if(tmp.getNodeType() == ASTNode.INFIX_EXPRESSION) {
+////                setInfixExpression((InfixExpression)tmp,methodInvocationSet,varNameSet);
+//            }else {
+//                varNameSet.add(tmp.toString());
+//            }
+//        }
+
+//        if(arguments!=null) {
+//            traverseASTNodeList(arguments, methodInvocationSet, varNameSet);
+//        }
+        return false;
+
+    }
+
+
+    @Deprecated
     private boolean isMethodInvocationName(MethodInvocation methodInvocation, String methodName) {
         String methodName1 = methodInvocation.getName().toString();
         if (methodName.equals(methodName1)) {

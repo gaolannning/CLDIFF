@@ -10,6 +10,9 @@ import edu.fdu.se.base.miningchangeentity.base.StatementPlusChangeEntity;
 import edu.fdu.se.base.miningchangeentity.member.*;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
+import org.eclipse.cdt.core.dom.ast.*;
+import org.eclipse.cdt.internal.core.pdom.dom.cpp.PDOMCPPAliasTemplateSpecialization;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -117,7 +120,8 @@ public class FileInnerLinksGenerator {
         List<ChangeEntity> stmtChangeEntity = new ArrayList<>();
         for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : mMap.entrySet()) {
             BodyDeclarationPairC key = entry.getKey();
-            if (key.getBodyDeclaration() instanceof MethodDeclaration) {
+            IASTNode n = key.getBodyDeclaration();
+            if (n instanceof IASTFunctionDefinition) {
                 List<ChangeEntity> mList = entry.getValue();
                 mList.forEach(a->{
                     if(a instanceof StatementPlusChangeEntity){
@@ -126,7 +130,7 @@ public class FileInnerLinksGenerator {
                 });
                 checkStatement2StatementAssoInMethod(mList);// method内stmt之间 定义本地变量 随后被use
             }
-            if(key.getBodyDeclaration() instanceof TypeDeclaration){
+            if(n instanceof IASTTranslationUnit || (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)){
                 List<ChangeEntity> mList = entry.getValue();
                 for(ChangeEntity tmp:mList){
                     if(tmp instanceof MethodChangeEntity){

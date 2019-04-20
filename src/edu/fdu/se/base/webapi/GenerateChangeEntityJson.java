@@ -9,6 +9,8 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.base.StageIIIBean;
 import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntity;
+import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
+import org.eclipse.cdt.internal.core.model.TranslationUnit;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -150,8 +152,10 @@ public class GenerateChangeEntityJson {
     }
 
     public static void setStageIIIBeanSubRangeDetail(StageIIIBean stageIIIBean, List<Action> actions, MiningActionData mad) {
-        CompilationUnit src = mad.preprocessedData.srcCu;
-        CompilationUnit dst = mad.preprocessedData.dstCu;
+//        CompilationUnit src = mad.preprocessedData.srcCu;
+//        CompilationUnit dst = mad.preprocessedData.dstCu;
+        IASTTranslationUnit src = mad.preprocessedData.srcTu;
+        IASTTranslationUnit dst = mad.preprocessedData.dstTu;
         List<Integer[]> rangeList = new ArrayList<>();
         MergeIntervals mi = new MergeIntervals();
         actions.forEach(a -> {
