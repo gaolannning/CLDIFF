@@ -71,6 +71,7 @@ public class LayeredChangeEntityContainerC {
                     location = location.substring(0, location.length() - 1);
                     int index = location.lastIndexOf(".");
                     location = location.substring(0, index + 1);
+                    String s = key.getLocationClassString();
                     if (location.equals(key.getLocationClassString())) {
                         mKey = key;
                         break;

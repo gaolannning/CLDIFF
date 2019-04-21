@@ -10,10 +10,7 @@ import org.eclipse.cdt.core.dom.ast.c.ICASTDesignator;
 import org.eclipse.cdt.core.dom.ast.cpp.*;
 import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTExpressionStatement;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTCompoundStatement;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTDeclarationStatement;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTEqualsInitializer;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPNodeFactory;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.*;
 
 
 import java.util.ArrayDeque;
@@ -374,7 +371,8 @@ public class JavaParserVisitorC  extends ASTVisitor {
     public static final int CAST_EXPRESSION = 22;
     public static final int EQUALS_INITIALIZER = 23;
     public static final int FUNCTION_CALL_EXPRESSION = 24;
-
+    public static final int NEW_EXPRESSION = 25;
+    public static final int CONSTRUCTOR_INITIALIZER = 26;
 
     public static int getNodeTypeId(IASTNode n){
 //        if(n instanceof IASTCompoundStatement){
@@ -452,6 +450,15 @@ public class JavaParserVisitorC  extends ASTVisitor {
         }
         if(n instanceof IASTFunctionCallExpression){
             return FUNCTION_CALL_EXPRESSION;
+        }
+        if(n instanceof  ICPPASTNewExpression){
+            return NEW_EXPRESSION;
+        }
+        if(n instanceof  ICPPASTNewExpression){
+            return NEW_EXPRESSION;
+        }
+        if(n instanceof CPPASTConstructorInitializer){
+            return CONSTRUCTOR_INITIALIZER;
         }
         return UNKNOWN;
     }

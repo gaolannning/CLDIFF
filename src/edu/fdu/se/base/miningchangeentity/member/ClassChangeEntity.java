@@ -6,6 +6,8 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.base.MemberPlusChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
+import org.eclipse.cdt.core.dom.ast.IASTCompositeTypeSpecifier;
+import org.eclipse.cdt.core.dom.ast.IASTSimpleDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /**
@@ -21,14 +23,14 @@ public class ClassChangeEntity extends MemberPlusChangeEntity {
      */
     public ClassChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
-        TypeDeclaration cod = (TypeDeclaration)bodyDeclarationPair.getBodyDeclaration();
+        IASTSimpleDeclaration cod = (IASTSimpleDeclaration) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());
-        if(cod.isInterface()){
+        if(((IASTCompositeTypeSpecifier)cod.getDeclSpecifier()).getKey() != 3){
             this.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_INTERFACE);
         }else{
             this.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_INNER_CLASS);
         }
-        this.stageIIBean.setThumbnail(cod.getName().toString());
+        this.stageIIBean.setThumbnail(((IASTCompositeTypeSpecifier) cod.getDeclSpecifier()).getName().toString());
         this.bodyDeclarationPair = bodyDeclarationPair;
     }
 

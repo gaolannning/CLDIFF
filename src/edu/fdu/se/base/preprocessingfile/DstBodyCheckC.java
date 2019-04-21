@@ -164,7 +164,7 @@ public class DstBodyCheckC {
             }
         }
         // new class
-        compareResult.addBodiesAdded(cod, prefixClassName);
+        compareResult.addBodiesAdded(cod, curName);
         compareCache.addToDstRemoveList(cod);
         return 3;
     }

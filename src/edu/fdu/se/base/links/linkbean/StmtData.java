@@ -13,6 +13,7 @@ import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionCallExpression;
+import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNewExpression;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
@@ -75,16 +76,16 @@ public class StmtData extends LinkBean {
         List<Tree> simpleNames = new ArrayList<>();
         for (ITree tmp : tree.preOrder()) {
             Tree t = (Tree) tmp;
-            if (t.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
+            if (JavaParserVisitorC.getNodeTypeId(t.getAstNodeC()) == JavaParserVisitorC.NAME
                     || t.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
                 simpleNames.add(t);
             }
         }
         for (Tree aa : simpleNames) {
-            if (aa.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
+            if (JavaParserVisitorC.getNodeTypeId(aa.getAstNodeC()) == JavaParserVisitorC.NAME
                     || aa.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
                 IASTNode exp = findExpression(tree);
-                if (exp == null || !(exp instanceof MethodInvocation)) {
+                if (exp == null || !(exp instanceof CPPASTFunctionCallExpression)) {
                     if (preprocessedData.prevCurrFieldNames.contains(tree.getLabel())) {
                         this.variableField.add(tree.getLabel());
                     } else {
@@ -92,7 +93,7 @@ public class StmtData extends LinkBean {
                     }
                     continue;
                 }
-                if (isMethodInvocationName((MethodInvocation) exp, tree.getLabel())) {
+                if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, tree.getLabel())) {
                     methodInvocation.add(tree.getLabel());
                 }
             }
@@ -123,8 +124,8 @@ public class StmtData extends LinkBean {
                         flag = false;
                     }
                 }
-                if (exp != null && exp instanceof ClassInstanceCreation) {
-                    if (isClassCreationName((ClassInstanceCreation) exp, tree.getLabel())) {
+                if (exp != null && exp instanceof CPPASTNewExpression) {
+                    if (isClassCreationName((CPPASTNewExpression) exp, tree.getLabel())) {
                         this.classCreation.add(tree.getLabel());
                         flag = false;
                     }
@@ -146,11 +147,11 @@ public class StmtData extends LinkBean {
             }
             if (updateFlag) {
                 Tree dstTree = (Tree) dstNode;
-                if (dstTree.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME
+                if (JavaParserVisitorC.getNodeTypeId(dstTree.getAstNodeC()) == JavaParserVisitorC.NAME
                         || dstTree.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
                     IASTNode exp = findExpression(dstTree);
-                    if (exp != null && exp instanceof MethodInvocation) {
-                        if (isMethodInvocationName((MethodInvocation) exp, updateVal)) {
+                    if (exp != null && exp instanceof CPPASTFunctionCallExpression) {
+                        if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, updateVal)) {
                             if (updateVal != null) {
                                 methodInvocation.add(updateVal);
                             }
@@ -171,6 +172,7 @@ public class StmtData extends LinkBean {
                 // TO ADD
                 case JavaParserVisitorC.EQUALS_INITIALIZER:
                 case JavaParserVisitorC.FUNCTION_CALL_EXPRESSION:
+                case JavaParserVisitorC.NEW_EXPRESSION:
 //                case ASTNode.NORMAL_ANNOTATION:
 //                case ASTNode.MARKER_ANNOTATION:
 //                case ASTNode.SINGLE_MEMBER_ANNOTATION:
@@ -235,9 +237,17 @@ public class StmtData extends LinkBean {
 //            }
 //        }
 //    }
-
+    @Deprecated
     public boolean isClassCreationName(ClassInstanceCreation classInstanceCreation, String clazzName) {
         String clazz = classInstanceCreation.getType().toString();
+        if (clazzName.equals(clazz)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isClassCreationName(CPPASTNewExpression classInstanceCreation, String clazzName) {
+        String clazz = classInstanceCreation.getImplicitNames()[0].toString();
         if (clazzName.equals(clazz)) {
             return true;
         }
@@ -331,6 +341,8 @@ public class StmtData extends LinkBean {
      *
      * @param moveAction
      */
+
+    @Deprecated
     public void move(Action moveAction) {
         Tree moveTree = (Tree) moveAction.getNode();
         for (ITree t : moveTree.preOrder()) {
@@ -342,6 +354,7 @@ public class StmtData extends LinkBean {
         }
     }
 
+    @Deprecated
     public void move(Tree moveTree) {
         for (ITree t : moveTree.preOrder()) {
             Tree tree = (Tree) t;

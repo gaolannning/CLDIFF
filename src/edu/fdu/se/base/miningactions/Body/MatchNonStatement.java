@@ -177,7 +177,7 @@ public class MatchNonStatement {
 
     public static void matchXXXChangeCurEntity(MiningActionData fp, Action a, ChangeEntity changeEntity, Tree traverseFather) {
         Tree queryFather = (Tree) changeEntity.clusteredActionBean.fafather;
-        int nodeType = queryFather.getAstNode().getNodeType();
+        int nodeType = JavaParserVisitorC.getNodeTypeId(queryFather.getAstNodeC());
         switch (nodeType) {
             case ASTNode.TYPE_DECLARATION:
                 MatchClass.matchClassSignatureCurrEntity(fp, a, changeEntity, traverseFather);

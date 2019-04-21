@@ -27,10 +27,8 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         List<ITree> children = node.getChildren();
         for(ITree child :children){
             Tree tmp = (Tree) child;
-            if(tmp.getAstNode().getNodeType()== ASTNode.MODIFIER ||
-                    tmp.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME ||
-                    tmp.getAstNode().getNodeType() == ASTNode.PARAMETERIZED_TYPE||
-                    tmp.getAstNode().getNodeType() == ASTNode.SIMPLE_TYPE){
+            if(true||
+                    JavaParserVisitorC.getNodeTypeId(tmp.getAstNodeC()) == JavaParserVisitorC.NAME){
                 traverseNodeSubTree(tmp,result1,changePacket.getChangeSet1());
             }
         }
