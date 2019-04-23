@@ -9,10 +9,7 @@ import edu.fdu.se.base.miningactions.util.BasicTreeTraversal;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.MethodChangeEntity;
-import org.eclipse.cdt.core.dom.ast.IASTFunctionDeclarator;
-import org.eclipse.cdt.core.dom.ast.IASTFunctionDefinition;
-import org.eclipse.cdt.core.dom.ast.IASTNode;
-import org.eclipse.cdt.core.dom.ast.IASTParameterDeclaration;
+import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.internal.core.model.FunctionDeclaration;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -52,12 +49,14 @@ public class MethodData extends LinkBean {
     public void setValue(IASTFunctionDefinition md){
         methodName.add(md.getDeclarator().getName().toString());
         List<IASTNode> params = Arrays.asList(((IASTFunctionDeclarator) md.getDeclarator()).getChildren());
-        params = params.subList(1,params.size());
+//        params = params.subList(1,params.size());
         for(IASTNode svd :params){
-            IASTParameterDeclaration pd = (IASTParameterDeclaration) svd;
-            ((IASTParameterDeclaration) svd).getDeclarator().getName();
-            parameterName.add(pd.getDeclarator().getName().toString());
-            parameterType.add(pd.getDeclSpecifier().toString());
+            if(svd instanceof IASTParameterDeclaration) {
+                IASTParameterDeclaration pd = (IASTParameterDeclaration) svd;
+                ((IASTParameterDeclaration) svd).getDeclarator().getName();
+                parameterName.add(pd.getDeclarator().getName().toString());
+                parameterType.add(pd.getDeclSpecifier().toString());
+            }
         }
         if(md.getDeclSpecifier()!=null){
             returnType = md.getDeclSpecifier().toString();
@@ -78,8 +77,8 @@ public class MethodData extends LinkBean {
         if(tree.getTreeSrcOrDst() == ChangeEntityDesc.StageITreeType.SRC_TREE_NODE){
             Tree dstTree = (Tree) fp.getMappedDstOfSrcNode(tree);
             if(dstTree!=null){
-                MethodDeclaration mdDst = (MethodDeclaration) dstTree.getAstNode();
-                methodName.add(mdDst.getName().toString());
+                IASTFunctionDefinition mdDst = (IASTFunctionDefinition) dstTree.getAstNodeC();
+                methodName.add(mdDst.getDeclarator().getName().toString());
             }
 
         }

@@ -138,10 +138,11 @@ public class GenerateChangeEntityJson {
         if (!(a instanceof Move)) {
             return;
         }
-        CompilationUnit src = mad.preprocessedData.srcCu;
-        CompilationUnit dst = mad.preprocessedData.dstCu;
+//        CompilationUnit src = mad.preprocessedData.srcCu;
+//        CompilationUnit dst = mad.preprocessedData.dstCu;
+        IASTTranslationUnit src = mad.preprocessedData.srcTu;
+        IASTTranslationUnit dst = mad.preprocessedData.dstTu;
         Move mv = (Move) a;
-
         Tree moveNode = (Tree) mv.getNode();
         Tree movedDstNode = (Tree) mad.getMappedDstOfSrcNode(moveNode);
         stageIIIBean.setRange(moveNode.getRangeString() + "-" + movedDstNode.getRangeString());

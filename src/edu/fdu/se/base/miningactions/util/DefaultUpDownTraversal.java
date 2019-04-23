@@ -29,6 +29,7 @@ public class DefaultUpDownTraversal extends BasicTreeTraversal{
         int i=0;
         for(;i<children.size();i++){
             Tree t = (Tree) children.get(i);
+
             if(t.getAstClass().getSimpleName().endsWith("Declaration")||t.getAstNode().getNodeType() == ASTNode.INITIALIZER){
                 break;
             }

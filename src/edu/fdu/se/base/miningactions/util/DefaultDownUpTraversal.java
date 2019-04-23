@@ -73,7 +73,7 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         int i;
         for(i =0;i<children.size();i++){
             Tree tmp = (Tree) children.get(i);
-            if(tmp.getAstNode().getNodeType() == ASTNode.BLOCK){
+            if(JavaParserVisitorC.getNodeTypeId(tmp.getAstNodeC()) == JavaParserVisitorC.COMPOUND_STATEMENT){
                 break;
             }
         }

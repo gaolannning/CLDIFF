@@ -5,6 +5,7 @@ import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntity;
 import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntityC;
 import edu.fdu.se.base.preprocessingfile.data.*;
+import edu.fdu.se.cldiff.CUtil;
 import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTCompositeTypeSpecifier;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTEnumerationSpecifier;
@@ -66,8 +67,7 @@ public class DstBodyCheckC {
                         return bodyDeclarationPair;
                     break;
                 case FieldDeclaration:
-                    if(node instanceof  IASTSimpleDeclaration)
-                        if(((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTNamedTypeSpecifier || ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier)
+                    if(CUtil.isFieldDeclaration(node))
                             return bodyDeclarationPair;
                     break;
                 case FunctionDeclaration:

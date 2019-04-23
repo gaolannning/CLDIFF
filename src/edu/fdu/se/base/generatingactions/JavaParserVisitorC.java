@@ -326,6 +326,8 @@ public class JavaParserVisitorC  extends ASTVisitor {
         if(inRemoveList(node)){
             return 1;
         }
+        if(node.getFileLocation() == null)
+            return 1;
         pushNode(node,getLabel((node)));
         return 3;
     }
@@ -334,6 +336,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
         if (n instanceof IASTName) return ((IASTName) n).toString();
         if (n instanceof IASTTranslationUnit) return "*TranslationUnit*";
         if (n instanceof IASTLiteralExpression) return String.valueOf(((IASTLiteralExpression) n).getValue());
+        if (n instanceof IASTBinaryExpression) return String.valueOf(((IASTBinaryExpression)n).getOperator());
 //        if (n instanceof StringLiteral) return ((StringLiteral) n).getEscapedValue();
 //        if (n instanceof NumberLiteral) return ((NumberLiteral) n).getToken();
 //        if (n instanceof CharacterLiteral) return ((CharacterLiteral) n).getEscapedValue();
@@ -373,6 +376,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
     public static final int FUNCTION_CALL_EXPRESSION = 24;
     public static final int NEW_EXPRESSION = 25;
     public static final int CONSTRUCTOR_INITIALIZER = 26;
+    public static final int BINARY_EXPRESSION = 27;
 
     public static int getNodeTypeId(IASTNode n){
 //        if(n instanceof IASTCompoundStatement){
@@ -460,6 +464,10 @@ public class JavaParserVisitorC  extends ASTVisitor {
         if(n instanceof CPPASTConstructorInitializer){
             return CONSTRUCTOR_INITIALIZER;
         }
+        if(n instanceof IASTBinaryExpression){
+            return BINARY_EXPRESSION;
+        }
+
         return UNKNOWN;
     }
 
@@ -504,7 +512,12 @@ public class JavaParserVisitorC  extends ASTVisitor {
     protected void pushNode(IASTNode n, String label) {
         int type = getNodeTypeId(n);
         String typeName = n.getClass().getSimpleName();
-        push(type, typeName, label, n.getFileLocation().getNodeOffset(), n.getFileLocation().getNodeLength(), n);
+        if(n.getFileLocation() != null) {
+            push(type, typeName, label, n.getFileLocation().getNodeOffset(), n.getFileLocation().getNodeLength(), n);
+        }
+        else{
+            System.out.println("anomaly found"+ label);
+        }
     }
 //
     private void push(int type, String typeName, String label, int startPosition, int length, IASTNode node) {

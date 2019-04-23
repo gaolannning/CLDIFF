@@ -123,7 +123,7 @@ public class PreprocessedTempDataC {
             assert(item.getNodeLocations()[0] instanceof IASTFileLocation);
             setLinesFlag(lineList, ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber(),
                     ((IASTFileLocation) item.getNodeLocations()[0]).getStartingLineNumber());
-            ASTRewrite rewriter = ASTRewrite.create(cu);
+//            ASTRewrite rewriter = ASTRewrite.create(cu);
 //            rewriter.remove(item,null);
         }
 //        dstRemovalNodes.clear();
@@ -168,6 +168,7 @@ public class PreprocessedTempDataC {
     }
 
     public void removeAllDstComments(IASTTranslationUnit cu,List<Integer> lineList) {
+        IASTNode[] tst = cu.getChildren();
         for(IASTNode item:cu.getChildren()){
             if(item instanceof CPPASTUsingDirective){
                 addToDstRemoveList(item);

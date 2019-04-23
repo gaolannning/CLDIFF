@@ -77,7 +77,7 @@ public class StmtData extends LinkBean {
         for (ITree tmp : tree.preOrder()) {
             Tree t = (Tree) tmp;
             if (JavaParserVisitorC.getNodeTypeId(t.getAstNodeC()) == JavaParserVisitorC.NAME
-                    || t.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
+                    || t.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
                 simpleNames.add(t);
             }
         }
@@ -148,7 +148,7 @@ public class StmtData extends LinkBean {
             if (updateFlag) {
                 Tree dstTree = (Tree) dstNode;
                 if (JavaParserVisitorC.getNodeTypeId(dstTree.getAstNodeC()) == JavaParserVisitorC.NAME
-                        || dstTree.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
+                        || dstTree.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
                     IASTNode exp = findExpression(dstTree);
                     if (exp != null && exp instanceof CPPASTFunctionCallExpression) {
                         if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, updateVal)) {

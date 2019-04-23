@@ -115,7 +115,17 @@ public class LayeredChangeEntityContainerC {
 
         } else if (changeEntity.clusteredActionBean.traverseType == ChangeEntityDesc.StageITraverseType.TRAVERSE_DOWN_UP) {
             // father节点的range
-            tree = (Tree) node;
+                // insert上一个节点mapping的节点
+                while (tree == null) {
+                    tree = (Tree) mad.getMappedSrcOfDstNode(node);
+                    if(node == null){
+                        break;
+                    }
+                    node = node.getParent();
+                }
+                if(tree == null)
+                    tree = (Tree) changeEntity.clusteredActionBean.fafather;
+//            tree = (Tree) node;
             startPos = tree.getAstNodeC().getFileLocation().getNodeOffset();
         }
         mKey = getEnclosedBodyDeclaration(changeEntity, startPos);

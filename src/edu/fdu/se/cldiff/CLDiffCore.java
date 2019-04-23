@@ -49,7 +49,7 @@ public class CLDiffCore {
     public static boolean isFilter(String filePathName){
         String name = filePathName.toLowerCase();
         //System.out.println(name);
-        if(!name.endsWith(".java")&&!name.endsWith(".cpp")){
+        if(!name.endsWith(".java")&&!name.endsWith(".cpp")&&!name.endsWith(".c")){
             return true;
         }
         if(name.contains("\\test\\")||name.contains("/test/")){

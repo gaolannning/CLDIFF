@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public class BodyDeclarationPairC {
     private IASTNode bd;
 
+
     private String locationClassString;
 
     public BodyDeclarationPairC(IASTNode bd1,String str){
@@ -22,6 +23,7 @@ public class BodyDeclarationPairC {
         String hashStr = String.valueOf(bd1.getRawSignature().toString().hashCode())+String.valueOf(str.hashCode());
         this.hashCode = hashStr.hashCode();
     }
+
     private int hashCode;
 
     public IASTNode getBodyDeclaration() {
