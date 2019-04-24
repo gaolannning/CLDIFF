@@ -1,4 +1,4 @@
-package edu.fdu.se.base.generatingactions;
+package edu.fdu.se.lang.generatingactions;
 
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
@@ -20,17 +20,17 @@ import java.util.Deque;
  * Created by huangkaifeng on 2018/1/23.
  *
  */
-public class JavaParserVisitorC  extends ASTVisitor {
+public class CParserVisitor  extends ASTVisitor {
 
 
     private int treeType;
 
-    public JavaParserVisitorC(int treeType) {
+    public CParserVisitor(int treeType) {
         super();
         this.treeType = treeType;
     }
 
-    public JavaParserVisitorC() {
+    public CParserVisitor() {
         super();
     }
 
@@ -497,7 +497,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
 //    }
 
 
-//    @Override
+    //    @Override
 //    public void postVisit(ASTNode n) {
 //        popNode();
 //    }
@@ -510,7 +510,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
     public TreeContext getTreeContext() {
         return context;
     }
-//
+    //
     protected void pushNode(IASTNode n, String label) {
         int type = getNodeTypeId(n);
         String typeName = n.getClass().getSimpleName();
@@ -521,7 +521,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
             System.out.println("anomaly found"+ label);
         }
     }
-//
+    //
     private void push(int type, String typeName, String label, int startPosition, int length, IASTNode node) {
         ITree t = context.createTree(type, label, node);
         t.setPos(startPosition);
@@ -552,7 +552,7 @@ public class JavaParserVisitorC  extends ASTVisitor {
         trees.push(t);
     }
 
-//    protected ITree getCurrentParent() {
+    //    protected ITree getCurrentParent() {
 //        return trees.peek();
 //    }
 //
@@ -566,3 +566,4 @@ public class JavaParserVisitorC  extends ASTVisitor {
 //        push(type, typeName, "", startPosition, length);
 //    }
 }
+

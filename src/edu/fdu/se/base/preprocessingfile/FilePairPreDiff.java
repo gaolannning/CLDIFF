@@ -39,6 +39,10 @@ public class FilePairPreDiff {
     private PreprocessedData preprocessedData;
     private PreprocessedTempData preprocessedTempData;
 
+    public PreprocessedTempData getPreprocessedTempData() {
+        return preprocessedTempData;
+    }
+
     class SrcDstPair{
         TypeDeclaration tpSrc;
         TypeDeclaration tpDst;

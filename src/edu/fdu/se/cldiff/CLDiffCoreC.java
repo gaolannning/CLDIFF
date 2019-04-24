@@ -110,9 +110,9 @@ public class CLDiffCoreC {
         long start = System.nanoTime();
         PreprocessedDataC preData = preDiff.getPreprocessedData();
         PreprocessedTempDataC preTempDataC = preDiff.getPreprocessedTempData();
-        Global.removal = new ArrayList<IASTNode>();
-        Global.removal.addAll(preTempDataC.srcRemovalNodes);
-        Global.removal.addAll(preTempDataC.dstRemovalNodes);
+//        Global.removal = new ArrayList<IASTNode>();
+//        Global.removal.addAll(preTempDataC.srcRemovalNodes);
+//        Global.removal.addAll(preTempDataC.dstRemovalNodes);
         JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(preData.getSrcTu(),preData.getDstTu());
         treeGenerator.setFileName(fileName);
 //        //gumtree

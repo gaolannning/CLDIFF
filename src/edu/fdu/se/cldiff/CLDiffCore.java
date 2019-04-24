@@ -2,7 +2,6 @@ package edu.fdu.se.cldiff;
 
 import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.GeneratingActionsData;
-import edu.fdu.se.base.generatingactions.JavaParserTreeGenerator;
 import edu.fdu.se.base.generatingactions.MyActionGenerator;
 import edu.fdu.se.base.generatingactions.SimpleActionPrinter;
 import edu.fdu.se.base.miningactions.ActionAggregationGenerator;
@@ -14,10 +13,16 @@ import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.AddOrRemoveFileProcessing;
 import edu.fdu.se.base.preprocessingfile.data.FileOutputLog;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
+import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempDataC;
 import edu.fdu.se.base.webapi.GenerateChangeEntityJson;
 import edu.fdu.se.config.ProjectProperties;
 import edu.fdu.se.config.PropertyKeys;
+import edu.fdu.se.lang.generatingactions.ParserTreeGenerator;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 /**
  * Created by huangkaifeng on 2018/2/27.
@@ -102,8 +107,22 @@ public class CLDiffCore {
 
     private void runDiff(FilePairPreDiff preDiff,String fileName){
         long start = System.nanoTime();
-//        PreprocessedData preData = preDiff.getPreprocessedData();
-//        JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(Global.util.getSrcCu(preData),Global.util.getDstCu(preData));
+        PreprocessedData preData = preDiff.getPreprocessedData();
+        PreprocessedTempData preTempDataC = preDiff.getPreprocessedTempData();
+        Global.util.preProcess(preTempDataC);;
+        ParserTreeGenerator parserTreeGenerator = null;
+        try{
+            Class clazz= Class.forName("edu.fdu.se.lang.generatingactions."+Global.lang+"ParserTreeGenerator");
+            Class[] argClazz = {Object.class,Object.class};
+            Object src = Global.util.getSrcCu(preData);
+            Object dst = Global.util.getDstCu(preData);
+            parserTreeGenerator = (ParserTreeGenerator) clazz.getConstructor(argClazz).newInstance(new Object[]{src,dst});
+        }catch (Exception e){
+            e.printStackTrace();
+            assert(parserTreeGenerator!=null);
+        }
+
+//        JavaParserTreeGenerato treeGenerator = new JavaParserTreeGenerato(Global.util.getSrcCu(preData),Global.util.getDstCu(preData));
 //        treeGenerator.setFileName(fileName);
 //        //gumtree
 //        MyActionGenerator actionGenerator = new MyActionGenerator(treeGenerator);
@@ -137,10 +156,10 @@ public class CLDiffCore {
     }
 
 
-    private void printActions(GeneratingActionsData actionsData, JavaParserTreeGenerator treeGenerator){
-        mFileOutputLog.writeTreeFile(treeGenerator.getPrettyOldTreeString(),treeGenerator.getPrettyNewTreeString());
-        SimpleActionPrinter.printMyActions(actionsData.getAllActions());
-    }
+//    private void printActions(GeneratingActionsData actionsData, JavaParserTreeGenerator treeGenerator){
+//        mFileOutputLog.writeTreeFile(treeGenerator.getPrettyOldTreeString(),treeGenerator.getPrettyNewTreeString());
+//        SimpleActionPrinter.printMyActions(actionsData.getAllActions());
+//    }
 
 
 }

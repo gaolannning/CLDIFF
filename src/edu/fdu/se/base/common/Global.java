@@ -41,7 +41,7 @@ public class Global {
 
     public static String parentCommit;
 
-    public static List<IASTNode> removal;
+    public static List<Object> removal;
 
 //    public static List<String> outputFilePathList;
 

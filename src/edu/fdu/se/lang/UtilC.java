@@ -1,5 +1,6 @@
 package edu.fdu.se.lang;
 
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
@@ -10,6 +11,7 @@ import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTUsingDirective;
 import org.eclipse.cdt.internal.core.model.FunctionDeclaration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -194,5 +196,11 @@ public class UtilC implements Util{
         return md.getDeclarator().getName().toString();
     }
 
+    @Override
+    public void preProcess(PreprocessedTempData tempData){
+        Global.removal = new ArrayList<Object>();
+        Global.removal.addAll(tempData.srcRemovalNodes);
+        Global.removal.addAll(tempData.dstRemovalNodes);
+    }
 
 }

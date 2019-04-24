@@ -31,4 +31,5 @@ public interface Util {
     boolean isTypeDeclaration(Object o);
     boolean isMethodDeclaration(Object o);
     String getMethodName(Object o);
+    void preProcess(PreprocessedTempData tempData);
 }

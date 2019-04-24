@@ -31,21 +31,21 @@ public class JavaParserTreeGenerator {
         this.fileName = fileName.substring(0,fileName.length()-5);
     }
 
-    public JavaParserTreeGenerator(File prevFile, File currFile) {
-        File oldFile = prevFile;
-        File newFile = currFile;
-        try {
-            srcTC = generateFromFile(oldFile);
-            src = srcTC.getRoot();
-            dstTC = generateFromFile(newFile);
-            dst = dstTC.getRoot();
-            Matcher m = Matchers.getInstance().getMatcher(src, dst);
-            m.match();
-            mapping = m.getMappings();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public JavaParserTreeGenerator(File prevFile, File currFile) {
+//        File oldFile = prevFile;
+//        File newFile = currFile;
+//        try {
+//            srcTC = generateFromFile(oldFile);
+//            src = srcTC.getRoot();
+//            dstTC = generateFromFile(newFile);
+//            dst = dstTC.getRoot();
+//            Matcher m = Matchers.getInstance().getMatcher(src, dst);
+//            m.match();
+//            mapping = m.getMappings();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Deprecated
     public JavaParserTreeGenerator(CompilationUnit prev, CompilationUnit curr) {
@@ -68,19 +68,19 @@ public class JavaParserTreeGenerator {
         mapping = m.getMappings();
     }
 
-    public JavaParserTreeGenerator(String prevContent, String currContent) {
-        try {
-            srcTC = generateFromString(prevContent);
-            src = srcTC.getRoot();
-            dstTC = generateFromString(currContent);
-            dst = dstTC.getRoot();
-            Matcher m = Matchers.getInstance().getMatcher(src, dst);
-            m.match();
-            mapping = m.getMappings();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public JavaParserTreeGenerator(String prevContent, String currContent) {
+//        try {
+//            srcTC = generateFromString(prevContent);
+//            src = srcTC.getRoot();
+//            dstTC = generateFromString(currContent);
+//            dst = dstTC.getRoot();
+//            Matcher m = Matchers.getInstance().getMatcher(src, dst);
+//            m.match();
+//            mapping = m.getMappings();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public TreeContext generate(Reader r) throws IOException {
         ASTParser parser = ASTParser.newParser(AST.JLS8);

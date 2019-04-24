@@ -50,7 +50,10 @@ public class Tree extends AbstractTree implements ITree {
 
     //add by yxy
     private IASTNode astNodeC;
-//    private JdtMethodCall methodCall = null;
+    private Object node;
+
+    public Object getNode() { return node; }
+    //    private JdtMethodCall methodCall = null;
     
     /**
      * added by hkf
