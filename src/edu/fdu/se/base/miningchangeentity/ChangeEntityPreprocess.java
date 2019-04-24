@@ -55,9 +55,9 @@ public class ChangeEntityPreprocess {
 
 
     public void setChangeEntityOpt2Opt2Exp(){
-        LayeredChangeEntityContainerC container = this.ced.entityContainer;
-        for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
-            BodyDeclarationPairC bodyDeclarationPair = entry.getKey();
+        LayeredChangeEntityContainer container = this.ced.entityContainer;
+        for (Map.Entry<BodyDeclarationPair, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
+            BodyDeclarationPair bodyDeclarationPair = entry.getKey();
             List<ChangeEntity> mList = entry.getValue();
             for(ChangeEntity ce:mList){
                 if(!ce.stageIIBean.getEntityCreationStage().equals(ChangeEntityDesc.StageIIGenStage.ENTITY_GENERATION_STAGE_PRE_DIFF)){
@@ -154,9 +154,9 @@ public class ChangeEntityPreprocess {
     }
 
     public void mergeMoveAndWrapper() {
-        LayeredChangeEntityContainerC container = this.ced.entityContainer;
-        for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
-            BodyDeclarationPairC bodyDeclarationPair = entry.getKey();
+        LayeredChangeEntityContainer container = this.ced.entityContainer;
+        for (Map.Entry<BodyDeclarationPair, List<ChangeEntity>> entry : container.getLayerMap().entrySet()) {
+            BodyDeclarationPair bodyDeclarationPair = entry.getKey();
             if (bodyDeclarationPair.getBodyDeclaration() instanceof MethodDeclaration) {
                 //每个method里面
                 List<ChangeEntity> mList = entry.getValue();
@@ -219,14 +219,14 @@ public class ChangeEntityPreprocess {
     }
 
     public void printContainerEntityDataBefore() {
-        ChangeEntityPrinter.printContainerEntity(ced.entityContainer, ced.mad.preprocessedData.srcCu);
+        ChangeEntityPrinter.printContainerEntity(ced.entityContainer, Global.util.getSrcCu(ced.mad.preprocessedData));
     }
 
     public void printContainerEntityDataAfter(){
-        ChangeEntityPrinter.printContainerEntity(ced.entityContainer, ced.mad.preprocessedData.srcCu);
+        ChangeEntityPrinter.printContainerEntity(ced.entityContainer,  Global.util.getDstCu(ced.mad.preprocessedData));
     }
     public void printNaturalEntityDesc(){
-        ChangeEntityPrinter.printContainerEntityNatural(ced.entityContainer, ced.mad.preprocessedData.srcTu);
+        ChangeEntityPrinter.printContainerEntityNatural(ced.entityContainer,  Global.util.getSrcCu(ced.mad.preprocessedData));
     }
 
     public void setChangeEntitySub(){

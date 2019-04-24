@@ -4,6 +4,7 @@ import com.github.gumtreediff.actions.model.*;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.statement.*;
@@ -53,54 +54,60 @@ public class MatchNonStatement {
 
 
     public static void matchNodeNewEntity(MiningActionData fp, Action a, Tree queryFather,int treeType, Tree traverseFather) {
-        int nodeType = JavaParserVisitorC.getNodeTypeId(traverseFather.getAstNodeC());
-        switch (nodeType) {
-            case JavaParserVisitorC.TYPE_DECLARATION:
-                MatchClass.matchClassSignatureNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.FIELD_DECLARATION:
-                MatchFieldDeclaration.matchFieldDeclarationChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.METHOD_DECLARATION:
-                if (JavaParserVisitorC.getNodeTypeId(((Tree) a.getNode()).getAstNodeC()) != JavaParserVisitorC.COMPOUND_STATEMENT) {
-                    MatchMethod.matchMethodSignatureChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                }
-                break;
-            case JavaParserVisitorC.ENUM_DECLARATION:
-                MatchEnum.matchEnumDeclarationNewEntity(fp,a,queryFather,treeType,traverseFather);
-                break;
-            case JavaParserVisitorC.IF_STATEMENT:
-                MatchIfElse.matchIfPredicateChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.FOR_STATEMENT:
-                MatchForStatement.matchForConditionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.WHILE_STATEMENT:
-                MatchWhileStatement.matchWhileConditionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.DO_STATEMENT:
-                MatchWhileStatement.matchDoConditionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.EXPRESSION_STATEMENT:
-                MatchExpressionStatement.matchExpressionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.RETURN_STATEMENT:
-                MatchReturnStatement.matchReturnChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.CATCH_CLAUSE:
-                MatchTry.matchCatchChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.SWITCH_STATEMENT:
-                MatchSwitch.matchSwitchNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.SWITCH_CASE:
-                MatchSwitch.matchSwitchCaseNewEntity(fp, a, queryFather,treeType, traverseFather);
-                break;
-            case JavaParserVisitorC.LABELED_STATEMENT:
-                MatchLabeledStatement.matchLabeledStatementNewEntity(fp,a,queryFather,treeType,traverseFather);
-                break;
-            default:
-                break;
+        Global.util.matchNodeNewEntity(fp,a,queryFather,treeType,traverseFather);
+//        int nodeType = JavaParserVisitorC.getNodeTypeId(traverseFather.getAstNodeC());
+//        switch (nodeType) {
+//            case JavaParserVisitorC.TYPE_DECLARATION:
+//                MatchClass.matchClassSignatureNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.FIELD_DECLARATION:
+//                MatchFieldDeclaration.matchFieldDeclarationChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.METHOD_DECLARATION:
+//                if (JavaParserVisitorC.getNodeTypeId(((Tree) a.getNode()).getAstNodeC()) != JavaParserVisitorC.COMPOUND_STATEMENT) {
+//                    MatchMethod.matchMethodSignatureChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                }
+//                break;
+//            case JavaParserVisitorC.ENUM_DECLARATION:
+//                MatchEnum.matchEnumDeclarationNewEntity(fp,a,queryFather,treeType,traverseFather);
+//                break;
+//            case JavaParserVisitorC.IF_STATEMENT:
+//                MatchIfElse.matchIfPredicateChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.FOR_STATEMENT:
+//                MatchForStatement.matchForConditionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.WHILE_STATEMENT:
+//                MatchWhileStatement.matchWhileConditionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.DO_STATEMENT:
+//                MatchWhileStatement.matchDoConditionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.EXPRESSION_STATEMENT:
+//                MatchExpressionStatement.matchExpressionChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.RETURN_STATEMENT:
+//                MatchReturnStatement.matchReturnChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.CATCH_CLAUSE:
+//                MatchTry.matchCatchChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.SWITCH_STATEMENT:
+//                MatchSwitch.matchSwitchNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.SWITCH_CASE:
+//                MatchSwitch.matchSwitchCaseNewEntity(fp, a, queryFather,treeType, traverseFather);
+//                break;
+//            case JavaParserVisitorC.LABELED_STATEMENT:
+//                MatchLabeledStatement.matchLabeledStatementNewEntity(fp,a,queryFather,treeType,traverseFather);
+//                break;
+//            default:
+//                break;
+
+
+
+
+
 //            case ASTNode.TYPE_DECLARATION:
 //                MatchClass.matchClassSignatureNewEntity(fp, a, queryFather,treeType, traverseFather);
 //                break;
@@ -172,7 +179,7 @@ public class MatchNonStatement {
 //                break;
 //            default:
 //                break;
-        }
+//        }
     }
 
     public static void matchXXXChangeCurEntity(MiningActionData fp, Action a, ChangeEntity changeEntity, Tree traverseFather) {

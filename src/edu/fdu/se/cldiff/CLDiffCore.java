@@ -116,50 +116,52 @@ public class CLDiffCore {
             Class[] argClazz = {Object.class,Object.class};
             Object src = Global.util.getSrcCu(preData);
             Object dst = Global.util.getDstCu(preData);
-            parserTreeGenerator = (ParserTreeGenerator) clazz.getConstructor(argClazz).newInstance(new Object[]{src,dst});
+            Object[] obj = new Object[2];
+            obj[0] = src;
+            obj[1] = dst;
+            parserTreeGenerator = (ParserTreeGenerator) clazz.getConstructor(argClazz).newInstance(obj);
         }catch (Exception e){
             e.printStackTrace();
             assert(parserTreeGenerator!=null);
         }
 
 //        JavaParserTreeGenerato treeGenerator = new JavaParserTreeGenerato(Global.util.getSrcCu(preData),Global.util.getDstCu(preData));
-//        treeGenerator.setFileName(fileName);
-//        //gumtree
-//        MyActionGenerator actionGenerator = new MyActionGenerator(treeGenerator);
-//        GeneratingActionsData actionsData = actionGenerator.generate();
+        parserTreeGenerator.setFileName(fileName);
+        //gumtree
+        MyActionGenerator actionGenerator = new MyActionGenerator(parserTreeGenerator);
+        GeneratingActionsData actionsData = actionGenerator.generate();
         //print
-//        long end = System.nanoTime();
-//        System.out.println("----mapping " +(end-start));
-//        printActions(actionsData,treeGenerator);
-//        long start2 = System.nanoTime();
-//        MiningActionData mad = new MiningActionData(preData,actionsData,treeGenerator);
-//        ActionAggregationGenerator aag = new ActionAggregationGenerator();
-//        aag.doCluster(mad);
+        long end = System.nanoTime();
+        System.out.println("----mapping " +(end-start));
+        printActions(actionsData,parserTreeGenerator);
+        long start2 = System.nanoTime();
+        MiningActionData mad = new MiningActionData(preData,actionsData,parserTreeGenerator);
+        ActionAggregationGenerator aag = new ActionAggregationGenerator();
+        aag.doCluster(mad);
 ////correcting
-//        ChangeEntityData ced = new ChangeEntityData(mad);
-//        ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);
-//        cep.preprocessChangeEntity();//1.init 2.merge 3.set 4.sub
-//        changeEntityData = ced;
-//        changeEntityData.fileName = fileName;
-//        long end2 = System.nanoTime();
-//        System.out.println("----grouping " +(end2-start2));
+        ChangeEntityData ced = new ChangeEntityData(mad);
+        ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);
+        cep.preprocessChangeEntity();//1.init 2.merge 3.set 4.sub
+        changeEntityData = ced;
+        changeEntityData.fileName = fileName;
+        long end2 = System.nanoTime();
+        System.out.println("----grouping " +(end2-start2));
 //// json
-//        GenerateChangeEntityJson.setStageIIIBean(ced);
-//        JSONArray json = GenerateChangeEntityJson.generateEntityJson(ced.mad);
-//        this.mFileOutputLog.writeEntityJson(json.toString(4));
-//        if(Global.runningMode==0){
-//            System.out.println(GenerateChangeEntityJson.toConsoleString(json));
-//        }else {
-//            System.out.println(json.toString(4));
-//        }
-
+        GenerateChangeEntityJson.setStageIIIBean(ced);
+        JSONArray json = GenerateChangeEntityJson.generateEntityJson(ced.mad);
+        this.mFileOutputLog.writeEntityJson(json.toString(4));
+        if(Global.runningMode==0){
+            System.out.println(GenerateChangeEntityJson.toConsoleString(json));
+        }else {
+            System.out.println(json.toString(4));
+        }
     }
 
 
-//    private void printActions(GeneratingActionsData actionsData, JavaParserTreeGenerator treeGenerator){
-//        mFileOutputLog.writeTreeFile(treeGenerator.getPrettyOldTreeString(),treeGenerator.getPrettyNewTreeString());
-//        SimpleActionPrinter.printMyActions(actionsData.getAllActions());
-//    }
+    private void printActions(GeneratingActionsData actionsData, ParserTreeGenerator treeGenerator){
+        mFileOutputLog.writeTreeFile(treeGenerator.getPrettyOldTreeString(),treeGenerator.getPrettyNewTreeString());
+        SimpleActionPrinter.printMyActions(actionsData.getAllActions());
+    }
 
 
 }

@@ -141,10 +141,6 @@ public class LayeredChangeEntityContainerC {
     private BodyDeclarationPairC getEnclosedBodyDeclaration(ChangeEntity changeEntity, int start) {
         for (BodyDeclarationPairC key : this.layerMap.keySet()) {
             IASTNode n = key.getBodyDeclaration();
-//            if(n instanceof IASTSimpleDeclaration){
-//                boolean b1 = ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier;
-//                boolean b2 = ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier;
-//            }
             if (n instanceof IASTTranslationUnit||(n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)) {
                 if (changeEntity instanceof ClassChangeEntity
                         || changeEntity instanceof EnumChangeEntity

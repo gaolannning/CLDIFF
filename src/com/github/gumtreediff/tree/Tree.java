@@ -46,10 +46,10 @@ public class Tree extends AbstractTree implements ITree {
     private AssociationMap metadata;
 
     //add by rh
-    private ASTNode astNode;
+//    private ASTNode astNode;
 
     //add by yxy
-    private IASTNode astNodeC;
+//    private IASTNode astNodeC;
     private Object node;
 
     public Object getNode() { return node; }
@@ -76,7 +76,8 @@ public class Tree extends AbstractTree implements ITree {
         this.pos = NO_VALUE;
         this.length = NO_VALUE;
         this.children = new ArrayList<>();
-        this.astNodeC = n;
+//        this.astNodeC = n;
+        this.node = n;
         this.astClass = n.getClass();
     }
 
@@ -92,7 +93,8 @@ public class Tree extends AbstractTree implements ITree {
         this.pos = NO_VALUE;
         this.length = NO_VALUE;
         this.children = new ArrayList<>();
-        this.astNodeC = n;
+//        this.astNodeC = n;
+        this.node = n;
         this.astClass = n.getClass();
         this.lineRange = lineRange;
     }
@@ -109,7 +111,8 @@ public class Tree extends AbstractTree implements ITree {
         this.pos = NO_VALUE;
         this.length = NO_VALUE;
         this.children = new ArrayList<>();
-        this.astNode = n;
+//        this.astNode = n;
+        this.node = n;
         this.astClass = n.getClass();
     }
 
@@ -127,7 +130,8 @@ public class Tree extends AbstractTree implements ITree {
         this.pos = NO_VALUE;
         this.length = NO_VALUE;
         this.children = new ArrayList<>();
-        this.astNode = n;
+//        this.astNode = n;
+        this.node = n;
         this.astClass = n.getClass();
         this.lineRange = lineRange;
     }
@@ -137,11 +141,13 @@ public class Tree extends AbstractTree implements ITree {
     }
 
     public ASTNode getAstNode(){
-    	return astNode;
+        return null;
+//    	return astNode;
     }
 
     public IASTNode getAstNodeC(){
-        return astNodeC;
+        return null;
+//        return astNodeC;
     }
 
     public String getRangeString(){
@@ -325,4 +331,7 @@ public class Tree extends AbstractTree implements ITree {
     public int getTreeSrcOrDst(){
         return this.srcOrDst;
     }
+
+
+
 }

@@ -36,7 +36,7 @@ public class EnumChangeEntity extends MemberPlusChangeEntity{
 
     }
 
-    public EnumChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange1){
+    public EnumChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange1){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange1);
         EnumDeclaration ed = (EnumDeclaration) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());

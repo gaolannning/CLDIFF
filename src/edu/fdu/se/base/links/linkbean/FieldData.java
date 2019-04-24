@@ -1,6 +1,7 @@
 package edu.fdu.se.base.links.linkbean;
 
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.FieldChangeEntity;
@@ -23,29 +24,30 @@ public class FieldData extends LinkBean {
         if(fieldName==null){
             fieldName = new ArrayList<>();
         }
-        IASTSimpleDeclaration fd = null;
+        Object fd = null;
         switch(ce.stageIIBean.getOpt()) {
             case ChangeEntityDesc.StageIIOpt.OPT_CHANGE:
                 Tree t = ce.clusteredActionBean.fafather;
-                if (JavaParserVisitorC.getNodeTypeId(t.getAstNodeC()) == JavaParserVisitorC.FIELD_DECLARATION) {
-                    fd = (IASTSimpleDeclaration) t.getAstNodeC();
+                if (Global.util.getNodeTypeId(t.getNode()) == JavaParserVisitorC.FIELD_DECLARATION) {
+                    fd = t.getNode();
                 }
                 break;
             case ChangeEntityDesc.StageIIOpt.OPT_DELETE:
             case ChangeEntityDesc.StageIIOpt.OPT_INSERT:
                 if (ce.stageIIBean.getEntityCreationStage().equals(ChangeEntityDesc.StageIIGenStage.ENTITY_GENERATION_STAGE_PRE_DIFF)) {
-                    fd = (IASTSimpleDeclaration) ce.bodyDeclarationPair.getBodyDeclaration();
+                    fd = ce.bodyDeclarationPair.getBodyDeclaration();
 
                 }
                 break;
 
         }
         if(fd!=null){
-            List<IASTDeclarator> list = Arrays.asList(fd.getDeclarators());
-            for(IASTDeclarator vd:list){
-                fieldName.add(vd.getName().toString());
-            }
-            fieldType = fd.getDeclSpecifier().toString();
+            fieldName.addAll(Global.util.getFieldDeclaratorNames(fd));
+//            List<IASTDeclarator> list = Arrays.asList(fd.getDeclarators());
+//            for(IASTDeclarator vd:list){
+//                fieldName.add(vd.getName().toString());
+//            }
+            fieldType = Global.util.getFieldType(fd);
         }
 
 

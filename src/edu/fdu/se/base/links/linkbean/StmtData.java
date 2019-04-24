@@ -33,7 +33,7 @@ public class StmtData extends LinkBean {
     public List<String> classCreation;
 
 
-    public StmtData(StatementPlusChangeEntity ce, PreprocessedDataC preprocessedData) {
+    public StmtData(StatementPlusChangeEntity ce, PreprocessedData preprocessedData) {
         this.variableLocal = new MyList<>();
         this.methodInvocation = new MyList<>();
         this.variableField = new MyList<>();
@@ -71,21 +71,19 @@ public class StmtData extends LinkBean {
     }
 
 
-    private void parseMove(Action a, PreprocessedDataC preprocessedData) {
+    private void parseMove(Action a, PreprocessedData preprocessedData) {
         Tree tree = (Tree) a.getNode();
         List<Tree> simpleNames = new ArrayList<>();
         for (ITree tmp : tree.preOrder()) {
             Tree t = (Tree) tmp;
-            if (JavaParserVisitorC.getNodeTypeId(t.getAstNodeC()) == JavaParserVisitorC.NAME
-                    || t.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
+            if (Global.util.isLiteral(t)) {
                 simpleNames.add(t);
             }
         }
         for (Tree aa : simpleNames) {
-            if (JavaParserVisitorC.getNodeTypeId(aa.getAstNodeC()) == JavaParserVisitorC.NAME
-                    || aa.getAstNode().getClass().getSimpleName().endsWith("Literal")) {
-                IASTNode exp = findExpression(tree);
-                if (exp == null || !(exp instanceof CPPASTFunctionCallExpression)) {
+            if (Global.util.isLiteral(aa)) {
+                Object exp = findExpression(tree);
+                if (exp == null || !(Global.util.isMethodInvocation(exp))) {
                     if (preprocessedData.prevCurrFieldNames.contains(tree.getLabel())) {
                         this.variableField.add(tree.getLabel());
                     } else {
@@ -93,14 +91,14 @@ public class StmtData extends LinkBean {
                     }
                     continue;
                 }
-                if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, tree.getLabel())) {
+                if (isMethodInvocationName( exp, tree.getLabel())) {
                     methodInvocation.add(tree.getLabel());
                 }
             }
         }
     }
 
-    private void parseNonMove(List<Action> actions, PreprocessedDataC preprocessedData) {
+    private void parseNonMove(List<Action> actions, PreprocessedData preprocessedData) {
         for (Action a : actions) {
             Tree tree = (Tree) a.getNode();
             String updateVal = null;
@@ -111,12 +109,11 @@ public class StmtData extends LinkBean {
             }
             ITree dstNode = Global.ced.mad.getMappedDstOfSrcNode(tree);
 
-            if (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC()) == JavaParserVisitorC.NAME
-                    || tree.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
-                IASTNode exp = findExpression(tree);
+            if (Global.util.isLiteral(tree)) {
+                Object exp = findExpression(tree);
                 boolean flag = true;
-                if (exp != null && exp instanceof CPPASTFunctionCallExpression) {
-                    if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, tree.getLabel())) {
+                if (exp != null && Global.util.isMethodInvocation(exp)) {
+                    if (isMethodInvocationName(exp, tree.getLabel())) {
                         if (updateVal != null) {
                             methodInvocation.add(updateVal);
                         }
@@ -124,8 +121,8 @@ public class StmtData extends LinkBean {
                         flag = false;
                     }
                 }
-                if (exp != null && exp instanceof CPPASTNewExpression) {
-                    if (isClassCreationName((CPPASTNewExpression) exp, tree.getLabel())) {
+                if (exp != null && Global.util.isClassInstanceCreation(exp)) {
+                    if (isClassCreationName( exp, tree.getLabel())) {
                         this.classCreation.add(tree.getLabel());
                         flag = false;
                     }
@@ -147,11 +144,10 @@ public class StmtData extends LinkBean {
             }
             if (updateFlag) {
                 Tree dstTree = (Tree) dstNode;
-                if (JavaParserVisitorC.getNodeTypeId(dstTree.getAstNodeC()) == JavaParserVisitorC.NAME
-                        || dstTree.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
-                    IASTNode exp = findExpression(dstTree);
-                    if (exp != null && exp instanceof CPPASTFunctionCallExpression) {
-                        if (isMethodInvocationName((CPPASTFunctionCallExpression) exp, updateVal)) {
+                if (Global.util.isLiteral(tree)) {
+                    Object exp = findExpression(dstTree);
+                    if (exp != null && Global.util.isMethodInvocation(exp)) {
+                        if (isMethodInvocationName( exp, updateVal)) {
                             if (updateVal != null) {
                                 methodInvocation.add(updateVal);
                             }
@@ -164,56 +160,57 @@ public class StmtData extends LinkBean {
     }
 
 
-    private IASTNode findExpression(Tree tree) {
-        int flag = 0;
-        while (!tree.getAstNodeC().getClass().getSimpleName().endsWith("Statement")) {
-            tree = (Tree) tree.getParent();
-            switch (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC())) {
-                // TO ADD
-                case JavaParserVisitorC.EQUALS_INITIALIZER:
-                case JavaParserVisitorC.FUNCTION_CALL_EXPRESSION:
-                case JavaParserVisitorC.NEW_EXPRESSION:
-//                case ASTNode.NORMAL_ANNOTATION:
-//                case ASTNode.MARKER_ANNOTATION:
-//                case ASTNode.SINGLE_MEMBER_ANNOTATION:
-//                case ASTNode.ARRAY_CREATION:
-//                case ASTNode.ARRAY_INITIALIZER:
-//                case ASTNode.ASSIGNMENT:
-//                case ASTNode.BOOLEAN_LITERAL:
-//                case ASTNode.CAST_EXPRESSION:
-//                case ASTNode.CHARACTER_LITERAL:
-//                case ASTNode.CLASS_INSTANCE_CREATION:
-//                case ASTNode.CONDITIONAL_EXPRESSION:
-//                case ASTNode.CREATION_REFERENCE:
-//                case ASTNode.EXPRESSION_METHOD_REFERENCE:
-//                case ASTNode.FIELD_ACCESS:
-//                case ASTNode.INFIX_EXPRESSION:
-//                case ASTNode.INSTANCEOF_EXPRESSION:
-//                case ASTNode.LAMBDA_EXPRESSION:
-//                case ASTNode.METHOD_INVOCATION:
-//                case ASTNode.SIMPLE_NAME:
-//                case ASTNode.QUALIFIED_NAME:
-//                case ASTNode.NULL_LITERAL:
-//                case ASTNode.NUMBER_LITERAL:
-//                case ASTNode.PARENTHESIZED_EXPRESSION:
-//                case ASTNode.POSTFIX_EXPRESSION:
-//                case ASTNode.PREFIX_EXPRESSION:
-//                case ASTNode.STRING_LITERAL:
-//                case ASTNode.SUPER_FIELD_ACCESS:
-//                case ASTNode.SUPER_METHOD_INVOCATION:
-//                case ASTNode.SUPER_METHOD_REFERENCE:
-//                case ASTNode.THIS_EXPRESSION:
-//                case ASTNode.TYPE_LITERAL:
-//                case ASTNode.TYPE_METHOD_REFERENCE:
-//                case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
-                    flag = 1;
-                    break;
-            }
-            if (flag == 1) {
-                return tree.getAstNodeC();
-            }
-        }
-        return null;
+    private Object findExpression(Tree tree) {
+        return Global.util.findExpression(tree);
+//        int flag = 0;
+//        while (!tree.getAstNodeC().getClass().getSimpleName().endsWith("Statement")) {
+//            tree = (Tree) tree.getParent();
+//            switch (JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC())) {
+//                // TO ADD
+//                case JavaParserVisitorC.EQUALS_INITIALIZER:
+//                case JavaParserVisitorC.FUNCTION_CALL_EXPRESSION:
+//                case JavaParserVisitorC.NEW_EXPRESSION:
+////                case ASTNode.NORMAL_ANNOTATION:
+////                case ASTNode.MARKER_ANNOTATION:
+////                case ASTNode.SINGLE_MEMBER_ANNOTATION:
+////                case ASTNode.ARRAY_CREATION:
+////                case ASTNode.ARRAY_INITIALIZER:
+////                case ASTNode.ASSIGNMENT:
+////                case ASTNode.BOOLEAN_LITERAL:
+////                case ASTNode.CAST_EXPRESSION:
+////                case ASTNode.CHARACTER_LITERAL:
+////                case ASTNode.CLASS_INSTANCE_CREATION:
+////                case ASTNode.CONDITIONAL_EXPRESSION:
+////                case ASTNode.CREATION_REFERENCE:
+////                case ASTNode.EXPRESSION_METHOD_REFERENCE:
+////                case ASTNode.FIELD_ACCESS:
+////                case ASTNode.INFIX_EXPRESSION:
+////                case ASTNode.INSTANCEOF_EXPRESSION:
+////                case ASTNode.LAMBDA_EXPRESSION:
+////                case ASTNode.METHOD_INVOCATION:
+////                case ASTNode.SIMPLE_NAME:
+////                case ASTNode.QUALIFIED_NAME:
+////                case ASTNode.NULL_LITERAL:
+////                case ASTNode.NUMBER_LITERAL:
+////                case ASTNode.PARENTHESIZED_EXPRESSION:
+////                case ASTNode.POSTFIX_EXPRESSION:
+////                case ASTNode.PREFIX_EXPRESSION:
+////                case ASTNode.STRING_LITERAL:
+////                case ASTNode.SUPER_FIELD_ACCESS:
+////                case ASTNode.SUPER_METHOD_INVOCATION:
+////                case ASTNode.SUPER_METHOD_REFERENCE:
+////                case ASTNode.THIS_EXPRESSION:
+////                case ASTNode.TYPE_LITERAL:
+////                case ASTNode.TYPE_METHOD_REFERENCE:
+////                case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+//                    flag = 1;
+//                    break;
+//            }
+//            if (flag == 1) {
+//                return tree.getAstNodeC();
+//            }
+//        }
+//        return null;
     }
 
 //    private void setInfixExpression(InfixExpression infixExpression, List<String> methodInvocationSet, List<String> varNameSet){
@@ -237,26 +234,27 @@ public class StmtData extends LinkBean {
 //            }
 //        }
 //    }
-    @Deprecated
-    public boolean isClassCreationName(ClassInstanceCreation classInstanceCreation, String clazzName) {
-        String clazz = classInstanceCreation.getType().toString();
+
+//    @Deprecated
+//    public boolean isClassCreationName(ClassInstanceCreation classInstanceCreation, String clazzName) {
+//        String clazz = classInstanceCreation.getType().toString();
+//        if (clazzName.equals(clazz)) {
+//            return true;
+//        }
+//        return false;
+//    }
+
+    public boolean isClassCreationName(Object classInstanceCreation, String clazzName) {
+        String clazz = Global.util.getClassCreationName(classInstanceCreation);
         if (clazzName.equals(clazz)) {
             return true;
         }
         return false;
     }
 
-    public boolean isClassCreationName(CPPASTNewExpression classInstanceCreation, String clazzName) {
-        String clazz = classInstanceCreation.getImplicitNames()[0].toString();
-        if (clazzName.equals(clazz)) {
-            return true;
-        }
-        return false;
-    }
 
-
-    private boolean isMethodInvocationName(CPPASTFunctionCallExpression methodInvocation, String methodName) {
-        String methodName1 = methodInvocation.getFunctionNameExpression().toString();
+    private boolean isMethodInvocationName(Object methodInvocation, String methodName) {
+        String methodName1 = Global.util.getMethodInvocationName(methodInvocation);
         if (methodName.equals(methodName1)) {
             return true;
         }

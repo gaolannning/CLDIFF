@@ -2,6 +2,7 @@ package edu.fdu.se.base.miningchangeentity;
 
 import com.github.gumtreediff.actions.model.Delete;
 import com.github.gumtreediff.actions.model.Insert;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.links.LayeredChangeEntityContainerC;
 import edu.fdu.se.base.links.Link;
 import edu.fdu.se.base.links.MyRange;
@@ -26,7 +27,7 @@ public class ChangeEntityData {
 
     public String fileName;
 
-    public LayeredChangeEntityContainerC entityContainer;
+    public LayeredChangeEntityContainer entityContainer;
     public MiningActionData mad;
 
     public List<Link> mLinks;
@@ -39,30 +40,30 @@ public class ChangeEntityData {
     }
 
 
-    public ChangeEntity addOneBody(BodyDeclarationPairC item, String type) {
+    public ChangeEntity addOneBody(BodyDeclarationPair item, String type) {
         ChangeEntity ce = null;
         int s;
         int e;
         MyRange myRange = null;
-        IASTNode n = item.getBodyDeclaration();
+        Object n = item.getBodyDeclaration();
         if (Insert.class.getSimpleName().equals(type)) {
-            s = n.getFileLocation().getStartingLineNumber();    //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
-            e = n.getFileLocation().getEndingLineNumber();       //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
+            s = Global.util.getLineNumber(Global.util.getDstCu(mad.preprocessedData),Global.util.getStartPosition(n)); //n.getFileLocation().getStartingLineNumber();    //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
+            e = Global.util.getLineNumber(Global.util.getDstCu(mad.preprocessedData),Global.util.getStartPosition(n)+Global.util.getNodeLength(n)); //n.getFileLocation().getEndingLineNumber();       //getDstCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
             myRange = new MyRange(s, e, ChangeEntityDesc.StageITreeType.DST_TREE_NODE);
         } else if (Delete.class.getSimpleName().equals(type)) {
-            s = n.getFileLocation().getStartingLineNumber();             //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
-            e = n.getFileLocation().getEndingLineNumber();              //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
+            s = Global.util.getLineNumber(Global.util.getSrcCu(mad.preprocessedData),Global.util.getStartPosition(n)); //n.getFileLocation().getStartingLineNumber();             //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition());
+            e = Global.util.getLineNumber(Global.util.getSrcCu(mad.preprocessedData),Global.util.getStartPosition(n)+Global.util.getNodeLength(n)); //n.getFileLocation().getEndingLineNumber();              //getSrcCu().getLineNumber(item.getBodyDeclaration().getStartPosition() + item.getBodyDeclaration().getLength() - 1);
             myRange = new MyRange(s, e, ChangeEntityDesc.StageITreeType.SRC_TREE_NODE);
         }
-        if (n instanceof IASTSimpleDeclaration && (((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier ||((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier)) {
+        if (Global.util.isFieldDeclaration(n)) {
             ce = new FieldChangeEntity(item, type, myRange);
-        } else if (n instanceof IASTFunctionDefinition) {
+        } else if (Global.util.isMethodDeclaration(n)) {
             ce = new MethodChangeEntity(item, type, myRange);
-        } else if (item.getBodyDeclaration() instanceof Initializer) {
+        } else if (item.getBodyDeclaration() instanceof Initializer) {  //Java专用
             ce = new InitializerChangeEntity(item, type, myRange);
-        } else if (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier) {
+        } else if (Global.util.isTypeDeclaration(n)) {
             ce = new ClassChangeEntity(item, type, myRange);
-        } else if (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTEnumerationSpecifier) {
+        } else if (Global.util.isEnumDeclaration(n)) {
             ce = new EnumChangeEntity(item, type, myRange);
         }
         return ce;

@@ -1,5 +1,6 @@
 package edu.fdu.se.base.miningchangeentity.member;
 
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.links.MyRange;
 import edu.fdu.se.base.miningchangeentity.ClusteredActionBean;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
@@ -25,16 +26,17 @@ public class FieldChangeEntity extends MemberPlusChangeEntity {
     /**
      * 预处理识别的
      */
-    public FieldChangeEntity(BodyDeclarationPairC fieldDeclarationPair, String changeType, MyRange myRange){
+    public FieldChangeEntity(BodyDeclarationPair fieldDeclarationPair, String changeType, MyRange myRange){
         super(fieldDeclarationPair.getLocationClassString(),changeType,myRange);
-        IASTSimpleDeclaration fd = (IASTSimpleDeclaration) fieldDeclarationPair.getBodyDeclaration();
+
         this.stageIIBean.setLocation(fieldDeclarationPair.getLocationClassString());
         this.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_FIELD);
         this.bodyDeclarationPair = fieldDeclarationPair;
-        List<IASTDeclarator> list = Arrays.asList(fd.getDeclarators());
+        Object node = fieldDeclarationPair.getBodyDeclaration();
+        List<String> sList = Global.util.getFieldDeclaratorNames(node);
         String res = "";
-        for(IASTDeclarator vd:list){
-            res += vd+",";
+        for(String s:sList){
+            res += s+",";
         }
         this.stageIIBean.setThumbnail(fieldDeclarationPair.getLocationClassString() + res);
 

@@ -109,12 +109,21 @@ public class CLDiffAPI {
             } else {
                 this.clDiffCore.dooDiffFile(fp.getFileName(), fp.getPrev(), fp.getCurr(), absolutePath);
             }
-//            this.fileChangeEntityData.put(fp.getParentCommit() + "@@@" + this.clDiffCore.changeEntityData.fileName, this.clDiffCore.changeEntityData);
+            this.fileChangeEntityData.put(fp.getParentCommit() + "@@@" + this.clDiffCore.changeEntityData.fileName, this.clDiffCore.changeEntityData);
         }
         List<String> fileNames = new ArrayList<>(this.fileChangeEntityData.keySet());
         TotalFileLinks totalFileLinks = new TotalFileLinks();
         for (int i = 0; i < fileNames.size(); i++) {
             String fileNameA = fileNames.get(i);
+            String[] s = fileNameA.split("\\.");
+            Global.lang = Global.formatLang(s[s.length-1]);
+            try {
+//                Class clazz = Class.forName("edu.fdu.se.lang.Util" + Global.lang);
+//                Util util = (Util)clazz.newInstance();
+                Global.util = (Util)Class.forName("edu.fdu.se.lang.Util" + Global.lang).newInstance();
+            }catch (Exception e){
+                assert(false);
+            }
             ChangeEntityData cedA = this.fileChangeEntityData.get(fileNameA);
             Global.ced = cedA;
             FileInnerLinksGenerator associationGenerator = new FileInnerLinksGenerator(cedA);
@@ -128,6 +137,11 @@ public class CLDiffAPI {
                 FileOuterLinksGenerator fileOuterLinksGenerator = new FileOuterLinksGenerator();
                 for (int j = i + 1; j < fileNames.size(); j++) {
                     String fileNameB = fileNames.get(j);
+                    String[] s1 = fileNameA.split("\\.");
+                    String[] s2 = fileNameB.split("\\.");
+                    if(Global.formatLang(s1[s1.length-1]) != Global.formatLang(s2[s2.length-1])){
+                        continue;
+                    }
                     //存在fileName为null的情况
                         ChangeEntityData cedB = this.fileChangeEntityData.get(fileNameB);
                         fileOuterLinksGenerator.generateOutsideAssociation(cedA, cedB);

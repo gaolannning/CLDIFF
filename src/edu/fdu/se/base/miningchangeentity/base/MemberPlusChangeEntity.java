@@ -11,7 +11,7 @@ import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPairC;
  */
 public class MemberPlusChangeEntity extends ChangeEntity {
 
-    public BodyDeclarationPairC bodyDeclarationPair;
+    public BodyDeclarationPair bodyDeclarationPair;
 
     public MemberPlusChangeEntity(ClusteredActionBean bean){
         super(bean);

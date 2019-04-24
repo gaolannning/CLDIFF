@@ -63,7 +63,7 @@ public class LayeredChangeEntityContainer {
         if(changeEntity==null) return;
         BodyDeclarationPair mKey = null;
         for (BodyDeclarationPair key : this.layerMap.keySet()) {
-            if (key.getBodyDeclaration() instanceof TypeDeclaration) {
+            if (Global.util.isTypeDeclaration(key.getBodyDeclaration())) {
                 if (changeEntity instanceof ClassChangeEntity) {
                     String location = changeEntity.stageIIBean.getLocation();
                     location = location.substring(0, location.length() - 1);
@@ -106,12 +106,21 @@ public class LayeredChangeEntityContainer {
             if (tree == null) {
                 System.out.println("a");
             }
-            startPos = tree.getAstNode().getStartPosition();
+            startPos = Global.util.getStartPosition(tree.getNode());
 
         } else if (changeEntity.clusteredActionBean.traverseType == ChangeEntityDesc.StageITraverseType.TRAVERSE_DOWN_UP) {
             // father节点的range
-            tree = (Tree) node;
-            startPos = tree.getAstNode().getStartPosition();
+            while (tree == null) {
+                tree = (Tree) mad.getMappedSrcOfDstNode(node);
+                if(node == null){
+                    break;
+                }
+                node = node.getParent();
+            }
+            if(tree == null)
+                tree = (Tree) changeEntity.clusteredActionBean.fafather;
+//            tree = (Tree) node;
+            startPos = Global.util.getStartPosition(tree.getNode());
         }
         mKey = getEnclosedBodyDeclaration(changeEntity, startPos);
         if (mKey != null && this.layerMap.containsKey(mKey)) {
@@ -125,18 +134,19 @@ public class LayeredChangeEntityContainer {
 
     private BodyDeclarationPair getEnclosedBodyDeclaration(ChangeEntity changeEntity, int start) {
         for (BodyDeclarationPair key : this.layerMap.keySet()) {
-            if (key.getBodyDeclaration() instanceof TypeDeclaration) {
+            Object o = key.getBodyDeclaration();
+            if (Global.util.isTypeDeclaration(o)) {
                 if (changeEntity instanceof ClassChangeEntity
                         || changeEntity instanceof EnumChangeEntity
                         || changeEntity instanceof FieldChangeEntity
                         || changeEntity instanceof InitializerChangeEntity
                         || changeEntity instanceof MethodChangeEntity) {
-                    if (start >= Global.util.getStartPosition(key.getBodyDeclaration()) && start <= Global.util.getStartPosition(key.getBodyDeclaration()) + Global.util.getNodeLength(key.getBodyDeclaration())) {
+                    if (start >= Global.util.getStartPosition(o) && start <= Global.util.getStartPosition(o) + Global.util.getNodeLength(o)) {
                         return key;
                     }
                 }
             } else {
-                if (start >= Global.util.getStartPosition(key.getBodyDeclaration()) && start <= Global.util.getStartPosition(key.getBodyDeclaration()) + Global.util.getNodeLength(key.getBodyDeclaration())) {
+                if (start >= Global.util.getStartPosition(o) && start <= Global.util.getStartPosition(o) + Global.util.getNodeLength(o)) {
                     return key;
                 }
             }

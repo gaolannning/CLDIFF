@@ -104,7 +104,7 @@ public class FileInnerLinksGenerator {
      * main entrance
      */
     public void generateFile() {
-        LayeredChangeEntityContainerC container = this.changeEntityData.entityContainer;
+        LayeredChangeEntityContainer container = this.changeEntityData.entityContainer;
         List<ChangeEntity> entities = this.changeEntityData.mad.getChangeEntityList();
         for(ChangeEntity a:entities) {
 
@@ -113,15 +113,15 @@ public class FileInnerLinksGenerator {
         if(container==null){
             return;
         }
-        Map<BodyDeclarationPairC, List<ChangeEntity>> mMap = container.getLayerMap();
+        Map<BodyDeclarationPair, List<ChangeEntity>> mMap = container.getLayerMap();
         List<ChangeEntity> methodChangeEntity = new ArrayList<>();
         List<ChangeEntity> fieldChangeEntity = new ArrayList<>();
         List<ChangeEntity> innerClassChangeEntity = new ArrayList<>();
         List<ChangeEntity> stmtChangeEntity = new ArrayList<>();
-        for (Map.Entry<BodyDeclarationPairC, List<ChangeEntity>> entry : mMap.entrySet()) {
-            BodyDeclarationPairC key = entry.getKey();
-            IASTNode n = key.getBodyDeclaration();
-            if (n instanceof IASTFunctionDefinition) {
+        for (Map.Entry<BodyDeclarationPair, List<ChangeEntity>> entry : mMap.entrySet()) {
+            BodyDeclarationPair key = entry.getKey();
+            Object n = key.getBodyDeclaration();
+            if (Global.util.isMethodDeclaration(n)) {
                 List<ChangeEntity> mList = entry.getValue();
                 mList.forEach(a->{
                     if(a instanceof StatementPlusChangeEntity){
@@ -130,7 +130,7 @@ public class FileInnerLinksGenerator {
                 });
                 checkStatement2StatementAssoInMethod(mList);// method内stmt之间 定义本地变量 随后被use
             }
-            if(n instanceof IASTTranslationUnit || (n instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)){
+            if(Global.util.isTypeDeclaration(n)){
                 List<ChangeEntity> mList = entry.getValue();
                 for(ChangeEntity tmp:mList){
                     if(tmp instanceof MethodChangeEntity){

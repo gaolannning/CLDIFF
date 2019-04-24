@@ -19,7 +19,7 @@ public class InitializerChangeEntity extends MemberPlusChangeEntity {
         super(bean);
     }
 
-    public InitializerChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
+    public InitializerChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
         Initializer iid = (Initializer) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());

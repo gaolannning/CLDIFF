@@ -3,6 +3,7 @@ package edu.fdu.se.lang.generatingactions;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
+import edu.fdu.se.base.generatingactions.SimpleActionPrinter;
 
 public abstract class ParserTreeGenerator {
     public TreeContext srcTC;
@@ -19,5 +20,13 @@ public abstract class ParserTreeGenerator {
             sb.append(s[i]);
         }
         this.fileName = sb.toString();
+    }
+
+    public String getPrettyOldTreeString() {
+        return SimpleActionPrinter.getPrettyTreeString(src);
+    }
+
+    public String getPrettyNewTreeString() {
+        return SimpleActionPrinter.getPrettyTreeString(dst);
     }
 }

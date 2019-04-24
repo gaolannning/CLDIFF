@@ -1,5 +1,6 @@
 package edu.fdu.se.base.miningchangeentity.member;
 
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.links.MyRange;
 import edu.fdu.se.base.miningchangeentity.ClusteredActionBean;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
@@ -19,12 +20,12 @@ public class MethodChangeEntity extends MemberPlusChangeEntity {
         super(bean);
     }
 
-    public MethodChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
+    public MethodChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
-        IASTFunctionDefinition md =(IASTFunctionDefinition) bodyDeclarationPair.getBodyDeclaration();
+        Object md = bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());
         this.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_METHOD);
-        this.stageIIBean.setThumbnail(md.getDeclarator().getName().toString());
+        this.stageIIBean.setThumbnail(Global.util.getMethodName(md));
         this.bodyDeclarationPair = bodyDeclarationPair;
     }
 

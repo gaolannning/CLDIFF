@@ -1,5 +1,6 @@
 package edu.fdu.se.base.miningchangeentity.base;
 
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -85,20 +86,20 @@ public class StageIIIBean {
     }
 
 
-    private void addRangeResultList(Integer[] range, IASTTranslationUnit cu, String file, String type) {
+    private void addRangeResultList(Integer[] range, Object cu, String file, String type) {
         if (subRange == null) {
             subRange = new ArrayList<>();
         }
-        int startLine = PreprocessedDataC.getLineNumber(cu,range[0]);
-        int startColumn = PreprocessedDataC.getColumnNumber(cu,range[0]);
-        int endLine =  PreprocessedDataC.getLineNumber(cu,range[1]);
-        int endColumn = PreprocessedDataC.getColumnNumber(cu,range[1]);
+        int startLine = Global.util.getLineNumber(cu,range[0]);
+        int startColumn = Global.util.getLineNumber(cu,range[0]);
+        int endLine =  Global.util.getLineNumber(cu,range[1]);
+        int endColumn = Global.util.getLineNumber(cu,range[1]);
 
         List<Integer> endColumnList = new ArrayList<>();
         int i = 1;
         while (startLine + i <= endLine) {
             int lineNum = startLine + i;
-            int pos = PreprocessedDataC.getPosition(cu,lineNum);
+            int pos = Global.util.getPositionFromLine(cu,lineNum);
             pos--;
             endColumnList.add(pos);
             i++;
@@ -134,7 +135,7 @@ public class StageIIIBean {
         }
     }
 
-    private void addRangesResultList(List<Integer[]> ranges, IASTTranslationUnit cu, String file, String type) {
+    private void addRangesResultList(List<Integer[]> ranges, Object cu, String file, String type) {
         for (Integer[] range : ranges) {
             addRangeResultList(range, cu, file, type);
         }
@@ -148,7 +149,7 @@ public class StageIIIBean {
         addRangesResultList(ranges, cu, file, type);
     }
 
-    public void addInsertList(List<Integer[]> ranges, IASTTranslationUnit cu) {
+    public void addInsertList(List<Integer[]> ranges, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.DST;
         String type = "insert";
         addRangesResultList(ranges, cu, file, type);
@@ -161,7 +162,7 @@ public class StageIIIBean {
         addRangesResultList(ranges, cu, file, type);
     }
 
-    public void addUpdateList(List<Integer[]> ranges, IASTTranslationUnit cu) {
+    public void addUpdateList(List<Integer[]> ranges, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
         String type = "update";
         addRangesResultList(ranges, cu, file, type);
@@ -174,7 +175,7 @@ public class StageIIIBean {
         addRangesResultList(ranges, cu, file, type);
     }
 
-    public void addDeleteList(List<Integer[]> ranges, IASTTranslationUnit cu) {
+    public void addDeleteList(List<Integer[]> ranges, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
         String type = "delete";
         addRangesResultList(ranges, cu, file, type);

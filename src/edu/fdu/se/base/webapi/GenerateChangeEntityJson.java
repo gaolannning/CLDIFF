@@ -2,6 +2,7 @@ package edu.fdu.se.base.webapi;
 
 import com.github.gumtreediff.actions.model.*;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningchangeentity.ChangeEntityData;
 import edu.fdu.se.base.miningchangeentity.ClusteredActionBean;
@@ -140,8 +141,8 @@ public class GenerateChangeEntityJson {
         }
 //        CompilationUnit src = mad.preprocessedData.srcCu;
 //        CompilationUnit dst = mad.preprocessedData.dstCu;
-        IASTTranslationUnit src = mad.preprocessedData.srcTu;
-        IASTTranslationUnit dst = mad.preprocessedData.dstTu;
+        IASTTranslationUnit src = (IASTTranslationUnit)Global.util.getSrcCu(mad.preprocessedData);
+        IASTTranslationUnit dst = (IASTTranslationUnit) Global.util.getDstCu(mad.preprocessedData);
         Move mv = (Move) a;
         Tree moveNode = (Tree) mv.getNode();
         Tree movedDstNode = (Tree) mad.getMappedDstOfSrcNode(moveNode);
@@ -155,8 +156,8 @@ public class GenerateChangeEntityJson {
     public static void setStageIIIBeanSubRangeDetail(StageIIIBean stageIIIBean, List<Action> actions, MiningActionData mad) {
 //        CompilationUnit src = mad.preprocessedData.srcCu;
 //        CompilationUnit dst = mad.preprocessedData.dstCu;
-        IASTTranslationUnit src = mad.preprocessedData.srcTu;
-        IASTTranslationUnit dst = mad.preprocessedData.dstTu;
+        Object src = Global.util.getSrcCu(mad.preprocessedData);
+        Object dst =  Global.util.getDstCu(mad.preprocessedData);
         List<Integer[]> rangeList = new ArrayList<>();
         MergeIntervals mi = new MergeIntervals();
         actions.forEach(a -> {

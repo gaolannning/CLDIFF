@@ -59,7 +59,7 @@ public class AddOrRemoveFileProcessing {
         List<ChangeEntity> mList = new ArrayList<>();
         for(IASTNode node:typeDeclaration.getChildren()) {
             if(node instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier){
-                ClassChangeEntity classChangeEntity = new ClassChangeEntity(new BodyDeclarationPairC(typeDeclaration, ((IASTCompositeTypeSpecifier) ((IASTSimpleDeclaration) typeDeclaration).getDeclSpecifier()).getName().toString() + "."),
+                ClassChangeEntity classChangeEntity = new ClassChangeEntity(new BodyDeclarationPair(typeDeclaration, ((IASTCompositeTypeSpecifier) ((IASTSimpleDeclaration) typeDeclaration).getDeclSpecifier()).getName().toString() + "."),
                         Insert.class.getSimpleName(),
                         new MyRange(node.getFileLocation().getStartingLineNumber(), node.getFileLocation().getEndingLineNumber(),
                                 treeType));

@@ -4,6 +4,7 @@ package edu.fdu.se.base.miningactions.util;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.links.MyRange;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import org.eclipse.cdt.core.dom.ast.*;
@@ -49,16 +50,8 @@ public class AstRelations {
 	}
 
 	public static String getLocationString(ITree tree){
-		IASTNode node = ((Tree)tree).getAstNodeC();
-		String result="";
-		while(!(node instanceof ICPPASTTranslationUnit)){
-			if(node instanceof IASTSimpleDeclaration &&((IASTSimpleDeclaration) node).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier){
-				IASTCompositeTypeSpecifier tp  = (IASTCompositeTypeSpecifier) ((IASTSimpleDeclaration)node).getDeclSpecifier();
-				result = tp.getName().toString()+"."+ result;
-			}
-			node = node.getParent();
-		}
-		return result;
+		Object node = ((Tree)tree).getNode();
+		return Global.util.getLocationString(node);
 	}
 
 }

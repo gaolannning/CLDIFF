@@ -30,6 +30,7 @@ import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 
 import com.github.gumtreediff.tree.TreeUtils;
+import edu.fdu.se.lang.generatingactions.ParserTreeGenerator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -80,7 +81,7 @@ public class MyActionGenerator {
         myAgbData = new GeneratingActionsData();
     }
 
-    public MyActionGenerator(JavaParserTreeGenerator generator) {
+    public MyActionGenerator(ParserTreeGenerator generator) {
         this.origSrc = generator.src;
         this.copySrc = this.origSrc.deepCopy();
         this.origDst = generator.dst;

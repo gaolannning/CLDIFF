@@ -21,7 +21,7 @@ public class ClassChangeEntity extends MemberPlusChangeEntity {
     /**
      * 预处理 识别的
      */
-    public ClassChangeEntity(BodyDeclarationPairC bodyDeclarationPair, String changeType, MyRange myRange){
+    public ClassChangeEntity(BodyDeclarationPair bodyDeclarationPair, String changeType, MyRange myRange){
         super(bodyDeclarationPair.getLocationClassString(),changeType,myRange);
         IASTSimpleDeclaration cod = (IASTSimpleDeclaration) bodyDeclarationPair.getBodyDeclaration();
         this.stageIIBean.setLocation(bodyDeclarationPair.getLocationClassString());
