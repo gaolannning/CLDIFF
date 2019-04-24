@@ -53,8 +53,8 @@ public class PreprocessedTempData {
     /**
      * list of comments to be removed
      */
-    public List<ASTNode> srcRemovalNodes;
-    public List<ASTNode> dstRemovalNodes;
+    public List<Object> srcRemovalNodes;
+    public List<Object> dstRemovalNodes;
 
 
     /**
@@ -71,13 +71,7 @@ public class PreprocessedTempData {
             this.srcNodeBodyNameMap.put(name, mList);
         }
     }
-
-
-    public void addToSrcRemoveList(ASTNode bd) {
-        this.srcRemovalNodes.add(bd);
-    }
-
-    private void setLinesFlag(List<Integer> lineFlags,int start,int end){
+    public void setLinesFlag(List<Integer> lineFlags,int start,int end){
         for(int i =start ;i<=end;i++){
             if(lineFlags.get(i-1)>0){
                 lineFlags.set(i-1, -lineFlags.get(i-1));
@@ -85,45 +79,49 @@ public class PreprocessedTempData {
         }
     }
 
-    public void removeSrcRemovalList(CompilationUnit cu, List<Integer> lineList) {
-        for (ASTNode item : this.srcRemovalNodes) {
-//            if(item instanceof MethodDeclaration){
-//                MethodDeclaration md = (MethodDeclaration) item;
-//                if(md.getName().toString().startsWith("create")){
-//                    System.out.println(md.getName().toString());
-//
-//                }
-//            }
-        	
-//        	System.out.println(item.toString());
-//            System.out.println(cu.getLineNumber(item.getStartPosition()) +"  "+cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
-            setLinesFlag(lineList,cu.getLineNumber(item.getStartPosition()),
-                    cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
-            
-            item.delete();
-        }
-        this.srcRemovalNodes.clear();
+    public void addToSrcRemoveList(Object bd) {
+        this.srcRemovalNodes.add(bd);
     }
 
-    public void addToDstRemoveList(ASTNode bd) {
+//    public void removeSrcRemovalList(CompilationUnit cu, List<Integer> lineList) {
+//        for (ASTNode item : this.srcRemovalNodes) {
+////            if(item instanceof MethodDeclaration){
+////                MethodDeclaration md = (MethodDeclaration) item;
+////                if(md.getName().toString().startsWith("create")){
+////                    System.out.println(md.getName().toString());
+////
+////                }
+////            }
+//
+////        	System.out.println(item.toString());
+////            System.out.println(cu.getLineNumber(item.getStartPosition()) +"  "+cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
+//            setLinesFlag(lineList,cu.getLineNumber(item.getStartPosition()),
+//                    cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
+//
+//            item.delete();
+//        }
+//        this.srcRemovalNodes.clear();
+//    }
+
+    public void addToDstRemoveList(Object bd) {
         dstRemovalNodes.add(bd);
     }
 
-    public void removeDstRemovalList(CompilationUnit cu, List<Integer> lineList) {
-        for (ASTNode item : this.dstRemovalNodes) {
-            if(item instanceof BodyDeclaration){
-                BodyDeclaration bd = (BodyDeclaration) item;
-                if(bd.getJavadoc()!=null){
-                    setLinesFlag(lineList,cu.getLineNumber(bd.getJavadoc().getStartPosition()),
-                            cu.getLineNumber(bd.getJavadoc().getStartPosition()+bd.getJavadoc().getLength()-1));
-                }
-            }
-            setLinesFlag(lineList,cu.getLineNumber(item.getStartPosition()),
-                    cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
-            item.delete();
-        }
-        dstRemovalNodes.clear();
-    }
+//    public void removeDstRemovalList(CompilationUnit cu, List<Integer> lineList) {
+//        for (ASTNode item : this.dstRemovalNodes) {
+//            if(item instanceof BodyDeclaration){
+//                BodyDeclaration bd = (BodyDeclaration) item;
+//                if(bd.getJavadoc()!=null){
+//                    setLinesFlag(lineList,cu.getLineNumber(bd.getJavadoc().getStartPosition()),
+//                            cu.getLineNumber(bd.getJavadoc().getStartPosition()+bd.getJavadoc().getLength()-1));
+//                }
+//            }
+//            setLinesFlag(lineList,cu.getLineNumber(item.getStartPosition()),
+//                    cu.getLineNumber(item.getStartPosition()+item.getLength()-1));
+//            item.delete();
+//        }
+//        dstRemovalNodes.clear();
+//    }
 
     public void initBodySrcNodeMap(BodyDeclarationPair bodyDeclarationPair){
         this.srcNodeVisitingMap.put(bodyDeclarationPair,BODY_INITIALIZED_VALUE);
@@ -142,38 +140,38 @@ public class PreprocessedTempData {
     }
 
 
-    public void removeAllSrcComments(CompilationUnit cu,List<Integer> lineList) {
-        PackageDeclaration packageDeclaration = cu.getPackage();
-        if (packageDeclaration != null)
-            addToSrcRemoveList(packageDeclaration);
-        List<ASTNode> commentList = cu.getCommentList();
-        for (int i = commentList.size() - 1; i >= 0; i--) {
-            if(commentList.get(i) instanceof Javadoc){
-                addToSrcRemoveList(commentList.get(i));
-            }
-        }
-        List<ImportDeclaration> imprortss = cu.imports();
-        for (int i = imprortss.size() - 1; i >= 0; i--) {
-            addToSrcRemoveList(imprortss.get(i));
-        }
-        removeSrcRemovalList(cu,lineList);
-    }
+//    public void removeAllSrcComments(CompilationUnit cu,List<Integer> lineList) {
+//        PackageDeclaration packageDeclaration = cu.getPackage();
+//        if (packageDeclaration != null)
+//            addToSrcRemoveList(packageDeclaration);
+//        List<ASTNode> commentList = cu.getCommentList();
+//        for (int i = commentList.size() - 1; i >= 0; i--) {
+//            if(commentList.get(i) instanceof Javadoc){
+//                addToSrcRemoveList(commentList.get(i));
+//            }
+//        }
+//        List<ImportDeclaration> imprortss = cu.imports();
+//        for (int i = imprortss.size() - 1; i >= 0; i--) {
+//            addToSrcRemoveList(imprortss.get(i));
+//        }
+//        removeSrcRemovalList(cu,lineList);
+//    }
 
-    public void removeAllDstComments(CompilationUnit cu,List<Integer> lineList) {
-        List<ASTNode> commentList = cu.getCommentList();
-        PackageDeclaration packageDeclaration = cu.getPackage();
-        if (packageDeclaration != null)
-            addToDstRemoveList(packageDeclaration);
-        List<ImportDeclaration> imprortss = cu.imports();
-        for (int i = commentList.size() - 1; i >= 0; i--) {
-            if(commentList.get(i) instanceof Javadoc) {
-                addToDstRemoveList(commentList.get(i));
-            }
-        }
-        for (int i = imprortss.size() - 1; i >= 0; i--) {
-            addToDstRemoveList(imprortss.get(i));
-        }
-        removeDstRemovalList(cu,lineList);
-    }
+//    public void removeAllDstComments(CompilationUnit cu,List<Integer> lineList) {
+//        List<ASTNode> commentList = cu.getCommentList();
+//        PackageDeclaration packageDeclaration = cu.getPackage();
+//        if (packageDeclaration != null)
+//            addToDstRemoveList(packageDeclaration);
+//        List<ImportDeclaration> imprortss = cu.imports();
+//        for (int i = commentList.size() - 1; i >= 0; i--) {
+//            if(commentList.get(i) instanceof Javadoc) {
+//                addToDstRemoveList(commentList.get(i));
+//            }
+//        }
+//        for (int i = imprortss.size() - 1; i >= 0; i--) {
+//            addToDstRemoveList(imprortss.get(i));
+//        }
+//        removeDstRemovalList(cu,lineList);
+//    }
 
 }

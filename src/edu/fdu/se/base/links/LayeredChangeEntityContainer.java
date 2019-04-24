@@ -3,6 +3,7 @@ package edu.fdu.se.base.links;
 import com.github.gumtreediff.actions.model.Insert;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
@@ -44,7 +45,7 @@ public class LayeredChangeEntityContainer {
         mList.sort(new Comparator<Entry<BodyDeclarationPair, List<ChangeEntity>>>() {
             @Override
             public int compare(Entry<BodyDeclarationPair, List<ChangeEntity>> a, Entry<BodyDeclarationPair, List<ChangeEntity>> b) {
-                return a.getKey().getBodyDeclaration().getStartPosition() - b.getKey().getBodyDeclaration().getStartPosition();
+                return Global.util.getStartPosition(a.getKey().getBodyDeclaration()) - Global.util.getStartPosition(b.getKey().getBodyDeclaration());
             }
         });
         mList.forEach(a -> keyIndex.add(a.getKey()));
@@ -130,12 +131,12 @@ public class LayeredChangeEntityContainer {
                         || changeEntity instanceof FieldChangeEntity
                         || changeEntity instanceof InitializerChangeEntity
                         || changeEntity instanceof MethodChangeEntity) {
-                    if (start >= key.getBodyDeclaration().getStartPosition() && start <= (key.getBodyDeclaration().getStartPosition() + key.getBodyDeclaration().getLength())) {
+                    if (start >= Global.util.getStartPosition(key.getBodyDeclaration()) && start <= Global.util.getStartPosition(key.getBodyDeclaration()) + Global.util.getNodeLength(key.getBodyDeclaration())) {
                         return key;
                     }
                 }
             } else {
-                if (start >= key.getBodyDeclaration().getStartPosition() && start <= (key.getBodyDeclaration().getStartPosition() + key.getBodyDeclaration().getLength())) {
+                if (start >= Global.util.getStartPosition(key.getBodyDeclaration()) && start <= Global.util.getStartPosition(key.getBodyDeclaration()) + Global.util.getNodeLength(key.getBodyDeclaration())) {
                     return key;
                 }
             }

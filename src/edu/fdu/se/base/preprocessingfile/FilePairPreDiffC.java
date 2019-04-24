@@ -67,7 +67,7 @@ public class FilePairPreDiffC {
     public int compareTwoFile() {
         IASTTranslationUnit cuSrc = preprocessedData.srcTu;
         IASTTranslationUnit cuDst = preprocessedData.dstTu;
-        test(cuSrc);
+//        test(cuSrc);
 //        fileOutputLog.writeFileBeforeProcess(preprocessedData);
 //        if ("true".equals(ProjectProperties.getInstance().getValue(PropertyKeys.DEBUG_PREPROCESSING))) {
 //            fileOutputLog = new FileOutputLog(outputDirName);

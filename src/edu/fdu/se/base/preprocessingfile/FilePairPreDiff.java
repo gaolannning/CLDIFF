@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
 
+import edu.fdu.se.base.common.Global;
 import org.eclipse.jdt.core.dom.*;
 
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-import edu.fdu.se.javaparser.JDTParserFactory;
+
+import edu.fdu.se.lang.TypeNodesTraversal;
 
 /**
  * 两个文件 预处理
@@ -31,7 +33,7 @@ public class FilePairPreDiff {
     public FilePairPreDiff() {
         preprocessedData = new PreprocessedData();
         preprocessedTempData = new PreprocessedTempData();
-        queue = new LinkedList<>();
+//        queue = new LinkedList<>();
     }
 
     private PreprocessedData preprocessedData;
@@ -44,15 +46,15 @@ public class FilePairPreDiff {
     private Queue<SrcDstPair> queue;
 
     public void initFilePath(String prevPath,String currPath){
-        preprocessedData.srcCu = JDTParserFactory.getCompilationUnit(prevPath);
-        preprocessedData.dstCu = JDTParserFactory.getCompilationUnit(currPath);
-        preprocessedData.loadTwoCompilationUnits(preprocessedData.srcCu, preprocessedData.dstCu, prevPath, currPath);
+        preprocessedData.setSrcCu(Global.util.parseCu(prevPath));
+        preprocessedData.setDstCu(Global.util.parseCu(currPath));
+        preprocessedData.loadTwoCompilationUnits(preprocessedData.getSrcCu(), preprocessedData.getDstCu(), prevPath, currPath);
     }
     public void initFileContent(byte[] prevContent,byte[] currContent){
         try {
-            preprocessedData.srcCu = JDTParserFactory.getCompilationUnit(prevContent);
-            preprocessedData.dstCu = JDTParserFactory.getCompilationUnit(currContent);
-            preprocessedData.loadTwoCompilationUnits(preprocessedData.srcCu, preprocessedData.dstCu, prevContent, currContent);
+            preprocessedData.setSrcCu(Global.util.parseCu(prevContent));
+            preprocessedData.setDstCu(Global.util.parseCu(currContent));
+            preprocessedData.loadTwoCompilationUnits(preprocessedData.getSrcCu(), preprocessedData.getDstCu(), prevContent, currContent);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -62,98 +64,108 @@ public class FilePairPreDiff {
         List<BodyDeclaration> bd = cu.types();
     }
     public int compareTwoFile() {
-        CompilationUnit cuSrc = preprocessedData.srcCu;
-        CompilationUnit cuDst = preprocessedData.dstCu;
-        test(cuSrc);
+        Object cuSrc = preprocessedData.getSrcCu();
+        Object cuDst = preprocessedData.getDstCu();
+//        test(cuSrc);
 //        fileOutputLog.writeFileBeforeProcess(preprocessedData);
 //        if ("true".equals(ProjectProperties.getInstance().getValue(PropertyKeys.DEBUG_PREPROCESSING))) {
 //            fileOutputLog = new FileOutputLog(outputDirName);
 //
 //        }
-        preprocessedTempData.removeAllSrcComments(cuSrc, preprocessedData.srcLines);
-        preprocessedTempData.removeAllDstComments(cuDst, preprocessedData.dstLines);
-        if(cuSrc.types().size() != cuDst.types().size()){
-            return -1;
-        }
-        for(int i = 0;i<cuSrc.types().size();i++){
-            BodyDeclaration bodyDeclarationSrc = (BodyDeclaration) cuSrc.types().get(i);
-            BodyDeclaration bodyDeclarationDst = (BodyDeclaration) cuDst.types().get(i);
-            if ((bodyDeclarationSrc instanceof TypeDeclaration) && (bodyDeclarationDst instanceof TypeDeclaration)) {
-                SrcDstPair srcDstPair = new SrcDstPair();
-                srcDstPair.tpSrc = (TypeDeclaration) bodyDeclarationSrc;
-                srcDstPair.tpDst = (TypeDeclaration) bodyDeclarationDst;
-                this.queue.offer(srcDstPair);
-            }else{
-                return -1;
-            }
-        }
-        while(queue.size()!=0){
-            SrcDstPair tmp = queue.poll();
-            compare(cuSrc,cuDst,tmp.tpSrc,tmp.tpDst);
-        }
-        return 0;
-    }
-    public void addSuperClass(TypeDeclaration type,List<String> list){
-        List<Type> aa  = type.superInterfaceTypes();
-        List<ASTNode> modifiers = type.modifiers();
-        for(ASTNode node:modifiers){
-            if(node instanceof Modifier){
-                Modifier modifier = (Modifier)node;
-                if(modifier.toString().equals("abstract")){
-                    list.add("abstract---"+type.getName().toString());
-                }
-            }
-        }
-        if(aa!=null) {
-            for (Type aaa : aa) {
-                list.add("interface---"+aaa.toString());
-            }
-        }
+        Global.util.removeAllSrcComments(preprocessedTempData,cuSrc, preprocessedData.srcLines);
+        Global.util.removeAllDstComments(preprocessedTempData,cuDst, preprocessedData.dstLines);
+        return Global.util.compareTwoFile(this,preprocessedTempData,preprocessedData);
 
-        if(type.getSuperclassType()!=null) {
-            list.add("superclass---"+type.getSuperclassType().toString());
-        }
-    }
-
-    private void compare(CompilationUnit cuSrc,CompilationUnit cuDst,TypeDeclaration tdSrc,TypeDeclaration tdDst){
-        TypeNodesTraversal astTraversal = new TypeNodesTraversal();
-        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
-        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
-
-        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, tdSrc, tdSrc.getName().toString() + ".");
-        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, tdDst, tdDst.getName().toString() + ".");
-        // 考虑后面的识别 method name变化，这里把remove的注释掉
-        iterateVisitingMap();
-        undeleteSignatureChange();
-        preprocessedTempData.removeSrcRemovalList(cuSrc, preprocessedData.srcLines);
-        preprocessedTempData.removeDstRemovalList(cuDst, preprocessedData.dstLines);
-        iterateVisitingMap2LoadContainerMap();
-//        astTraversal.traverseSrcTypeDeclaration2Keys(preprocessedData,preprocessedTempData,tdSrc,tdSrc.getName().toString() + ".");
-//        if (fileOutputLog != null) {
-//            fileOutputLog.writeFileAfterProcess(preprocessedData);
+//        if(cuSrc.types().size() != cuDst.types().size()){
+//            return -1;
 //        }
-
+////        if(Global.util.getChildrenFromCu(Global.util))
+//        for(int i = 0;i<cuSrc.types().size();i++){
+//            BodyDeclaration bodyDeclarationSrc = (BodyDeclaration) cuSrc.types().get(i);
+//            BodyDeclaration bodyDeclarationDst = (BodyDeclaration) cuDst.types().get(i);
+//            if ((bodyDeclarationSrc instanceof TypeDeclaration) && (bodyDeclarationDst instanceof TypeDeclaration)) {
+//                SrcDstPair srcDstPair = new SrcDstPair();
+//                srcDstPair.tpSrc = (TypeDeclaration) bodyDeclarationSrc;
+//                srcDstPair.tpDst = (TypeDeclaration) bodyDeclarationDst;
+//                this.queue.offer(srcDstPair);
+//            }else{
+//                return -1;
+//            }
+//        }
+//        while(queue.size()!=0){
+//            SrcDstPair tmp = queue.poll();
+//            compare(cuSrc,cuDst,tmp.tpSrc,tmp.tpDst);
+//        }
+//        return 0;
     }
+//    public void addSuperClass(TypeDeclaration type,List<String> list){
+//        List<Type> aa  = type.superInterfaceTypes();
+//        List<ASTNode> modifiers = type.modifiers();
+//        for(ASTNode node:modifiers){
+//            if(node instanceof Modifier){
+//                Modifier modifier = (Modifier)node;
+//                if(modifier.toString().equals("abstract")){
+//                    list.add("abstract---"+type.getName().toString());
+//                }
+//            }
+//        }
+//        if(aa!=null) {
+//            for (Type aaa : aa) {
+//                list.add("interface---"+aaa.toString());
+//            }
+//        }
+//
+//        if(type.getSuperclassType()!=null) {
+//            list.add("superclass---"+type.getSuperclassType().toString());
+//        }
+//    }
+
+//    private void compare(CompilationUnit cuSrc,CompilationUnit cuDst,TypeDeclaration tdSrc,TypeDeclaration tdDst){
+//        TypeNodesTraversal astTraversal = new TypeNodesTraversal();
+//        addSuperClass(tdSrc,preprocessedData.getInterfacesAndFathers());
+//        addSuperClass(tdDst,preprocessedData.getInterfacesAndFathers());
+//
+//        astTraversal.traverseSrcTypeDeclarationInit(preprocessedData, preprocessedTempData, tdSrc, tdSrc.getName().toString() + ".");
+//        astTraversal.traverseDstTypeDeclarationCompareSrc(preprocessedData, preprocessedTempData, tdDst, tdDst.getName().toString() + ".");
+//        // 考虑后面的识别 method name变化，这里把remove的注释掉
+//        iterateVisitingMap();
+//        undeleteSignatureChange();
+//        preprocessedTempData.removeSrcRemovalList(cuSrc, preprocessedData.srcLines);
+//        preprocessedTempData.removeDstRemovalList(cuDst, preprocessedData.dstLines);
+//        iterateVisitingMap2LoadContainerMap();
+////        astTraversal.traverseSrcTypeDeclaration2Keys(preprocessedData,preprocessedTempData,tdSrc,tdSrc.getName().toString() + ".");
+////        if (fileOutputLog != null) {
+////            fileOutputLog.writeFileAfterProcess(preprocessedData);
+////        }
+//
+//    }
 
 
-    private void iterateVisitingMap() {
+    public void iterateVisitingMap() {
         for (Entry<BodyDeclarationPair, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
             BodyDeclarationPair bdp = item.getKey();
             int value = item.getValue();
-            BodyDeclaration bd = bdp.getBodyDeclaration();
-            if (bd instanceof TypeDeclaration) {
+            Object bd = bdp.getBodyDeclaration();
+            TypeNodesTraversal traversal= null;
+            try {
+                Class clazz = Class.forName("edu.fdu.se.lang.TypeNodesTraversal" + Global.lang);
+                traversal = (TypeNodesTraversal) clazz.newInstance();
+            }catch(Exception e){
+                assert(traversal!=null);
+            }
+            if (Global.util.isTypeDeclaration(bd)) {
                 switch (value) {
 //                    case PreprocessedTempData.BODY_DIFFERENT_RETAIN:
 //                    case PreprocessedTempData.BODY_FATHERNODE_REMOVE:
 //                        break;
                     case PreprocessedTempData.BODY_INITIALIZED_VALUE:
-                        this.preprocessedData.addBodiesDeleted(bdp);
-                        this.preprocessedTempData.addToSrcRemoveList(bd);
-                        TypeNodesTraversal.traverseTypeDeclarationSetVisited(preprocessedTempData, (TypeDeclaration) bd, bdp.getLocationClassString());
+                        preprocessedData.addBodiesDeleted(bdp);
+                        preprocessedTempData.addToSrcRemoveList(bd);
+                        traversal.traverseTypeDeclarationSetVisited(preprocessedTempData, bd, bdp.getLocationClassString());
                         break;
                     case PreprocessedTempData.BODY_SAME_REMOVE:
-                        this.preprocessedTempData.addToSrcRemoveList(bd);
-                        TypeNodesTraversal.traverseTypeDeclarationSetVisited(preprocessedTempData, (TypeDeclaration) bd, bdp.getLocationClassString());
+                        preprocessedTempData.addToSrcRemoveList(bd);
+                        traversal.traverseTypeDeclarationSetVisited(preprocessedTempData, (TypeDeclaration) bd, bdp.getLocationClassString());
                         break;
                 }
             }
@@ -161,15 +173,15 @@ public class FilePairPreDiff {
         for (Entry<BodyDeclarationPair, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
             BodyDeclarationPair bdp = item.getKey();
             int value = item.getValue();
-            BodyDeclaration bd = bdp.getBodyDeclaration();
+            Object bd = bdp.getBodyDeclaration();
 
-            if (!(bd instanceof TypeDeclaration)) {
+            if (!Global.util.isTypeDeclaration(bd)) {
                 switch (value) {
                     case PreprocessedTempData.BODY_DIFFERENT_RETAIN:
                     case PreprocessedTempData.BODY_FATHERNODE_REMOVE:
                         break;
                     case PreprocessedTempData.BODY_INITIALIZED_VALUE:
-                        this.preprocessedData.addBodiesDeleted(bdp);
+                        preprocessedData.addBodiesDeleted(bdp);
                         preprocessedTempData.addToSrcRemoveList(bd);
                         break;
                     case PreprocessedTempData.BODY_SAME_REMOVE:
@@ -187,7 +199,7 @@ public class FilePairPreDiff {
         }
     }
 
-    private void iterateVisitingMap2LoadContainerMap() {
+    public void iterateVisitingMap2LoadContainerMap() {
         for (Entry<BodyDeclarationPair, Integer> item : preprocessedTempData.srcNodeVisitingMap.entrySet()) {
             BodyDeclarationPair bdp = item.getKey();
             int value = item.getValue();
@@ -215,14 +227,14 @@ public class FilePairPreDiff {
     public void undeleteSignatureChange() {
         List<BodyDeclarationPair> addTmp = new ArrayList<>();
         for (BodyDeclarationPair bdpAdd : preprocessedData.getmBodiesAdded()) {
-            if (bdpAdd.getBodyDeclaration() instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) bdpAdd.getBodyDeclaration();
-                String methodName = md.getName().toString();
+            if (Global.util.isMethodDeclaration(bdpAdd.getBodyDeclaration())) {
+                Object md = bdpAdd.getBodyDeclaration();
+                String methodName = Global.util.getMethodName(md);
                 List<BodyDeclarationPair> bdpDeleteList = new ArrayList<>();
                 for (BodyDeclarationPair bdpDelete : preprocessedData.getmBodiesDeleted()) {
-                    if (bdpDelete.getBodyDeclaration() instanceof MethodDeclaration) {
-                        MethodDeclaration md2 = (MethodDeclaration) bdpDelete.getBodyDeclaration();
-                        String methodName2 = md2.getName().toString();
+                    if (Global.util.isMethodDeclaration(bdpDelete.getBodyDeclaration())){
+                        Object md2 = bdpAdd.getBodyDeclaration();
+                        String methodName2 = Global.util.getMethodName(md2);
                         if (potentialMethodNameChange(methodName, methodName2)) {
                             bdpDeleteList.add(bdpDelete);
                         }

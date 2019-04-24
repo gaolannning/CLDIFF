@@ -1,17 +1,9 @@
-package edu.fdu.se.base.preprocessingfile;
+package edu.fdu.se.lang;
 
-import edu.fdu.se.base.links.MyRange;
-import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
-import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntity;
-import edu.fdu.se.base.miningchangeentity.member.EnumChangeEntityC;
 import edu.fdu.se.base.preprocessingfile.data.*;
+import edu.fdu.se.cldiff.CUtil;
 import org.eclipse.cdt.core.dom.ast.*;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTCompositeTypeSpecifier;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTEnumerationSpecifier;
-import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNamedTypeSpecifier;
-import org.eclipse.jdt.core.dom.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +11,7 @@ import java.util.List;
  * Created by huangkaifeng on 2018/4/2.
  *
  */
-public class DstBodyCheckC {
+public class DstBodyCheckC implements DstBodyCheck{
 
 //    public BodyDeclarationPair getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Class clazz){
 //        for(BodyDeclarationPair bodyDeclarationPair:bodyDeclarationPairs){
@@ -55,9 +47,9 @@ public class DstBodyCheckC {
         TypeDeclaration,FieldDeclaration,FunctionDeclaration,EnumDeclaration
     }
 
-    public BodyDeclarationPairC getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Type type){
-        for(BodyDeclarationPairC bodyDeclarationPair:bodyDeclarationPairs){
-            IASTNode node = bodyDeclarationPair.getBodyDeclaration();
+    public BodyDeclarationPair getExactBodyDeclarationPair(List<BodyDeclarationPair> bodyDeclarationPairs, Type type){
+        for(BodyDeclarationPair bodyDeclarationPair:bodyDeclarationPairs){
+            IASTNode node = (IASTNode) bodyDeclarationPair.getBodyDeclaration();
             switch(type){
                 case TypeDeclaration:
                     if(node instanceof IASTTranslationUnit)
@@ -66,8 +58,7 @@ public class DstBodyCheckC {
                         return bodyDeclarationPair;
                     break;
                 case FieldDeclaration:
-                    if(node instanceof  IASTSimpleDeclaration)
-                        if(((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTNamedTypeSpecifier || ((IASTSimpleDeclaration)node).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier)
+                    if(CUtil.isFieldDeclaration(node))
                             return bodyDeclarationPair;
                     break;
                 case FunctionDeclaration:
@@ -87,7 +78,7 @@ public class DstBodyCheckC {
     /**
      * visited
      */
-    public int checkFieldDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode fd, String prefix) {
+    public int checkFieldDeclarationInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, IASTNode fd, String prefix) {
 
         List<IASTDeclarator> vdList = Arrays.asList(((IASTSimpleDeclaration) fd).getDeclarators());
         for (IASTDeclarator vd : vdList) {
@@ -96,11 +87,11 @@ public class DstBodyCheckC {
             compareResult.prevCurrFieldNames.add(vd.getName().toString());
             boolean newFieldFlag = true;
             if (compareCache.srcNodeBodyNameMap.containsKey(key)) {
-                List<BodyDeclarationPairC> srcBodyPairs = compareCache.srcNodeBodyNameMap.get(key);
-                BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcBodyPairs,Type.FieldDeclaration);
+                List<BodyDeclarationPair> srcBodyPairs = compareCache.srcNodeBodyNameMap.get(key);
+                BodyDeclarationPair srcBody = getExactBodyDeclarationPair(srcBodyPairs, Type.FieldDeclaration);
                 if(srcBody != null){
                     newFieldFlag = false;
-                    if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == fd.getRawSignature().toString().hashCode()
+                    if (((IASTNode)srcBody.getBodyDeclaration()).getRawSignature().toString().hashCode() == fd.getRawSignature().toString().hashCode()
                             && srcBody.getLocationClassString().hashCode() == prefix.hashCode()) {
                         compareCache.addToDstRemoveList(fd);
                         compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
@@ -131,7 +122,7 @@ public class DstBodyCheckC {
      * @param prefixClassName classname到cod的name前一个为止
      * @return 1 2
      */
-    public int checkTypeDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode cod, String prefixClassName) {
+    public int checkTypeDeclarationInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, IASTNode cod, String prefixClassName) {
         String curName = null;
         if(cod instanceof  IASTTranslationUnit) {
             curName = "Root.";
@@ -142,16 +133,18 @@ public class DstBodyCheckC {
         }
         String key = curName;
         if (compareCache.srcNodeBodyNameMap.containsKey(key)) {
-            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
-            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,Type.TypeDeclaration);
+            List<BodyDeclarationPair> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
+            BodyDeclarationPair srcBody = getExactBodyDeclarationPair(srcNodeList, Type.TypeDeclaration);
             if(srcBody != null) {
-                if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode()
-                        && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
+                boolean b1 = ((IASTNode)srcBody.getBodyDeclaration()).getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode();
+                boolean b2 = curName.hashCode() == srcBody.getLocationClassString().hashCode();
+                if (((IASTNode)srcBody.getBodyDeclaration()).getRawSignature().toString().hashCode() == cod.getRawSignature().toString().hashCode()
+                        && curName.hashCode() == srcBody.getLocationClassString().hashCode()) {
 //                System.out.println(srcBody.getBodyDeclaration().toString());
 //                System.out.println(cod.toString());
                     compareCache.addToDstRemoveList(cod);
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
-                    TypeNodesTraversalC.traverseTypeDeclarationSetVisited(compareCache, (IASTNode) srcBody.getBodyDeclaration(), curName);
+                    new TypeNodesTraversalC().traverseTypeDeclarationSetVisited(compareCache, (IASTNode) srcBody.getBodyDeclaration(), curName);
                     return 1;
                 } else {
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_DIFFERENT_RETAIN);
@@ -162,19 +155,19 @@ public class DstBodyCheckC {
             }
         }
         // new class
-        compareResult.addBodiesAdded(cod, prefixClassName);
+        compareResult.addBodiesAdded(cod, curName);
         compareCache.addToDstRemoveList(cod);
         return 3;
     }
 
-    public int checkEnumDeclarationInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode ed, String prefixClassName){
+    public int checkEnumDeclarationInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, IASTNode ed, String prefixClassName){
         String name= ((IASTEnumerationSpecifier)((IASTSimpleDeclaration)ed).getDeclSpecifier()).getName().toString();
         String key = prefixClassName + name;
         if(compareCache.srcNodeBodyNameMap.containsKey(key)){
-            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
-            BodyDeclarationPairC srcBody = getExactBodyDeclarationPair(srcNodeList,Type.EnumDeclaration);
+            List<BodyDeclarationPair> srcNodeList = compareCache.srcNodeBodyNameMap.get(key);
+            BodyDeclarationPair srcBody = getExactBodyDeclarationPair(srcNodeList, Type.EnumDeclaration);
             if(srcBody != null) {
-                if (srcBody.getBodyDeclaration().getRawSignature().toString().hashCode() == ed.getRawSignature().toString().hashCode()
+                if (((IASTNode)srcBody.getBodyDeclaration()).getRawSignature().toString().hashCode() == ed.getRawSignature().toString().hashCode()
                         && prefixClassName.hashCode() == srcBody.getLocationClassString().hashCode()) {
                     compareCache.addToDstRemoveList(ed);
                     compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_SAME_REMOVE);
@@ -212,7 +205,7 @@ public class DstBodyCheckC {
     /**
      * curr的节点去prev的map里check
      */
-    public int checkMethodDeclarationOrInitializerInDst(PreprocessedDataC compareResult, PreprocessedTempDataC compareCache, IASTNode bd, String prefixClassName) {
+    public int checkMethodDeclarationOrInitializerInDst(PreprocessedData compareResult, PreprocessedTempData compareCache, IASTNode bd, String prefixClassName) {
         String methodNameKey = null;
 //        if (bd instanceof Initializer) {
 //            Initializer idd = (Initializer) bd;
@@ -241,9 +234,9 @@ public class DstBodyCheckC {
         }
 
         if (compareCache.srcNodeBodyNameMap.containsKey(methodNameKey)) {
-            List<BodyDeclarationPairC> srcNodeList = compareCache.srcNodeBodyNameMap.get(methodNameKey);
+            List<BodyDeclarationPair> srcNodeList = compareCache.srcNodeBodyNameMap.get(methodNameKey);
             boolean findSame = false;
-            for (BodyDeclarationPairC srcBody : srcNodeList) {
+            for (BodyDeclarationPair srcBody : srcNodeList) {
                 int hashCode1 = (String.valueOf(bd.getRawSignature().toString().hashCode()) + String.valueOf(prefixClassName.hashCode())).hashCode();
                 int hashCode2 = srcBody.hashCode();
                 if (srcBody.hashCode() == (String.valueOf(bd.getRawSignature().toString().hashCode()) + String.valueOf(prefixClassName.hashCode())).hashCode()) {
@@ -256,7 +249,7 @@ public class DstBodyCheckC {
             if (findSame) {
                 return 1;
             } else {
-                for (BodyDeclarationPairC srcBody : srcNodeList) {
+                for (BodyDeclarationPair srcBody : srcNodeList) {
                     if (PreprocessedTempData.BODY_SAME_REMOVE != compareCache.getNodeMapValue(srcBody)) {
                         compareCache.setBodySrcNodeMap(srcBody, PreprocessedTempData.BODY_DIFFERENT_RETAIN);
                     }

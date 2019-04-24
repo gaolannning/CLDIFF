@@ -102,12 +102,12 @@ public class CLDiffCore {
 
     private void runDiff(FilePairPreDiff preDiff,String fileName){
         long start = System.nanoTime();
-        PreprocessedData preData = preDiff.getPreprocessedData();
-        JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(preData.getSrcCu(),preData.getDstCu());
-        treeGenerator.setFileName(fileName);
-        //gumtree
-        MyActionGenerator actionGenerator = new MyActionGenerator(treeGenerator);
-        GeneratingActionsData actionsData = actionGenerator.generate();
+//        PreprocessedData preData = preDiff.getPreprocessedData();
+//        JavaParserTreeGenerator treeGenerator = new JavaParserTreeGenerator(Global.util.getSrcCu(preData),Global.util.getDstCu(preData));
+//        treeGenerator.setFileName(fileName);
+//        //gumtree
+//        MyActionGenerator actionGenerator = new MyActionGenerator(treeGenerator);
+//        GeneratingActionsData actionsData = actionGenerator.generate();
         //print
 //        long end = System.nanoTime();
 //        System.out.println("----mapping " +(end-start));

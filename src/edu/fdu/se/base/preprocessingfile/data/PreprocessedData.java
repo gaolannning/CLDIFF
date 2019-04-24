@@ -5,8 +5,7 @@ import edu.fdu.se.base.links.LayeredChangeEntityContainer;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.javaparser.JDTParserFactory;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
-import org.eclipse.jdt.core.dom.CompilationUnit;
+
 
 import java.util.*;
 
@@ -24,8 +23,8 @@ public class PreprocessedData {
     public List<Integer> dstLines;
     public List<Integer> srcLines;
 
-    public CompilationUnit dstCu;
-    public CompilationUnit srcCu;
+    private Object dstCu;
+    private Object srcCu;
 
     private List<String> interfacesAndFathers;
 
@@ -33,12 +32,14 @@ public class PreprocessedData {
     public Set<String> currFieldNames;
     public Set<String> prevCurrFieldNames;
 
-    public CompilationUnit getDstCu() {
+    public Object getDstCu() {
         return dstCu;
     }
-    public CompilationUnit getSrcCu() {
+    public Object getSrcCu() {
         return srcCu;
     }
+    public void setDstCu(Object cu) {this.dstCu = cu; }
+    public void setSrcCu(Object cu) {this.srcCu = cu; }
 
     /**
      * curr 删除的added的body
@@ -60,7 +61,7 @@ public class PreprocessedData {
     }
 
 
-    private Map<String,List<BodyDeclaration>> classOrInterfaceOrEnum;
+    private Map<String,List<Object>> classOrInterfaceOrEnum;
 
     public PreprocessedData(){
         mBodiesAdded = new ArrayList<>();
@@ -77,18 +78,18 @@ public class PreprocessedData {
     public LayeredChangeEntityContainer entityContainer;
 
 
-    public void addTypeDeclaration(String prefix, BodyDeclaration a, String name){
+    public void addTypeDeclaration(String prefix, Object a, String name){
         String key = prefix + "." + name;
         if(this.classOrInterfaceOrEnum.containsKey(key)){
             classOrInterfaceOrEnum.get(key).add(a);
         }else{
-            List<BodyDeclaration> mList = new ArrayList<>();
+            List<Object> mList = new ArrayList<>();
             mList.add(a);
             this.classOrInterfaceOrEnum.put(key,mList);
         }
     }
 
-    public void loadTwoCompilationUnits(CompilationUnit src,CompilationUnit dst,String srcPath,String dstPath){
+    public void loadTwoCompilationUnits(Object src,Object dst,String srcPath,String dstPath){
         this.srcCu = src;
         this.srcLineList = new ArrayList<>();
         this.fullStringSrc = JDTParserFactory.getLinesOfFile(srcPath,this.srcLineList);
@@ -100,7 +101,7 @@ public class PreprocessedData {
         this.dstLines = JDTParserFactory.getLinesList(dstLineList.size());
     }
 
-    public void loadTwoCompilationUnits(CompilationUnit src,CompilationUnit dst,byte[] srcContent,byte[] dstContent){
+    public void loadTwoCompilationUnits(Object src,Object dst,byte[] srcContent,byte[] dstContent){
         this.srcCu = src;
         this.srcLineList = new ArrayList<>();
         this.fullStringSrc = JDTParserFactory.getLinesOfFile(srcContent,this.srcLineList);
@@ -114,7 +115,7 @@ public class PreprocessedData {
 
 
 
-    public void addBodiesAdded(BodyDeclaration bodyDeclaration,String classPrefix){
+    public void addBodiesAdded(Object bodyDeclaration,String classPrefix){
         this.mBodiesAdded.add(new BodyDeclarationPair(bodyDeclaration,classPrefix));
     }
 

@@ -2,6 +2,7 @@ package edu.fdu.se.base.common;
 
 import edu.fdu.se.base.miningchangeentity.ChangeEntityData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
+import edu.fdu.se.lang.Util;
 import edu.fdu.se.server.Meta;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 
@@ -14,6 +15,20 @@ import java.util.Map;
  *
  */
 public class Global {
+    //add by yxy
+    public static Util util;
+    public static String lang;
+
+    public static String formatLang(String s){
+        if(s.toLowerCase().equals("c")||s.toLowerCase().equals("cpp")){
+            return "C";
+        }
+        if(s.toLowerCase().equals("java")){
+           return "Java";
+        }
+        assert(false);
+        return null;
+    }
 
     public static Meta mmeta;
 

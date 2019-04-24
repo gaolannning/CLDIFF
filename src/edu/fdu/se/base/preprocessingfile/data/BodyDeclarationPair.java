@@ -1,6 +1,7 @@
 package edu.fdu.se.base.preprocessingfile.data;
 
 
+import edu.fdu.se.base.common.Global;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -11,11 +12,11 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  *
  */
 public class BodyDeclarationPair {
-    private BodyDeclaration bd;
+    private Object bd;
 
     private String locationClassString;
 
-    public BodyDeclarationPair(BodyDeclaration bd1,String str){
+    public BodyDeclarationPair(Object bd1,String str){
         this.bd = bd1;
         this.locationClassString = str;
         String hashStr = String.valueOf(bd1.toString().hashCode())+String.valueOf(str.hashCode());
@@ -23,7 +24,7 @@ public class BodyDeclarationPair {
     }
     private int hashCode;
 
-    public BodyDeclaration getBodyDeclaration() {
+    public Object getBodyDeclaration() {
         return bd;
     }
 
@@ -45,6 +46,7 @@ public class BodyDeclarationPair {
 
     @Override
     public String toString(){
+        Global.util.BodyDeclarationPairToString(this);
         String result = this.getLocationClassString() +" ";
         if(this.getBodyDeclaration() instanceof TypeDeclaration){
             TypeDeclaration td = (TypeDeclaration)this.getBodyDeclaration();

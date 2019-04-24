@@ -11,6 +11,7 @@ import edu.fdu.se.base.links.similarity.TreeDistance;
 import edu.fdu.se.base.miningchangeentity.ChangeEntityData;
 import edu.fdu.se.base.preprocessingfile.data.FileOutputLog;
 import edu.fdu.se.fileutil.FileUtil;
+import edu.fdu.se.lang.Util;
 import edu.fdu.se.server.Meta;
 import edu.fdu.se.server.CommitFile;
 import org.eclipse.jgit.internal.storage.file.GlobalAttributesNode;
@@ -26,7 +27,7 @@ import java.util.*;
 public class CLDiffAPI {
 
     private Map<String, ChangeEntityData> fileChangeEntityData = new HashMap<>();
-    public CLDiffCoreC clDiffCore;
+    public CLDiffCore clDiffCore;
     private List<FilePairData> filePairDatas;
 
     /**
@@ -37,7 +38,7 @@ public class CLDiffAPI {
     public CLDiffAPI(String outputDir, Meta meta) {
 //        Global.outputFilePathList = new ArrayList<>();
         filePairDatas = new ArrayList<>();
-        clDiffCore = new CLDiffCoreC();
+        clDiffCore = new CLDiffCore();
         clDiffCore.mFileOutputLog = new FileOutputLog(outputDir, meta.getProject_name());
         clDiffCore.mFileOutputLog.setCommitId(meta.getCommit_hash(), meta.getParents());
         initDataFromJson(meta);
@@ -84,6 +85,16 @@ public class CLDiffAPI {
         String absolutePath = this.clDiffCore.mFileOutputLog.metaLinkPath;
         Global.changeEntityFileNameMap = new HashMap<>();
         for (FilePairData fp : filePairDatas) {
+            String z = fp.getFileName();
+            String[] s = fp.getFileName().split("\\.");
+            Global.lang = Global.formatLang(s[s.length-1]);
+            try {
+//                Class clazz = Class.forName("edu.fdu.se.lang.Util" + Global.lang);
+//                Util util = (Util)clazz.newInstance();
+                Global.util = (Util)Class.forName("edu.fdu.se.lang.Util" + Global.lang).newInstance();
+            }catch (Exception e){
+                assert(false);
+            }
             Global.parentCommit = fp.getParentCommit();
             System.out.println(fp.getFileName());
             Global.fileName = fp.getFileName();
