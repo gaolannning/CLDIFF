@@ -1,5 +1,7 @@
 package edu.fdu.se.cldiff;
 
+import com.github.gumtreediff.actions.model.Action;
+import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.GeneratingActionsData;
 import edu.fdu.se.base.generatingactions.MyActionGenerator;
@@ -138,6 +140,12 @@ public class CLDiffCore {
         MiningActionData mad = new MiningActionData(preData,actionsData,parserTreeGenerator);
         ActionAggregationGenerator aag = new ActionAggregationGenerator();
         aag.doCluster(mad);
+//        int i = 0;
+//        for(Action action:mad.mGeneratingActionsData.getAllActions()){
+//            if(Global.util.getLineNumber(preData.getSrcCu(),Global.util.getStartPosition(((Tree)action.getNode()).getNode()))==508)
+//                System.out.println(i+"     "+action);
+//            i++;
+//        }
 ////correcting
         ChangeEntityData ced = new ChangeEntityData(mad);
         ChangeEntityPreprocess cep = new ChangeEntityPreprocess(ced);

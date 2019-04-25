@@ -1,5 +1,6 @@
 package edu.fdu.se.base.miningchangeentity.base;
 
+
 import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
@@ -142,12 +143,12 @@ public class StageIIIBean {
     }
 
 
-    @Deprecated
-    public void addInsertList(List<Integer[]> ranges, CompilationUnit cu) {
-        String file = ChangeEntityDesc.StageIIIFile.DST;
-        String type = "insert";
-        addRangesResultList(ranges, cu, file, type);
-    }
+//    @Deprecated
+//    public void addInsertList(List<Integer[]> ranges, CompilationUnit cu) {
+//        String file = ChangeEntityDesc.StageIIIFile.DST;
+//        String type = "insert";
+//        addRangesResultList(ranges, cu, file, type);
+//    }
 
     public void addInsertList(List<Integer[]> ranges, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.DST;
@@ -155,12 +156,12 @@ public class StageIIIBean {
         addRangesResultList(ranges, cu, file, type);
     }
 
-    @Deprecated
-    public void addUpdateList(List<Integer[]> ranges, CompilationUnit cu) {
-        String file = ChangeEntityDesc.StageIIIFile.SRC;
-        String type = "update";
-        addRangesResultList(ranges, cu, file, type);
-    }
+//    @Deprecated
+//    public void addUpdateList(List<Integer[]> ranges, CompilationUnit cu) {
+//        String file = ChangeEntityDesc.StageIIIFile.SRC;
+//        String type = "update";
+//        addRangesResultList(ranges, cu, file, type);
+//    }
 
     public void addUpdateList(List<Integer[]> ranges, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
@@ -168,12 +169,12 @@ public class StageIIIBean {
         addRangesResultList(ranges, cu, file, type);
     }
 
-    @Deprecated
-    public void addDeleteList(List<Integer[]> ranges, CompilationUnit cu) {
-        String file = ChangeEntityDesc.StageIIIFile.SRC;
-        String type = "delete";
-        addRangesResultList(ranges, cu, file, type);
-    }
+//    @Deprecated
+//    public void addDeleteList(List<Integer[]> ranges, CompilationUnit cu) {
+//        String file = ChangeEntityDesc.StageIIIFile.SRC;
+//        String type = "delete";
+//        addRangesResultList(ranges, cu, file, type);
+//    }
 
     public void addDeleteList(List<Integer[]> ranges, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
@@ -181,27 +182,27 @@ public class StageIIIBean {
         addRangesResultList(ranges, cu, file, type);
     }
 
-    @Deprecated
-    public void addMoveListSrc(Integer[] range, CompilationUnit cu) {
+//    @Deprecated
+//    public void addMoveListSrc(Integer[] range, CompilationUnit cu) {
+//        String file = ChangeEntityDesc.StageIIIFile.SRC;
+//        String type = "move";
+//        addRangeResultList(range, cu, file, type);
+//    }
+
+    public void addMoveListSrc(Integer[] range, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.SRC;
         String type = "move";
         addRangeResultList(range, cu, file, type);
     }
 
-    public void addMoveListSrc(Integer[] range, IASTTranslationUnit cu) {
-        String file = ChangeEntityDesc.StageIIIFile.SRC;
-        String type = "move";
-        addRangeResultList(range, cu, file, type);
-    }
+//    @Deprecated
+//    public void addMoveListDst(Integer[] range, CompilationUnit cu) {
+//        String file = ChangeEntityDesc.StageIIIFile.DST;
+//        String type = "move";
+//        addRangeResultList(range, cu, file, type);
+//    }
 
-    @Deprecated
-    public void addMoveListDst(Integer[] range, CompilationUnit cu) {
-        String file = ChangeEntityDesc.StageIIIFile.DST;
-        String type = "move";
-        addRangeResultList(range, cu, file, type);
-    }
-
-    public void addMoveListDst(Integer[] range, IASTTranslationUnit cu) {
+    public void addMoveListDst(Integer[] range, Object cu) {
         String file = ChangeEntityDesc.StageIIIFile.DST;
         String type = "move";
         addRangeResultList(range, cu, file, type);

@@ -122,7 +122,7 @@ public class MatchIfElse {
 		code.stageIIBean.setGranularity(ChangeEntityDesc.StageIIGranularity.GRANULARITY_STATEMENT);
 		if(a instanceof Move){
 			code.stageIIBean.setOpt(ChangeEntityDesc.StageIIOpt.OPT_CHANGE_MOVE);
-			code.stageIIBean.setChangeEntity(((Tree)a.getNode()).getAstClass().getSimpleName());
+			code.stageIIBean.setChangeEntity(((Tree)a.getNode()).getNode().getClass().getSimpleName());
 		}else {
 			code.stageIIBean.setOpt(ChangeEntityDesc.StageIIOpt.OPT_CHANGE);
 			code.stageIIBean.setChangeEntity(ChangeEntityDesc.StageIIENTITY.ENTITY_IF_STMT);

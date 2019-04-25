@@ -62,7 +62,7 @@ public class ClusterUpDown extends AbstractCluster{
             for(int i=0;i<treeListA.size();i++){
                 ta = treeListA.get(i);
                 tb = treeListB.get(i);
-                if(JavaParserVisitorC.getNodeTypeId(ta.getAstNodeC()) != JavaParserVisitorC.getNodeTypeId(tb.getAstNodeC())){
+                if(Global.util.getNodeTypeId(ta.getNode()) != Global.util.getNodeTypeId(tb.getNode())){
                     flag = 1;
                     break;
                 }
@@ -100,7 +100,7 @@ public class ClusterUpDown extends AbstractCluster{
             int pos = parent.getChildPosition(t);
             posList.add(pos);
             list.add(parent);
-            if(JavaParserVisitorC.getNodeTypeId(parent.getAstNodeC())!=JavaParserVisitorC.BLOCK_SCOPE){
+            if(!Global.util.isBlock(parent.getNode())){
                 break;
             }
         }

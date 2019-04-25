@@ -8,19 +8,15 @@ import edu.fdu.se.base.miningactions.Body.*;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.statement.*;
 import edu.fdu.se.base.miningactions.util.AstRelations;
+import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-import edu.fdu.se.lang.parser.CDTParserFactory;
 import edu.fdu.se.lang.parser.JDTParserFactory;
-import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.jdt.core.dom.*;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class UtilJava implements Util{
     @Override
@@ -254,6 +250,19 @@ public class UtilJava implements Util{
     }
 
     @Override
+    public String BodyDeclarationToString(Object o) {
+        return o.toString();
+    }
+
+    @Override
+    public boolean isIf(Object o){
+        if(getNodeTypeId(o)==ASTNode.IF_STATEMENT){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean isTypeDeclaration(Object o){
         if(o instanceof TypeDeclaration){
             return true;
@@ -279,7 +288,7 @@ public class UtilJava implements Util{
 
     @Override
     public boolean isEnumDeclaration(Object o){
-        IASTNode n = (IASTNode)o;
+        ASTNode n = (ASTNode)o;
         if(n instanceof EnumDeclaration){
             return true;
         }
@@ -322,6 +331,24 @@ public class UtilJava implements Util{
     public boolean isCompilationUnit(Object o){
         ASTNode n = (ASTNode)o;
         if(n instanceof CompilationUnit){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isBlock(Object o){
+        ASTNode n = (ASTNode)o;
+        if(n instanceof Block){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSwitchCase(Object o){
+        ASTNode n = (ASTNode)o;
+        if(n instanceof SwitchCase){
             return true;
         }
         return false;
@@ -376,6 +403,43 @@ public class UtilJava implements Util{
     public Object getMethodType(Object o){
         MethodDeclaration md = (MethodDeclaration)o;
         return md.getReturnType2();
+    }
+
+    @Override
+    public String getTypeName(Object o){
+        TypeDeclaration td = (TypeDeclaration) o;
+        return td.getName().toString();
+    }
+
+    @Override
+    public List<String> getBaseTypeName(Object o){
+        TypeDeclaration td = (TypeDeclaration) o;
+        List<String> s = new ArrayList<String>();
+        List<Type> aa  = td.superInterfaceTypes();
+        for(Type aaa:aa) {
+            s.add(aaa.toString());
+        }
+        if(td.getSuperclassType()!=null) {
+            s.add(td.getSuperclassType().toString());
+        }
+        return s;
+    }
+
+//    @Override
+    public List<Object> getChildren(Object o){
+        return null;
+    }
+
+    @Override
+    public List<Object> getFunctionFromType(Object o){
+        TypeDeclaration n = (TypeDeclaration) o;
+        return Arrays.asList(n.getMethods());
+    }
+
+    @Override
+    public List<Object> getFieldFromType(Object o){
+        TypeDeclaration n = (TypeDeclaration) o;
+        return Arrays.asList(n.getFields());
     }
 
 
@@ -444,7 +508,7 @@ public class UtilJava implements Util{
             case ASTNode.INITIALIZER:
                 break;
             case ASTNode.METHOD_DECLARATION:
-                if (((Tree) a.getNode()).getAstNode().getNodeType() != ASTNode.BLOCK) {
+                if (getNodeTypeId(((Tree) a.getNode()).getNode()) != ASTNode.BLOCK) {
                     MatchMethod.matchMethodSignatureChangeNewEntity(fp, a, queryFather,treeType, traverseFather);
                 }
                 break;
@@ -684,6 +748,152 @@ public class UtilJava implements Util{
                 break;
         }
         return  res;
+    }
+
+    @Override
+    public void matchXXXChangeCurEntity(MiningActionData fp, Action a, ChangeEntity changeEntity, int nodeType, Tree traverseFather){
+        switch (nodeType) {
+            case ASTNode.TYPE_DECLARATION:
+                MatchClass.matchClassSignatureCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.FIELD_DECLARATION:
+                MatchFieldDeclaration.matchFieldDeclarationChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.INITIALIZER:
+                break;
+            case ASTNode.METHOD_DECLARATION:
+                if (!isBlock(((Tree) a.getNode()).getNode())) {
+                    MatchMethod.matchMethodSignatureChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                }
+                break;
+            case ASTNode.ENUM_DECLARATION:
+            case ASTNode.ENUM_CONSTANT_DECLARATION:
+                MatchEnum.matchEnumDeclarationCurrEntity(fp,a,changeEntity,traverseFather);
+                break;
+            case ASTNode.IF_STATEMENT:
+                MatchIfElse.matchIfPredicateChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.FOR_STATEMENT:
+                MatchForStatement.matchForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.WHILE_STATEMENT:
+                MatchWhileStatement.matchWhileConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.DO_STATEMENT:
+                MatchWhileStatement.matchDoConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.ENHANCED_FOR_STATEMENT:
+                MatchForStatement.matchEnhancedForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+                MatchVariableDeclarationExpression.matchVariableDeclarationCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.EXPRESSION_STATEMENT:
+                MatchExpressionStatement.matchExpressionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+
+            case ASTNode.RETURN_STATEMENT:
+                MatchReturnStatement.matchReturnChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.ASSERT_STATEMENT:
+                MatchAssert.matchAssertChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.CATCH_CLAUSE:
+                MatchTry.matchCatchChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.SYNCHRONIZED_STATEMENT:
+                MatchSynchronized.matchSynchronizedChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.SWITCH_STATEMENT:
+                MatchSwitch.matchSwitchCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.SWITCH_CASE:
+                MatchSwitch.matchSwitchCaseCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
+                MatchConstructorInvocation.matchSuperConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
+                break;
+            case ASTNode.CONSTRUCTOR_INVOCATION:
+                MatchConstructorInvocation.matchConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
+                break;
+            case ASTNode.LABELED_STATEMENT:
+                MatchLabeledStatement.matchLabeledStatementCurrEntity(fp,a,changeEntity,traverseFather);
+                break;
+            case ASTNode.THROW_STATEMENT:
+                MatchTry.matchThrowStatementCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    @Override
+    public int getGeneratingExpressionsType(int type){
+        int flag = 0;
+        switch(type){
+
+            case ASTNode.ASSIGNMENT:
+            case ASTNode.CLASS_INSTANCE_CREATION:
+            case ASTNode.CONDITIONAL_EXPRESSION:
+            case ASTNode.CREATION_REFERENCE:
+            case ASTNode.EXPRESSION_METHOD_REFERENCE:
+            case ASTNode.FIELD_ACCESS:
+            case ASTNode.INFIX_EXPRESSION:
+            case ASTNode.INSTANCEOF_EXPRESSION:
+            case ASTNode.LAMBDA_EXPRESSION:
+            case ASTNode.METHOD_INVOCATION:
+            case ASTNode.PARENTHESIZED_EXPRESSION:
+            case ASTNode.POSTFIX_EXPRESSION:
+            case ASTNode.PREFIX_EXPRESSION:
+            case ASTNode.SUPER_FIELD_ACCESS:
+            case ASTNode.SUPER_METHOD_INVOCATION:
+            case ASTNode.SUPER_METHOD_REFERENCE:
+            case ASTNode.THIS_EXPRESSION:
+            case ASTNode.TYPE_METHOD_REFERENCE:
+            case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+            case ASTNode.TYPE_LITERAL:
+                flag = 2; break;
+            case ASTNode.CHARACTER_LITERAL:
+            case ASTNode.BOOLEAN_LITERAL:
+
+            case ASTNode.SIMPLE_NAME:
+            case ASTNode.STRING_LITERAL:
+            case ASTNode.NULL_LITERAL:
+            case ASTNode.NUMBER_LITERAL:
+            case ASTNode.QUALIFIED_NAME:
+                flag = 1;break;
+            default:break;
+        }
+        return flag;
+    }
+
+    @Override
+    public void matchBlock(MiningActionData fp, Action a,int type,Tree fatherNode){
+        switch (type) {
+            case ASTNode.SWITCH_STATEMENT:
+//                MatchSwitch.matchSwitchCaseNewEntity(fp,a);
+                fp.setActionTraversedMap(a);
+                break;
+            case ASTNode.IF_STATEMENT:
+                //Pattern 1.2 Match else
+                if (fatherNode.getChildPosition(a.getNode()) == 2) {
+                    MatchIfElse.matchElse(fp, a);
+                }
+                fp.setActionTraversedMap(a);
+                break;
+            case ASTNode.TRY_STATEMENT:
+                ////Finally块
+                if (fatherNode.getChildPosition(a.getNode()) == fatherNode.getChildren().size() - 1) {
+                    MatchTry.matchFinally(fp, a);
+                }
+                fp.setActionTraversedMap(a);
+                break;
+            default:
+                fp.setActionTraversedMap(a);
+                break;
+        }
+
     }
 
 }

@@ -4,6 +4,7 @@ import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
+import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
@@ -42,9 +43,11 @@ public interface Util {
     int compareTwoFile(FilePairPreDiff preDiff,PreprocessedTempData tempData, PreprocessedData data);
 //    int getNode(BodyDeclarationPair bd);
     String BodyDeclarationPairToString(BodyDeclarationPair pair);
+    String BodyDeclarationToString(Object pair);
 //    void removeSrcRemovelList(Object o, List<Integer> lineList,PreprocessedTempData data);
 //    void removeDstRemovelList(Object o, List<Integer> lineList,PreprocessedTempData data);
 
+    boolean isIf(Object o);
     boolean isTypeDeclaration(Object o);
     boolean isMethodDeclaration(Object o);
     boolean isFieldDeclaration(Object o);
@@ -54,6 +57,8 @@ public interface Util {
     boolean isSingleVariableDeclaration(Object o);
     boolean isLiteral(Tree tree);
     boolean isCompilationUnit(Object o);
+    boolean isBlock(Object o);
+    boolean isSwitchCase(Object o);
     String getMethodName(Object o);
     String getMethodInvocationName(Object o);
     String getClassCreationName(Object o);
@@ -63,14 +68,20 @@ public interface Util {
     String getSingleVariableDeclarationName(Object o);
     String getSingleVariableDeclarationTypeName(Object o);
     Object getMethodType(Object o);
-
+    String getTypeName(Object o);
+    List<String> getBaseTypeName(Object o);
+//    List<Object> getChildren(Object o);
+    List<Object> getFunctionFromType(Object o);
+    List<Object> getFieldFromType(Object o);
 
     void preProcess(PreprocessedTempData tempData);
     Tree findFafatherNode(ITree node);
     void matchNodeNewEntity(MiningActionData fp, Action a, Tree queryFather, int treeType, Tree traverseFather);
+    void matchXXXChangeCurEntity(MiningActionData fp, Action a, ChangeEntity changeEntity, int nodeType, Tree traverseFather);
     String getLocationString(Object node);
 
     Object findExpression(Tree tree);
     int processBigAction(MiningActionData fp,Action a,int type);
-
+    int getGeneratingExpressionsType(int type);
+    void matchBlock(MiningActionData fp, Action a,int type,Tree fatherNode);
 }

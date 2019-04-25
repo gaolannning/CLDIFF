@@ -141,8 +141,8 @@ public class GenerateChangeEntityJson {
         }
 //        CompilationUnit src = mad.preprocessedData.srcCu;
 //        CompilationUnit dst = mad.preprocessedData.dstCu;
-        IASTTranslationUnit src = (IASTTranslationUnit)Global.util.getSrcCu(mad.preprocessedData);
-        IASTTranslationUnit dst = (IASTTranslationUnit) Global.util.getDstCu(mad.preprocessedData);
+        Object src = Global.util.getSrcCu(mad.preprocessedData);
+        Object dst = Global.util.getDstCu(mad.preprocessedData);
         Move mv = (Move) a;
         Tree moveNode = (Tree) mv.getNode();
         Tree movedDstNode = (Tree) mad.getMappedDstOfSrcNode(moveNode);

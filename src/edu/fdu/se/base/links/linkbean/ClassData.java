@@ -3,6 +3,7 @@ package edu.fdu.se.base.links.linkbean;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.actions.model.Move;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
@@ -28,30 +29,33 @@ public class ClassData extends LinkBean {
         fieldType = new MyList<>();
         if(ce.stageIIBean==null
             || ce.stageIIBean.getEntityCreationStage().equals(ChangeEntityDesc.StageIIGenStage.ENTITY_GENERATION_STAGE_PRE_DIFF)){
-            IASTSimpleDeclaration td = (IASTSimpleDeclaration) ce.bodyDeclarationPair.getBodyDeclaration();
-            this.clazzName = ((IASTCompositeTypeSpecifier)td.getDeclSpecifier()).getName().toString();
-            List<IASTNode> aa  = Arrays.asList(((ICPPASTCompositeTypeSpecifier) td.getDeclSpecifier()).getBaseSpecifiers());
-            for(IASTNode aaa:aa) {
-                interfacesAndSuperClazz.add(aaa.toString());
-            }
+            Object td =  ce.bodyDeclarationPair.getBodyDeclaration();
+            this.clazzName = Global.util.getTypeName(td);
+            List<String> aa  = Global.util.getBaseTypeName(td);
+            interfacesAndSuperClazz.addAll(aa);
             //MethodDeclaration[] mehtodss = td.getMethods();
-            IASTNode[] children = td.getChildren();
-            for(IASTNode n :children){
-                if(n instanceof IASTFunctionDefinition) {
-                    IASTFunctionDefinition fd = (IASTFunctionDefinition) n;
-                    methods.add(((IASTFunctionDefinition) n).getDeclarator().getName().toString());
-                }
+            List<Object> funcs = Global.util.getFunctionFromType(td);
+//            IASTNode[] children = td.getChildren();
+            for(Object n :funcs){
+                methods.add(Global.util.getMethodName(n));
+//                if(n instanceof IASTFunctionDefinition) {
+//                    IASTFunctionDefinition fd = (IASTFunctionDefinition) n;
+//                    methods.add(((IASTFunctionDefinition) n).getDeclarator().getName().toString());
+//                }
             }
             //FieldDeclaration[] fielddd = td.getFields();
-            for(IASTNode n:children){
-                if(n instanceof IASTSimpleDeclaration && (((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier ||((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier)){
-                    IASTSimpleDeclaration fd = (IASTSimpleDeclaration) n;
-                    List<IASTDeclarator> mmList = Arrays.asList(fd.getDeclarators());
-                    for (IASTDeclarator vd : mmList) {
-                        fields.add(vd.getName().toString());
-                    }
-                    fieldType.add(fd.getDeclSpecifier().toString());
-                }
+            List<Object> fields = Global.util.getFieldFromType(td);
+            for(Object n:fields){
+                fields.addAll(Global.util.getFieldDeclaratorNames(n));
+                fieldType.add(Global.util.getFieldType(n));
+//                if(n instanceof IASTSimpleDeclaration && (((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTSimpleDeclSpecifier ||((IASTSimpleDeclaration)n).getDeclSpecifier() instanceof IASTNamedTypeSpecifier)){
+//                    IASTSimpleDeclaration fd = (IASTSimpleDeclaration) n;
+//                    List<IASTDeclarator> mmList = Arrays.asList(fd.getDeclarators());
+//                    for (IASTDeclarator vd : mmList) {
+//                        fields.add(vd.getName().toString());
+//                    }
+//                    fieldType.add(fd.getDeclSpecifier().toString());
+//                }
             }
 //            for(FieldDeclaration fdd:fielddd){
 //                List<VariableDeclarationFragment> list = fdd.fragments();
@@ -80,19 +84,16 @@ public class ClassData extends LinkBean {
         Tree tree = (Tree)ce.clusteredActionBean.curAction.getNode();
         List<String> tempinterfacesAndSuperClazz = new MyList<>();
         String tempClassName = null;
-        if(JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC()) == JavaParserVisitorC.TYPE_DECLARATION) {
-            IASTSimpleDeclaration td = (IASTSimpleDeclaration) ce.bodyDeclarationPair.getBodyDeclaration();
-            tempClassName = ((IASTCompositeTypeSpecifier)td.getDeclSpecifier()).getName().toString();
-            List<IASTNode> aa  = Arrays.asList(((ICPPASTCompositeTypeSpecifier) td.getDeclSpecifier()).getBaseSpecifiers());
-            for(IASTNode aaa:aa) {
-                interfacesAndSuperClazz.add(aaa.toString());
-            }
+        if(Global.util.isTypeDeclaration(tree.getNode())) {
+            Object td =  ce.bodyDeclarationPair.getBodyDeclaration();
+            tempClassName = Global.util.getTypeName(td);
+            List<String> aa  = Global.util.getBaseTypeName(td);
+            interfacesAndSuperClazz.addAll(aa);
 
         }
         for(Action a:ce.clusteredActionBean.actions){
             Tree t = (Tree) a.getNode();
-            if (JavaParserVisitorC.getNodeTypeId(t.getAstNodeC()) == JavaParserVisitorC.NAME
-                    || t.getAstNodeC().getClass().getSimpleName().endsWith("Literal")) {
+            if (Global.util.isLiteral(t)) {
                 if(tempinterfacesAndSuperClazz.contains(t.getLabel())){
                     interfacesAndSuperClazz.add(t.getLabel());
                 }

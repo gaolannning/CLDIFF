@@ -3,6 +3,7 @@ package edu.fdu.se.base.miningactions.statement;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.actions.model.Move;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.JavaParserVisitor;
 import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.ChangePacket;
@@ -20,37 +21,37 @@ import java.util.List;
 public class MatchBlock {
 
     public static void matchBlock(MiningActionData fp, Action a) {
-
         Tree fatherNode = (Tree) a.getNode().getParent();
-        int type = JavaParserVisitorC.getNodeTypeId(fatherNode.getAstNodeC());
-        if (a instanceof Move && type != JavaParserVisitorC.IF_STATEMENT) {
+        int type = Global.util.getNodeTypeId(fatherNode.getNode());
+        if (a instanceof Move && !Global.util.isIf(fatherNode.getNode())) {
             handleMoveOnBlock(fp, a);
             fp.setActionTraversedMap(a);
             return;
         }
-        switch (type) {
-            case JavaParserVisitorC.SWITCH_STATEMENT:
-//                MatchSwitch.matchSwitchCaseNewEntity(fp,a);
-                fp.setActionTraversedMap(a);
-                break;
-            case JavaParserVisitorC.IF_STATEMENT:
-                //Pattern 1.2 Match else
-                if (fatherNode.getChildPosition(a.getNode()) == 2) {
-                    MatchIfElse.matchElse(fp, a);
-                }
-                fp.setActionTraversedMap(a);
-                break;
-            case JavaParserVisitorC.TRY_STATEMENT:
-                ////Finally块
-                if (fatherNode.getChildPosition(a.getNode()) == fatherNode.getChildren().size() - 1) {
-                    MatchTry.matchFinally(fp, a);
-                }
-                fp.setActionTraversedMap(a);
-                break;
-            default:
-                fp.setActionTraversedMap(a);
-                break;
-        }
+        Global.util.matchBlock(fp,a,type,fatherNode);
+//        switch (type) {
+//            case JavaParserVisitorC.SWITCH_STATEMENT:
+////                MatchSwitch.matchSwitchCaseNewEntity(fp,a);
+//                fp.setActionTraversedMap(a);
+//                break;
+//            case JavaParserVisitorC.IF_STATEMENT:
+//                //Pattern 1.2 Match else
+//                if (fatherNode.getChildPosition(a.getNode()) == 2) {
+//                    MatchIfElse.matchElse(fp, a);
+//                }
+//                fp.setActionTraversedMap(a);
+//                break;
+//            case JavaParserVisitorC.TRY_STATEMENT:
+//                ////Finally块
+//                if (fatherNode.getChildPosition(a.getNode()) == fatherNode.getChildren().size() - 1) {
+//                    MatchTry.matchFinally(fp, a);
+//                }
+//                fp.setActionTraversedMap(a);
+//                break;
+//            default:
+//                fp.setActionTraversedMap(a);
+//                break;
+//        }
     }
 
     public static void handleMoveOnBlock(MiningActionData fp, Action a) {

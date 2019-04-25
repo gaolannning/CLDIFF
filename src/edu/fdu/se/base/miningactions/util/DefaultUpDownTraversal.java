@@ -3,6 +3,7 @@ package edu.fdu.se.base.miningactions.util;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.ActionConstants;
 import edu.fdu.se.base.generatingactions.JavaParserVisitor;
 import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
@@ -65,7 +66,7 @@ public class DefaultUpDownTraversal extends BasicTreeTraversal{
         int i=0;
         for(;i<children.size();i++){
             Tree t = (Tree) children.get(i);
-            if(t.getAstNode().getNodeType() == ASTNode.BLOCK ){
+            if(Global.util.isBlock(t.getNode()) ){
                 break;
             }
         }
@@ -115,7 +116,7 @@ public class DefaultUpDownTraversal extends BasicTreeTraversal{
         int i=0;
         for(;i<children.size();i++){
             Tree t = (Tree) children.get(i);
-            if(JavaParserVisitorC.getNodeTypeId(t.getAstNodeC())== JavaParserVisitorC.COMPOUND_STATEMENT){
+            if(Global.util.isBlock(t.getNode())){
                 type = 1;
                 break;
             }else if(t.getAstClass().getSimpleName().endsWith("Statement")){

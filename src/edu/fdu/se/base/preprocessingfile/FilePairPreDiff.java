@@ -169,7 +169,7 @@ public class FilePairPreDiff {
                         break;
                     case PreprocessedTempData.BODY_SAME_REMOVE:
                         preprocessedTempData.addToSrcRemoveList(bd);
-                        traversal.traverseTypeDeclarationSetVisited(preprocessedTempData, (TypeDeclaration) bd, bdp.getLocationClassString());
+                        traversal.traverseTypeDeclarationSetVisited(preprocessedTempData,  bd, bdp.getLocationClassString());
                         break;
                 }
             }

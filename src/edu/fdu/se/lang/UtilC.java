@@ -1,6 +1,7 @@
 package edu.fdu.se.lang;
 
 import com.github.gumtreediff.actions.model.Action;
+import com.github.gumtreediff.tree.AbstractTree;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.common.Global;
@@ -10,6 +11,7 @@ import edu.fdu.se.base.miningactions.Body.MatchFieldDeclaration;
 import edu.fdu.se.base.miningactions.Body.MatchMethod;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
 import edu.fdu.se.base.miningactions.statement.*;
+import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
@@ -18,11 +20,13 @@ import edu.fdu.se.lang.generatingactions.CParserVisitor;
 import edu.fdu.se.lang.parser.CDTParserFactory;
 import edu.fdu.se.lang.parser.JDTParserFactory;
 import org.eclipse.cdt.core.dom.ast.*;
+import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTCompositeTypeSpecifier;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTTranslationUnit;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTFunctionCallExpression;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTNewExpression;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTUsingDirective;
 import org.eclipse.cdt.internal.core.model.FunctionDeclaration;
+import org.eclipse.jdt.core.dom.ASTNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -212,6 +216,20 @@ public class UtilC implements Util{
     }
 
     @Override
+    public String BodyDeclarationToString(Object o) {
+        IASTNode node = (IASTNode)o;
+        return node.getRawSignature().toString();
+    }
+
+    @Override
+    public boolean isIf(Object o){
+        if(getNodeTypeId(o)==CParserVisitor.IF_STATEMENT){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public boolean isTypeDeclaration(Object o){
         if(o instanceof IASTTranslationUnit||(o instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration) o).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier)){
             return true;
@@ -286,6 +304,24 @@ public class UtilC implements Util{
         return false;
     }
 
+    @Override
+    public boolean isBlock(Object o){
+        IASTNode n = (IASTNode)o;
+        if(n instanceof IASTCompoundStatement){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSwitchCase(Object o){
+        IASTNode n = (IASTNode)o;
+        if(n instanceof IASTCaseStatement){
+            return true;
+        }
+        return false;
+    }
+
 
 
     @Override
@@ -336,6 +372,55 @@ public class UtilC implements Util{
         return md.getDeclSpecifier();
     }
 
+    @Override
+    public String getTypeName(Object o){
+        IASTSimpleDeclaration sd = (IASTSimpleDeclaration) o;
+        return ((IASTCompositeTypeSpecifier)sd.getDeclSpecifier()).getName().toString();
+    }
+
+    @Override
+    public List<String> getBaseTypeName(Object o){
+        IASTSimpleDeclaration sd = (IASTSimpleDeclaration) o;
+        List<String> s = new ArrayList<String>();
+        List<IASTNode> nodes= Arrays.asList(((ICPPASTCompositeTypeSpecifier)sd.getDeclSpecifier()).getBaseSpecifiers());
+        for(IASTNode node:nodes){
+            s.add(nodes.toString());
+        }
+        return s;
+    }
+
+//    @Override
+    public List<Object> getChildren(Object o){
+        IASTNode n = (IASTNode) o;
+        return Arrays.asList(n.getChildren());
+    }
+
+    @Override
+    public List<Object> getFunctionFromType(Object o){
+        IASTNode n = (IASTNode) o;
+        IASTNode[] nodes = n.getChildren();
+        List<Object> rst = new ArrayList<Object>();
+        for(IASTNode node :nodes){
+            if(node instanceof IASTFunctionDefinition) {
+                rst.add(node);
+            }
+        }
+        return rst;
+    }
+
+    @Override
+    public List<Object> getFieldFromType(Object o){
+        IASTNode n = (IASTNode) o;
+        IASTNode[] nodes = n.getChildren();
+        List<Object> rst = new ArrayList<Object>();
+        for(IASTNode node :nodes){
+            if(isFieldDeclaration(node)) {
+                rst.add(node);
+            }
+        }
+        return rst;
+    }
+
 
     @Override
     public void preProcess(PreprocessedTempData tempData){
@@ -382,6 +467,7 @@ public class UtilC implements Util{
             if(isEnd){
                 break;
             }
+            assert(! (curNode.getParent() instanceof AbstractTree.FakeTree));
 //            try {
             curNode = (Tree) curNode.getParent();
 //            }catch(Exception e){
@@ -439,6 +525,83 @@ public class UtilC implements Util{
             case CParserVisitor.LABELED_STATEMENT:
                 MatchLabeledStatement.matchLabeledStatementNewEntity(fp,a,queryFather,treeType,traverseFather);
                 break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void matchXXXChangeCurEntity(MiningActionData fp, Action a, ChangeEntity changeEntity, int nodeType, Tree traverseFather){
+        switch (nodeType) {
+            case CParserVisitor.TYPE_DECLARATION:
+                MatchClass.matchClassSignatureCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case CParserVisitor.FIELD_DECLARATION:
+                MatchFieldDeclaration.matchFieldDeclarationChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+//            case ASTNode.INITIALIZER:
+//                break;
+            case CParserVisitor.METHOD_DECLARATION:
+                if (!isBlock(((Tree) a.getNode()).getNode())) {
+                    MatchMethod.matchMethodSignatureChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                }
+                break;
+            case CParserVisitor.ENUM_DECLARATION:
+//            case CParserVisitor.ENUM_CONSTANT_DECLARATION:
+                MatchEnum.matchEnumDeclarationCurrEntity(fp,a,changeEntity,traverseFather);
+                break;
+            case CParserVisitor.IF_STATEMENT:
+                MatchIfElse.matchIfPredicateChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case CParserVisitor.FOR_STATEMENT:
+                MatchForStatement.matchForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case CParserVisitor.WHILE_STATEMENT:
+                MatchWhileStatement.matchWhileConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case CParserVisitor.DO_STATEMENT:
+                MatchWhileStatement.matchDoConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+//            case CParserVisitor.ENHANCED_FOR_STATEMENT:
+//                MatchForStatement.matchEnhancedForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case CParserVisitor.VARIABLE_DECLARATION_STATEMENT:
+//                MatchVariableDeclarationExpression.matchVariableDeclarationCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+            case CParserVisitor.EXPRESSION_STATEMENT:
+                MatchExpressionStatement.matchExpressionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+
+            case CParserVisitor.RETURN_STATEMENT:
+                MatchReturnStatement.matchReturnChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+//            case CParserVisitor.ASSERT_STATEMENT:
+//                MatchAssert.matchAssertChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+            case CParserVisitor.CATCH_CLAUSE:
+                MatchTry.matchCatchChangeCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+//            case CParserVisitor.SYNCHRONIZED_STATEMENT:
+//                MatchSynchronized.matchSynchronizedChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+            case CParserVisitor.SWITCH_STATEMENT:
+                MatchSwitch.matchSwitchCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+            case CParserVisitor.SWITCH_CASE:
+                MatchSwitch.matchSwitchCaseCurrEntity(fp, a, changeEntity, traverseFather);
+                break;
+//            case CParserVisitor.SUPER_CONSTRUCTOR_INVOCATION:
+//                MatchConstructorInvocation.matchSuperConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
+//                break;
+//            case CParserVisitor.CONSTRUCTOR_INVOCATION:
+//                MatchConstructorInvocation.matchConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
+//                break;
+            case CParserVisitor.LABELED_STATEMENT:
+                MatchLabeledStatement.matchLabeledStatementCurrEntity(fp,a,changeEntity,traverseFather);
+                break;
+//            case CParserVisitor.THROW_STATEMENT:
+//                MatchTry.matchThrowStatementCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
             default:
                 break;
         }
@@ -557,6 +720,57 @@ public class UtilC implements Util{
                 break;
         }
         return  res;
+    }
+
+    // To Do
+    @Override
+    public int getGeneratingExpressionsType(int type){
+        int flag = 0;
+        switch(type){
+            case CParserVisitor.EQUALS_INITIALIZER:
+            case CParserVisitor.ASSIGNMENT:
+            case CParserVisitor.NEW_EXPRESSION:
+            case CParserVisitor.CONDITIONAL_EXPRESSION:
+            case CParserVisitor.FIELD_REFERENCE:
+            case CParserVisitor.LAMBDA_EXPRESSION:
+            case CParserVisitor.FUNCTION_CALL_EXPRESSION:
+                flag = 2; break;
+
+
+            case CParserVisitor.NAME:
+            case CParserVisitor.LITERAL_EXPRESSION:
+                flag = 1;break;
+            default:break;
+        }
+        return flag;
+
+    }
+
+    @Override
+    public void matchBlock(MiningActionData fp, Action a,int type,Tree fatherNode){
+        switch (type) {
+            case CParserVisitor.SWITCH_STATEMENT:
+//                MatchSwitch.matchSwitchCaseNewEntity(fp,a);
+                fp.setActionTraversedMap(a);
+                break;
+            case CParserVisitor.IF_STATEMENT:
+                //Pattern 1.2 Match else
+                if (fatherNode.getChildPosition(a.getNode()) == 2) {
+                    MatchIfElse.matchElse(fp, a);
+                }
+                fp.setActionTraversedMap(a);
+                break;
+            case CParserVisitor.TRY_STATEMENT:
+                ////Finally块
+                if (fatherNode.getChildPosition(a.getNode()) == fatherNode.getChildren().size() - 1) {
+                    MatchTry.matchFinally(fp, a);
+                }
+                fp.setActionTraversedMap(a);
+                break;
+            default:
+                fp.setActionTraversedMap(a);
+                break;
+        }
     }
 
 }

@@ -184,80 +184,81 @@ public class MatchNonStatement {
 
     public static void matchXXXChangeCurEntity(MiningActionData fp, Action a, ChangeEntity changeEntity, Tree traverseFather) {
         Tree queryFather = (Tree) changeEntity.clusteredActionBean.fafather;
-        int nodeType = JavaParserVisitorC.getNodeTypeId(queryFather.getAstNodeC());
-        switch (nodeType) {
-            case ASTNode.TYPE_DECLARATION:
-                MatchClass.matchClassSignatureCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.FIELD_DECLARATION:
-                MatchFieldDeclaration.matchFieldDeclarationChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.INITIALIZER:
-                break;
-            case ASTNode.METHOD_DECLARATION:
-                if (((Tree) a.getNode()).getAstNode().getNodeType() != ASTNode.BLOCK) {
-                    MatchMethod.matchMethodSignatureChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                }
-                break;
-            case ASTNode.ENUM_DECLARATION:
-            case ASTNode.ENUM_CONSTANT_DECLARATION:
-                MatchEnum.matchEnumDeclarationCurrEntity(fp,a,changeEntity,traverseFather);
-                break;
-            case ASTNode.IF_STATEMENT:
-                MatchIfElse.matchIfPredicateChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.FOR_STATEMENT:
-                MatchForStatement.matchForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.WHILE_STATEMENT:
-                MatchWhileStatement.matchWhileConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.DO_STATEMENT:
-                MatchWhileStatement.matchDoConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.ENHANCED_FOR_STATEMENT:
-                MatchForStatement.matchEnhancedForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-                MatchVariableDeclarationExpression.matchVariableDeclarationCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.EXPRESSION_STATEMENT:
-                MatchExpressionStatement.matchExpressionChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-
-            case ASTNode.RETURN_STATEMENT:
-                MatchReturnStatement.matchReturnChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.ASSERT_STATEMENT:
-                MatchAssert.matchAssertChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.CATCH_CLAUSE:
-                MatchTry.matchCatchChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.SYNCHRONIZED_STATEMENT:
-                MatchSynchronized.matchSynchronizedChangeCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.SWITCH_STATEMENT:
-                MatchSwitch.matchSwitchCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.SWITCH_CASE:
-                MatchSwitch.matchSwitchCaseCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
-                MatchConstructorInvocation.matchSuperConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
-                break;
-            case ASTNode.CONSTRUCTOR_INVOCATION:
-                MatchConstructorInvocation.matchConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
-                break;
-            case ASTNode.LABELED_STATEMENT:
-                MatchLabeledStatement.matchLabeledStatementCurrEntity(fp,a,changeEntity,traverseFather);
-                break;
-            case ASTNode.THROW_STATEMENT:
-                MatchTry.matchThrowStatementCurrEntity(fp, a, changeEntity, traverseFather);
-                break;
-            default:
-                break;
-        }
+        int nodeType = Global.util.getNodeTypeId(queryFather.getNode());
+        Global.util.matchXXXChangeCurEntity(fp,a,changeEntity,nodeType,traverseFather);
+//        switch (nodeType) {
+//            case ASTNode.TYPE_DECLARATION:
+//                MatchClass.matchClassSignatureCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.FIELD_DECLARATION:
+//                MatchFieldDeclaration.matchFieldDeclarationChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.INITIALIZER:
+//                break;
+//            case ASTNode.METHOD_DECLARATION:
+//                if (((Tree) a.getNode()).getAstNode().getNodeType() != ASTNode.BLOCK) {
+//                    MatchMethod.matchMethodSignatureChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                }
+//                break;
+//            case ASTNode.ENUM_DECLARATION:
+//            case ASTNode.ENUM_CONSTANT_DECLARATION:
+//                MatchEnum.matchEnumDeclarationCurrEntity(fp,a,changeEntity,traverseFather);
+//                break;
+//            case ASTNode.IF_STATEMENT:
+//                MatchIfElse.matchIfPredicateChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.FOR_STATEMENT:
+//                MatchForStatement.matchForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.WHILE_STATEMENT:
+//                MatchWhileStatement.matchWhileConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.DO_STATEMENT:
+//                MatchWhileStatement.matchDoConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.ENHANCED_FOR_STATEMENT:
+//                MatchForStatement.matchEnhancedForConditionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+//                MatchVariableDeclarationExpression.matchVariableDeclarationCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.EXPRESSION_STATEMENT:
+//                MatchExpressionStatement.matchExpressionChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//
+//            case ASTNode.RETURN_STATEMENT:
+//                MatchReturnStatement.matchReturnChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.ASSERT_STATEMENT:
+//                MatchAssert.matchAssertChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.CATCH_CLAUSE:
+//                MatchTry.matchCatchChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.SYNCHRONIZED_STATEMENT:
+//                MatchSynchronized.matchSynchronizedChangeCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.SWITCH_STATEMENT:
+//                MatchSwitch.matchSwitchCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.SWITCH_CASE:
+//                MatchSwitch.matchSwitchCaseCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
+//                MatchConstructorInvocation.matchSuperConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
+//                break;
+//            case ASTNode.CONSTRUCTOR_INVOCATION:
+//                MatchConstructorInvocation.matchConstructorInvocationCurrEntity(fp,a,changeEntity,traverseFather);
+//                break;
+//            case ASTNode.LABELED_STATEMENT:
+//                MatchLabeledStatement.matchLabeledStatementCurrEntity(fp,a,changeEntity,traverseFather);
+//                break;
+//            case ASTNode.THROW_STATEMENT:
+//                MatchTry.matchThrowStatementCurrEntity(fp, a, changeEntity, traverseFather);
+//                break;
+//            default:
+//                break;
+//        }
 
 
     }

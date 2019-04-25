@@ -8,13 +8,14 @@ import org.eclipse.cdt.core.dom.IName;
 import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.core.dom.ast.c.ICASTDesignator;
 import org.eclipse.cdt.core.dom.ast.cpp.*;
-import org.eclipse.cdt.internal.core.dom.parser.ASTNode;
 import org.eclipse.cdt.internal.core.dom.parser.c.CASTExpressionStatement;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.*;
 
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 
 /**
  * Created by huangkaifeng on 2018/1/23.
@@ -379,6 +380,12 @@ public class CParserVisitor  extends ASTVisitor {
     public static final int NEW_EXPRESSION = 25;
     public static final int CONSTRUCTOR_INITIALIZER = 26;
     public static final int BINARY_EXPRESSION = 27;
+    public static final int ASSIGNMENT = 28;
+    public static final int CONDITIONAL_EXPRESSION = 29;
+    public static final int FIELD_REFERENCE = 30;
+    public static final int LAMBDA_EXPRESSION = 31;
+    public static final int LITERAL_EXPRESSION = 32;
+
 
     public static int getNodeTypeId(IASTNode n){
 //        if(n instanceof IASTCompoundStatement){
@@ -467,7 +474,22 @@ public class CParserVisitor  extends ASTVisitor {
             return CONSTRUCTOR_INITIALIZER;
         }
         if(n instanceof IASTBinaryExpression){
+            if(((IASTBinaryExpression) n).getOperator() == 17){
+                return ASSIGNMENT;
+            }
             return BINARY_EXPRESSION;
+        }
+        if(n instanceof IASTConditionalExpression){
+            return CONDITIONAL_EXPRESSION;
+        }
+        if(n instanceof IASTFieldReference){
+            return FIELD_REFERENCE;
+        }
+        if(n instanceof CPPASTLambdaExpression){
+            return LAMBDA_EXPRESSION;
+        }
+        if(n instanceof IASTLiteralExpression) {
+            return LITERAL_EXPRESSION;
         }
 
         return UNKNOWN;

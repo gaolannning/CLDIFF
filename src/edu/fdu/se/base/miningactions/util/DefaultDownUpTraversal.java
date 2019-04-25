@@ -3,6 +3,7 @@ package edu.fdu.se.base.miningactions.util;
 import com.github.gumtreediff.actions.model.Action;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
+import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.ActionConstants;
 import edu.fdu.se.base.generatingactions.JavaParserVisitorC;
 import edu.fdu.se.base.miningactions.bean.ChangePacket;
@@ -27,8 +28,12 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         List<ITree> children = node.getChildren();
         for(ITree child :children){
             Tree tmp = (Tree) child;
-            if(true||
-                    JavaParserVisitorC.getNodeTypeId(tmp.getAstNodeC()) == JavaParserVisitorC.NAME){
+            //to Do
+//            if(tmp.getAstNode().getNodeType()== ASTNode.MODIFIER ||
+//                    tmp.getAstNode().getNodeType() == ASTNode.SIMPLE_NAME ||
+//                    tmp.getAstNode().getNodeType() == ASTNode.PARAMETERIZED_TYPE||
+//                    tmp.getAstNode().getNodeType() == ASTNode.SIMPLE_TYPE){
+            if(false){
                 traverseNodeSubTree(tmp,result1,changePacket.getChangeSet1());
             }
         }
@@ -43,7 +48,7 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         List<ITree> children = node.getChildren();
         for(ITree child:children){
             Tree tmp = (Tree) child;
-            if(JavaParserVisitorC.getNodeTypeId(tmp.getAstNodeC()) == JavaParserVisitorC.COMPOUND_STATEMENT){
+            if(Global.util.isBlock(tmp.getNode())){
                 break;
             }
             traverseNodeSubTree(tmp,result1,changePacket.getChangeSet1());
@@ -64,7 +69,7 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
     }
 
     public static void traverseIfPredicate(Tree node,List<Action> result1,ChangePacket changePacket){
-        assert(node.getDoAction() == null);
+//        assert(node.getDoAction() == null);
         if(changePacket.getChangeSet1()==null){
             changePacket.initChangeSet1();
         }
@@ -73,7 +78,7 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         int i;
         for(i =0;i<children.size();i++){
             Tree tmp = (Tree) children.get(i);
-            if(JavaParserVisitorC.getNodeTypeId(tmp.getAstNodeC()) == JavaParserVisitorC.COMPOUND_STATEMENT){
+            if(Global.util.isBlock(tmp.getNode())){
                 break;
             }
         }
@@ -105,7 +110,7 @@ public class DefaultDownUpTraversal extends BasicTreeTraversal{
         List<ITree> children = node.getChildren();
         for(ITree tmp:children){
             Tree tmp2 = (Tree) tmp;
-            if(tmp2.getAstNode().getNodeType() == ASTNode.SWITCH_CASE){
+            if(Global.util.isSwitchCase(tmp2.getNode())){
                 break;
             }
             traverseOneType(node,result,changePacket);

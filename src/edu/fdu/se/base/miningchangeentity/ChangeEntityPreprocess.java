@@ -91,43 +91,9 @@ public class ChangeEntityPreprocess {
     public void generatingExpressions(List<Action> actions,StageIIBean bean){
         for(Action a:actions){
             Tree tree = (Tree) a.getNode();
-            int nodeType = JavaParserVisitorC.getNodeTypeId(tree.getAstNodeC());
+            int nodeType = Global.util.getNodeTypeId(tree.getNode());
 //            System.out.println(tree.getAstNode());
-            int flag = 0;
-            switch(nodeType){
-
-                case ASTNode.ASSIGNMENT:
-                case ASTNode.CLASS_INSTANCE_CREATION:
-                case ASTNode.CONDITIONAL_EXPRESSION:
-                case ASTNode.CREATION_REFERENCE:
-                case ASTNode.EXPRESSION_METHOD_REFERENCE:
-                case ASTNode.FIELD_ACCESS:
-                case ASTNode.INFIX_EXPRESSION:
-                case ASTNode.INSTANCEOF_EXPRESSION:
-                case ASTNode.LAMBDA_EXPRESSION:
-                case ASTNode.METHOD_INVOCATION:
-                case ASTNode.PARENTHESIZED_EXPRESSION:
-                case ASTNode.POSTFIX_EXPRESSION:
-                case ASTNode.PREFIX_EXPRESSION:
-                case ASTNode.SUPER_FIELD_ACCESS:
-                case ASTNode.SUPER_METHOD_INVOCATION:
-                case ASTNode.SUPER_METHOD_REFERENCE:
-                case ASTNode.THIS_EXPRESSION:
-                case ASTNode.TYPE_METHOD_REFERENCE:
-                case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
-                case ASTNode.TYPE_LITERAL:
-                flag = 2; break;
-                case ASTNode.CHARACTER_LITERAL:
-                case ASTNode.BOOLEAN_LITERAL:
-
-                case ASTNode.SIMPLE_NAME:
-                case ASTNode.STRING_LITERAL:
-                case ASTNode.NULL_LITERAL:
-                case ASTNode.NUMBER_LITERAL:
-                case ASTNode.QUALIFIED_NAME:
-                flag = 1;break;
-                default:break;
-            }
+            int flag = Global.util.getGeneratingExpressionsType(nodeType);
             if(flag==1){
                 String name =a.getClass().getSimpleName();
                 String exp = null;
@@ -145,7 +111,7 @@ public class ChangeEntityPreprocess {
                 bean.addOpt2AndOpt2Expression(name,exp);
             }else if(flag ==2){
                 String name =a.getClass().getSimpleName();
-                String exp = tree.getAstNodeC().getClass().getSimpleName();
+                String exp = tree.getNode().getClass().getSimpleName();
 //            	System.out.println("-------------------------"+tree.getAstNode().getNodeType());
 //                System.out.println("-------------------------"+name+"  "+exp);
                 bean.addOpt2AndOpt2Expression(name,exp);
