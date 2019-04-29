@@ -4,8 +4,7 @@ package edu.fdu.se.lang.java.preprocess;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-import edu.fdu.se.lang.DstBodyCheckJava;
-import edu.fdu.se.lang.TypeNodesTraversal;
+import edu.fdu.se.lang.common.preprocess.TypeNodesTraversal;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.List;

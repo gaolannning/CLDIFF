@@ -9,12 +9,7 @@ import edu.fdu.se.base.miningactions.util.BasicTreeTraversal;
 import edu.fdu.se.base.miningactions.util.MyList;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
 import edu.fdu.se.base.miningchangeentity.member.MethodChangeEntity;
-import edu.fdu.se.lang.generatingactions.CParserVisitor;
-import org.eclipse.cdt.core.dom.ast.*;
-import org.eclipse.cdt.internal.core.model.FunctionDeclaration;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+
 
 import java.util.Arrays;
 import java.util.List;

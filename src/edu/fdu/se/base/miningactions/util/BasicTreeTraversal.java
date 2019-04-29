@@ -7,10 +7,10 @@ import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.Tree;
 import edu.fdu.se.base.common.Global;
 import edu.fdu.se.base.generatingactions.ActionConstants;
-import edu.fdu.se.lang.generatingactions.CParserVisitor;
+
 import edu.fdu.se.base.miningactions.bean.ChangePacket;
 import edu.fdu.se.base.miningactions.bean.MiningActionData;
-import org.eclipse.jdt.core.dom.ASTNode;
+
 
 import java.util.List;
 

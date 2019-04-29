@@ -1,7 +1,6 @@
 package edu.fdu.se.base.preprocessingfile;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -12,8 +11,7 @@ import org.eclipse.jdt.core.dom.*;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-
-import edu.fdu.se.lang.TypeNodesTraversal;
+import edu.fdu.se.lang.common.preprocess.TypeNodesTraversal;
 
 /**
  * 两个文件 预处理
@@ -152,7 +150,7 @@ public class FilePairPreDiff {
             Object bd = bdp.getBodyDeclaration();
             TypeNodesTraversal traversal= null;
             try {
-                Class clazz = Class.forName("edu.fdu.se.lang.TypeNodesTraversal" + Global.lang);
+                Class clazz = Class.forName("edu.fdu.se.lang."+Global.lang.toLowerCase()+".preprocess.TypeNodesTraversal" + Global.lang);
                 traversal = (TypeNodesTraversal) clazz.newInstance();
             }catch(Exception e){
                 assert(traversal!=null);

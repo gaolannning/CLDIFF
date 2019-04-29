@@ -8,8 +8,6 @@ import edu.fdu.se.base.preprocessingfile.PreprocessUtil;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-import edu.fdu.se.lang.DstBodyCheck;
-import edu.fdu.se.lang.TypeNodesTraversalJava;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.ArrayList;
@@ -19,7 +17,7 @@ import java.util.List;
  * Created by huangkaifeng on 2018/4/2.
  *
  */
-public class DstBodyCheckJava implements DstBodyCheck{
+public class DstBodyCheckJava {
 
     public BodyDeclarationPair getExactBodyDeclarationPair(List<BodyDeclarationPair> bodyDeclarationPairs,Class clazz){
         for(BodyDeclarationPair bodyDeclarationPair:bodyDeclarationPairs){

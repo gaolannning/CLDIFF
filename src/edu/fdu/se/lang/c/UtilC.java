@@ -16,10 +16,9 @@ import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-import edu.fdu.se.lang.TypeNodesTraversalC;
-import edu.fdu.se.lang.Util;
-import edu.fdu.se.lang.generatingactions.CParserVisitor;
-import edu.fdu.se.lang.parser.CDTParserFactory;
+import edu.fdu.se.lang.c.generatingactions.CParserVisitor;
+import edu.fdu.se.lang.c.preprocess.TypeNodesTraversalC;
+import edu.fdu.se.lang.common.Util;
 import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTCompositeTypeSpecifier;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTTranslationUnit;
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UtilC implements Util{
+public class UtilC implements Util {
     @Override
     public IASTTranslationUnit getSrcCu(PreprocessedData data){
         return (IASTTranslationUnit) data.getSrcCu();

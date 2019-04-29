@@ -5,8 +5,7 @@ import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
 import edu.fdu.se.cldiff.CUtil;
-import edu.fdu.se.lang.DstBodyCheckC;
-import edu.fdu.se.lang.TypeNodesTraversal;
+import edu.fdu.se.lang.common.preprocess.TypeNodesTraversal;
 import org.eclipse.cdt.core.dom.ast.*;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTUsingDirective;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPASTVisibilityLabel;
@@ -18,7 +17,7 @@ import java.util.List;
  * Created by huangkaifeng on 2018/3/12.
  *
  */
-public class TypeNodesTraversalC implements TypeNodesTraversal{
+public class TypeNodesTraversalC implements TypeNodesTraversal {
 
     private DstBodyCheckC dstBodyCheck;
 

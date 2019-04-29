@@ -11,10 +11,9 @@ import edu.fdu.se.base.links.similarity.TreeDistance;
 import edu.fdu.se.base.miningchangeentity.ChangeEntityData;
 import edu.fdu.se.base.preprocessingfile.data.FileOutputLog;
 import edu.fdu.se.fileutil.FileUtil;
-import edu.fdu.se.lang.Util;
+import edu.fdu.se.lang.common.Util;
 import edu.fdu.se.server.Meta;
 import edu.fdu.se.server.CommitFile;
-import org.eclipse.jgit.internal.storage.file.GlobalAttributesNode;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -91,7 +90,7 @@ public class CLDiffAPI {
             try {
 //                Class clazz = Class.forName("edu.fdu.se.lang.Util" + Global.lang);
 //                Util util = (Util)clazz.newInstance();
-                Global.util = (Util)Class.forName("edu.fdu.se.lang.Util" + Global.lang).newInstance();
+                Global.util = (Util) Class.forName("edu.fdu.se.lang."+Global.lang.toLowerCase()+".Util" + Global.lang).newInstance();
             }catch (Exception e){
                 assert(false);
             }
@@ -120,7 +119,7 @@ public class CLDiffAPI {
             try {
 //                Class clazz = Class.forName("edu.fdu.se.lang.Util" + Global.lang);
 //                Util util = (Util)clazz.newInstance();
-                Global.util = (Util)Class.forName("edu.fdu.se.lang.Util" + Global.lang).newInstance();
+                Global.util = (Util)Class.forName("edu.fdu.se.lang."+Global.lang.toLowerCase()+".Util" + Global.lang).newInstance();
             }catch (Exception e){
                 assert(false);
             }

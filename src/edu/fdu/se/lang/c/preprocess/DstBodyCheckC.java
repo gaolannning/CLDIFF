@@ -4,8 +4,6 @@ import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
 import edu.fdu.se.cldiff.CUtil;
-import edu.fdu.se.lang.DstBodyCheck;
-import edu.fdu.se.lang.TypeNodesTraversalC;
 import org.eclipse.cdt.core.dom.ast.*;
 
 import java.util.Arrays;
@@ -15,7 +13,7 @@ import java.util.List;
  * Created by huangkaifeng on 2018/4/2.
  *
  */
-public class DstBodyCheckC implements DstBodyCheck{
+public class DstBodyCheckC {
 
 //    public BodyDeclarationPair getExactBodyDeclarationPair(List<BodyDeclarationPairC> bodyDeclarationPairs,Class clazz){
 //        for(BodyDeclarationPair bodyDeclarationPair:bodyDeclarationPairs){

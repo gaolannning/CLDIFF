@@ -1,10 +1,8 @@
 package edu.fdu.se.base.common;
 
 import edu.fdu.se.base.miningchangeentity.ChangeEntityData;
-import edu.fdu.se.base.preprocessingfile.data.PreprocessedDataC;
-import edu.fdu.se.lang.Util;
+import edu.fdu.se.lang.common.Util;
 import edu.fdu.se.server.Meta;
-import org.eclipse.cdt.core.dom.ast.IASTNode;
 
 import java.util.List;
 import java.util.Map;

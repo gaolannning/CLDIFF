@@ -13,7 +13,7 @@ import edu.fdu.se.base.generatingactions.GeneratingActionsData;
 import edu.fdu.se.base.generatingactions.GumTreeDiffParser;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntity;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
-import edu.fdu.se.lang.generatingactions.ParserTreeGenerator;
+import edu.fdu.se.lang.common.generatingactions.ParserTreeGenerator;
 
 public class MiningActionData {
 

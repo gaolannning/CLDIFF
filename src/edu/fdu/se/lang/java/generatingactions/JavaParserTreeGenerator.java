@@ -4,8 +4,7 @@ import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.TreeContext;
 import edu.fdu.se.base.miningchangeentity.base.ChangeEntityDesc;
-import edu.fdu.se.lang.generatingactions.JavaParserVisitor;
-import edu.fdu.se.lang.generatingactions.ParserTreeGenerator;
+import edu.fdu.se.lang.common.generatingactions.ParserTreeGenerator;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 

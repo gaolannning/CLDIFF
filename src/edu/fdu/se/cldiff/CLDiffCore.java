@@ -20,7 +20,7 @@ import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempDataC;
 import edu.fdu.se.base.webapi.GenerateChangeEntityJson;
 import edu.fdu.se.config.ProjectProperties;
 import edu.fdu.se.config.PropertyKeys;
-import edu.fdu.se.lang.generatingactions.ParserTreeGenerator;
+import edu.fdu.se.lang.common.generatingactions.ParserTreeGenerator;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.json.JSONArray;
 
@@ -114,7 +114,7 @@ public class CLDiffCore {
         Global.util.preProcess(preTempDataC);;
         ParserTreeGenerator parserTreeGenerator = null;
         try{
-            Class clazz= Class.forName("edu.fdu.se.lang.generatingactions."+Global.lang+"ParserTreeGenerator");
+            Class clazz= Class.forName("edu.fdu.se.lang."+Global.lang.toLowerCase()+".generatingactions."+Global.lang+"ParserTreeGenerator");
             Class[] argClazz = {Object.class,Object.class};
             Object src = Global.util.getSrcCu(preData);
             Object dst = Global.util.getDstCu(preData);

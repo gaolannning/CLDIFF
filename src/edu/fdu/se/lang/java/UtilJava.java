@@ -13,14 +13,13 @@ import edu.fdu.se.base.preprocessingfile.FilePairPreDiff;
 import edu.fdu.se.base.preprocessingfile.data.BodyDeclarationPair;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedData;
 import edu.fdu.se.base.preprocessingfile.data.PreprocessedTempData;
-import edu.fdu.se.lang.TypeNodesTraversalJava;
-import edu.fdu.se.lang.Util;
-import edu.fdu.se.lang.parser.JDTParserFactory;
+import edu.fdu.se.lang.common.Util;
+import edu.fdu.se.lang.java.preprocess.TypeNodesTraversalJava;
 import org.eclipse.jdt.core.dom.*;
 
 import java.util.*;
 
-public class UtilJava implements Util{
+public class UtilJava implements Util {
     @Override
     public CompilationUnit getSrcCu(PreprocessedData data){ return (CompilationUnit) data.getSrcCu(); }
 
