@@ -337,6 +337,7 @@ public class CParserVisitor extends ASTVisitor {
         if (n instanceof IASTTranslationUnit) return "*TranslationUnit*";
         if (n instanceof IASTLiteralExpression) return String.valueOf(((IASTLiteralExpression) n).getValue());
         if (n instanceof IASTBinaryExpression) return String.valueOf(((IASTBinaryExpression)n).getOperator());
+        if(n instanceof  IASTUnaryExpression) return String.valueOf(((IASTUnaryExpression) n).getOperator());
 //        if (n instanceof StringLiteral) return ((StringLiteral) n).getEscapedValue();
 //        if (n instanceof NumberLiteral) return ((NumberLiteral) n).getToken();
 //        if (n instanceof CharacterLiteral) return ((CharacterLiteral) n).getEscapedValue();
@@ -382,7 +383,7 @@ public class CParserVisitor extends ASTVisitor {
     public static final int FIELD_REFERENCE = 30;
     public static final int LAMBDA_EXPRESSION = 31;
     public static final int LITERAL_EXPRESSION = 32;
-
+    public static final int UNARY_EXPRESSION = 33;
 
     public static int getNodeTypeId(IASTNode n){
 //        if(n instanceof IASTCompoundStatement){
@@ -487,6 +488,9 @@ public class CParserVisitor extends ASTVisitor {
         }
         if(n instanceof IASTLiteralExpression) {
             return LITERAL_EXPRESSION;
+        }
+        if(n instanceof IASTUnaryExpression) {
+            return UNARY_EXPRESSION;
         }
 
         return UNKNOWN;

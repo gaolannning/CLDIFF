@@ -50,6 +50,9 @@ public class TypeNodesTraversalC implements TypeNodesTraversal {
         for (int i = nodeList.size() - 1; i >= 0; i--) {
             IASTNode node = nodeList.get(i);
             if (CUtil.isTypeDeclaration(node)) {
+                int c;
+                if(CUtil.getTypeName(node).equals("rd_kafka_property"))
+                    c = 1;
                 IASTSimpleDeclaration cod2 = ( IASTSimpleDeclaration) node;
                 String kind = CUtil.getTypeKind(node);
                 String name = kind+CUtil.getTypeName(node);
@@ -103,11 +106,13 @@ public class TypeNodesTraversalC implements TypeNodesTraversal {
             if (CUtil.isTypeDeclaration(n)) {
                 IASTSimpleDeclaration next = (IASTSimpleDeclaration) n;
                 String name = CUtil.getTypeName(n);
-                BodyDeclarationPair bdp = new BodyDeclarationPair(n, prefixClassName+name+".");
+                int type = ((IASTCompositeTypeSpecifier)(next.getDeclSpecifier())).getKey();
+                String curName = prefixClassName+(type==3?"class:":"struct:")+name+".";
+                BodyDeclarationPair bdp = new BodyDeclarationPair(n, curName);
                 if (compareCache.srcNodeVisitingMap.containsKey(bdp)) {
                     compareCache.setBodySrcNodeMap(bdp, PreprocessedTempData.BODY_FATHERNODE_REMOVE);
                 }
-                traverseTypeDeclarationSetVisited(compareCache, next, prefixClassName + name+".");
+                traverseTypeDeclarationSetVisited(compareCache, next, curName);
             }else {
                 BodyDeclarationPair bdp = new BodyDeclarationPair(n, prefixClassName);
                 if (compareCache.srcNodeVisitingMap.containsKey(bdp)) {
@@ -138,6 +143,9 @@ public class TypeNodesTraversalC implements TypeNodesTraversal {
             IASTNode bodyDeclaration = nodeList.get(i);
             //class or struct
             if (bodyDeclaration instanceof IASTSimpleDeclaration && ((IASTSimpleDeclaration)bodyDeclaration).getDeclSpecifier() instanceof IASTCompositeTypeSpecifier) {
+                int c;
+                if(CUtil.getTypeName(bodyDeclaration).equals(""))
+                    c = 1;
                 IASTSimpleDeclaration cod2 = (IASTSimpleDeclaration) bodyDeclaration;
                 String name = CUtil.getTypeName(cod2);
                 String type = CUtil.getTypeKind(cod2);    //key = 3表示class,key = 1表示struct

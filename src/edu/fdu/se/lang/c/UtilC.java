@@ -207,6 +207,29 @@ public class UtilC implements Util {
         return 0;
     }
 
+//    private void addSuperClass(IASTSimpleDeclaration type,List<String> list){
+//        List<Type> aa  = type.superInterfaceTypes();
+//        List<ASTNode> modifiers = type.modifiers();
+//        ((IASTCompositeTypeSpecifier)type.getDeclSpecifier()).getMembers();
+//        for(ASTNode node:modifiers){
+//            if(node instanceof Modifier){
+//                Modifier modifier = (Modifier)node;
+//                if(modifier.toString().equals("abstract")){
+//                    list.add("abstract---"+type.getName().toString());
+//                }
+//            }
+//        }
+//        if(aa!=null) {
+//            for (Type aaa : aa) {
+//                list.add("interface---"+aaa.toString());
+//            }
+//        }
+//
+//        if(type.getSuperclassType()!=null) {
+//            list.add("superclass---"+type.getSuperclassType().toString());
+//        }
+//    }
+
     @Override
     public String BodyDeclarationPairToString(BodyDeclarationPair pair) {
         String result = pair.getLocationClassString() +" ";
@@ -732,6 +755,8 @@ public class UtilC implements Util {
             case CParserVisitor.FIELD_REFERENCE:
             case CParserVisitor.LAMBDA_EXPRESSION:
             case CParserVisitor.FUNCTION_CALL_EXPRESSION:
+            case CParserVisitor.BINARY_EXPRESSION:
+            case CParserVisitor.UNARY_EXPRESSION:
                 flag = 2; break;
 
 

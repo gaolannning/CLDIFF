@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Created by huangkaifeng on 2018/1/18.
